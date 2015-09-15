@@ -35,7 +35,7 @@
 
 namespace MyNixWorld;
 
-define ( "JS_NAMESPACE" , "js55f82caaae905" );
+define ( "JS_NAMESPACE" , "js55f846e1d1da3" );
 define('ROOT_PATH',dirname(__FILE__).DIRECTORY_SEPARATOR);
 define('TMP_PATH',ROOT_PATH.'tmp'.DIRECTORY_SEPARATOR);
 define('LOGS_PATH',TMP_PATH.'logs'.DIRECTORY_SEPARATOR);

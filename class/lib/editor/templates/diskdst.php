@@ -40,7 +40,7 @@ namespace MyNixWorld;
 <td colspan="3"><table style="width: 100%">
 <tr>
 <td><input type="checkbox" name="disk_enabled" id="disk_enabled"
-value="1" onclick='js55f82caaae905.submitOptions(this,0);'
+value="1" onclick='js55f846e1d1da3.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="disk_enabled" value="0"></td>
@@ -63,7 +63,7 @@ value=<?php
 echo "'" . $this->root . "'";
 ?> size=40
 <?php echo $this->enabled_tag; ?>><a class='help'
-onclick=<?php echo '"js55f82caaae905.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
+onclick=<?php echo '"js55f846e1d1da3.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
 <td><input type="button" id='update_disk_dir' class="button"
 value="<?php _pesc('Read disk');?>"
 onclick="<?php echo $this->getRefreshFolderJS();?>"

@@ -50,7 +50,7 @@ namespace MyNixWorld;
 <tr>
 <td colspan="3" style='text-align: center'><input type="button"
 class="button" value="<?php _pesc('Check PHP setup');?>"
-onclick="js55f82caaae905.php_setup();"><a style='vertical-align: middle' class='help'
+onclick="js55f846e1d1da3.php_setup();"><a style='vertical-align: middle' class='help'
 onclick=<?php echo echoHelp($help_3 );?>> [?]</a></td>
 </tr>
 <tr>

@@ -132,8 +132,11 @@ function metadata($path, $include_trash = false) {
 return $this->searchFileNames ( $path, null, $include_trash );
 }
 private function _socketWriteMultiparts($socketHandle, $mime_boundary, $filename, $description, $target_path_id) {
+if (class_exists ( 'finfo' )) {
 $finfo = new \finfo ( FILEINFO_MIME_TYPE );
 $file_mime_type = print_r ( $finfo->file ( $filename ), true );
+} else
+$file_mime_type = 'application/octet-stream';
 $google_file = new \stdClass ();
 $google_file->title = _basename ( $filename, DIRECTORY_SEPARATOR );
 $google_file->description = $description;

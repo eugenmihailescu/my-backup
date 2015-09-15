@@ -73,7 +73,7 @@ private function getSSLIcon() {
 if (! $this->isSSL ()) {
 $icon = 'security-high.png';
 $title = _ ( 'Warning' );
-$function = "js55f82caaae905.popupError";
+$function = "js55f846e1d1da3.popupError";
 $msg = _ ( "Password fields present on an insecure (http://) page.<br>This is a security risk that allows user login credentials<br>to be stolen.<br><b>Solution</b> : connect the server by using its SSL certificate,<br>ie. replace <i>http</i> with http<span style=\\\"color:red;font-weight:bold\\\">s</span> in the browser address bar.<br>You will want to install one (if it does not already exist)<br>in order to:<ol type=\\\"i\\\"><li>hide the information that you send/receive from server</li><li>make sure the computer you are talking to is the one<br>you trust</li></ol>" );
 $msg .= "<a href=\\\"https://www.youtube.com/watch?v=SJJmoDZ3il8\\\" target=\\\"_blank\\\">" . _ ( 'The short story' ) . "</a>. ";
 $msg .= "<a href=\\\"https://www.youtube.com/watch?v=iQsKdtjwtYI\\\" target=\\\"_blank\\\">" . _ ( 'The long story' ) . "</a>. ";
@@ -81,7 +81,7 @@ $msg .= "<a href=\\\"https://developer.mozilla.org/docs/Security/InsecurePasswor
 } else {
 $icon = 'security-low.png';
 $title = _ ( 'Notice' );
-$function = "js55f82caaae905.popupWindow";
+$function = "js55f846e1d1da3.popupWindow";
 $msg = _ ( "Password fields present on an secure (https://) page.<br>Thanks to the SSL your password is safe, nobody between this<br>PC and the web server can read/stole your password likewise<br>no other data send/received between these two machines.<br>Although <a href=\\\"http://lmgtfy.com/?q=SSL\\\" target=\\\"_blank\\\">Google Is Your Friend</a> (GIYF) in this case I warmly<br>recommend searching the Wikipedia about <a href=\\\"http://en.wikipedia.org/wiki/Transport_Layer_Security\\\" target=\\\"_blank\\\">SSL</a>." );
 }
 return "<img id='ssl_alert' style='vertical-align:middle;cursor:help' src='img/$icon' onclick='$function(\"$title\",\"$msg\");'/>";
@@ -242,8 +242,8 @@ function recovery_pwd(url)
 {
 var username=document.getElementById('username').value,secret=document.getElementById('pwd_recovery').value;
 if(username.length==0 || secret.length==0)
-<?php printf("return js55f82caaae905.popupError('%s','<b>%s</b> and <b>%s</b> %s');",_('Error'),_('Username'),_('Secret'),_('must not be empty'));?>
-js55f82caaae905.asyncGetContent(url,"action=login_recovery&username="+username+"&secret="+secret);
+<?php printf("return js55f846e1d1da3.popupError('%s','<b>%s</b> and <b>%s</b> %s');",_('Error'),_('Username'),_('Secret'),_('must not be empty'));?>
+js55f846e1d1da3.asyncGetContent(url,"action=login_recovery&username="+username+"&secret="+secret);
 }
 function set_login_state(entropy)
 {

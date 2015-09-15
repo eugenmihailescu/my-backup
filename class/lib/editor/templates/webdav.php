@@ -38,7 +38,7 @@ namespace MyNixWorld;
 <tr>
 <td><label for="webdav_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="webdav_enabled" id="webdav_enabled"
-value="1" onclick='js55f82caaae905.submitOptions(this,0);'
+value="1" onclick='js55f846e1d1da3.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="webdav_enabled" value="0"></td>

@@ -10,7 +10,10 @@
 </Files>			
 
 # Turn off output buffering/compression
-SetEnv no-gzip 1
+<IfModule rewrite_module>
+	RewriteRule ^(.*)$ $1 [NS,E=no-gzip:1,E=dont-vary:1]
+</IfModule>
+
 
 <IfModule buffer_module>
 	BufferSize 1

@@ -55,7 +55,7 @@ echoHelp ( $help_2 );
 <tr>
 <td colspan="3"><input type="button" class="button"
 value="<?php _pesc('Flush ALL messages');?>"
-onclick="js55f82caaae905.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js55f82caaae905.asyncGetContent(js55f82caaae905.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js55f82caaae905.read_alerts();js55f82caaae905.messages_scroll(1);js55f82caaae905.message_info();});js55f82caaae905.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
+onclick="js55f846e1d1da3.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js55f846e1d1da3.read_alerts();js55f846e1d1da3.messages_scroll(1);js55f846e1d1da3.message_info();});js55f846e1d1da3.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
 class='help' onclick=<?php
 echoHelp ( $help_3 );
 ?>> [?]</a></td>

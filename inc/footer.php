@@ -70,6 +70,6 @@ title='<?php echo !empty($copyright[0])?$copyright[0].' Copyright':'';?>'>&copy;
 echo $footer_banner;
 $allow_cookie = isset ( $_COOKIE ['cookie_accept'] ) && strToBool ( $_COOKIE ['cookie_accept'] );
 if ($allow_cookie && (! isset ( $_COOKIE ['lang'] ) || $sel_lang_code != $_COOKIE ['lang']))
-printf ( '<script type="text/javascript">js55f82caaae905.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
+printf ( '<script type="text/javascript">js55f846e1d1da3.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
 insertHTMLSection ( $section_name, true );
 ?>

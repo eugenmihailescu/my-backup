@@ -38,7 +38,7 @@ namespace MyNixWorld;
 <tr>
 <td colspan="3"><input type="checkbox" id="schedule_enabled"
 name="schedule_enabled" value="1"
-onclick="js55f82caaae905.toggle_enabled('schedule_grp',this.checked);"
+onclick="js55f846e1d1da3.toggle_enabled('schedule_grp',this.checked);"
 <?php
 if (strToBool ( $this->settings ['schedule_enabled'] ))
 echo 'checked';

@@ -53,7 +53,7 @@ echoHelp ( $help_1 );
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
 title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="js55f82caaae905.run_mysql_maint();"
+name="mysql_maint_run" onclick="js55f846e1d1da3.run_mysql_maint();"
 id="btn_mysql_maint" <?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>

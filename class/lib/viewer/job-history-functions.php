@@ -81,11 +81,11 @@ $rst = $stat_mngr->queryData ( $sql );
 $i = 0;
 while ( $row = $stat_mngr->fetchArray ( $rst, SQLITE3_ASSOC ) ) {
 $onclick = "
-js55f82caaae905.asyncGetMediaInfo ( " . $row ['id'] . ", null );";
+js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", null );";
 $onclick .= "
-js55f82caaae905.asyncGetMediaInfo ( " . $row ['id'] . ", 'd' );";
+js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", 'd' );";
 $onclick .= "
-js55f82caaae905.asyncGetMediaInfo ( " . $row ['id'] . ", 'sysinfo' );";
+js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", 'sysinfo' );";
 $events = array (
 'onclick="' . $onclick . '"' 
 );
@@ -95,7 +95,7 @@ case JOB_STATUS_RUNNING :
 if (time () - $row ['started_time'] > LONG_RUNNING_JOB_TIMEOUT) {
 $status = 'suspect';
 $bg = 'rgba(255,0,0,0.25)';
-$events [] = "oncontextmenu='js55f82caaae905.onHistoryListContextMenu(event);'";
+$events [] = "oncontextmenu='js55f846e1d1da3.onHistoryListContextMenu(event);'";
 } else
 $bg = '#FFC';
 break;
@@ -111,7 +111,7 @@ $bg = 'rgba(255,0,0,0.25)';
 break;
 default :
 $status = 'unknown';
-$events [] = "oncontextmenu='js55f82caaae905.onHistoryListContextMenu(event);'";
+$events [] = "oncontextmenu='js55f846e1d1da3.onHistoryListContextMenu(event);'";
 break;
 }
 $style = empty ( $bg ) ? '' : 'style="background-color:' . $bg . ';"';
@@ -276,7 +276,7 @@ class='help' onclick=<?php echoHelp ( $help_2 ); ?>>[?]</a></td>
 <td>:</td>
 <td colspan="4"><img class="help"
 src="<?php echo plugins_url_wrapper('img/report.png', IMG_PATH);?>"
-onclick="js55f82caaae905.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
+onclick="js55f846e1d1da3.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
 <a class="help" onclick=<?php echoHelp ( $help_3 ); ?>><?php echo $row['unique_id'];?></a></td>
 </tr>
 <tr>
@@ -488,7 +488,7 @@ while ( $row = $stat_mngr->fetchArray ( $rst, SQLITE3_ASSOC ) ) {
 if ($row ['operation'] < 0)
 continue;
 if (null !== $row ['operation']) {
-$onclick = "js55f82caaae905.asyncGetMediaInfo(" . $params ['id'] . "," . $row ['operation'] / 2 . ");";
+$onclick = "js55f846e1d1da3.asyncGetMediaInfo(" . $params ['id'] . "," . $row ['operation'] / 2 . ");";
 $onclick .= "document.getElementById('folder_info').style.display='inline-block';";
 } else
 $onclick = '';

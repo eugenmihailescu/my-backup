@@ -87,7 +87,7 @@ $login_obj->onCheckJavaScript = 'checkJavaScriptAvailable';
 $login_obj->setEnforceStrongPassword ();
 $login_obj->allowPasswordRecovery ( true, selfURL () );
 $login_obj->setLoginTitle ( sprintf ( _esc ( 'Login into %s' ), WPMYBACKUP ) );
-$login_obj->setOnPasswordStrength ( 'js55f82caaae905.passwordEntropy' );
+$login_obj->setOnPasswordStrength ( 'js55f846e1d1da3.passwordEntropy' );
 $is_logged = $login_obj->isLogged ();
 ! $is_logged && _kill_too_many_requests ( $login_obj );
 ! empty ( $_POST ['action'] ) && $_POST ['action'] == 'login_recovery' && _do_password_recovery ( $login_obj );
@@ -114,7 +114,7 @@ $login_obj->logout ();
 $is_logged = false;
 }
 if ($is_logged) {
-define ( "WPMYBACKUP_LOGOFF", "<img src=\"" . plugins_url_wrapper ( 'img/avatar.png', IMG_PATH ) . "\"> <a style='cursor:pointer' onclick='js55f82caaae905.post(js55f82caaae905.this_url,{action:\"logout\"});'>" . sprintf ( _esc ( 'Logoff %s' ), $username ) . "</a>" );
+define ( "WPMYBACKUP_LOGOFF", "<img src=\"" . plugins_url_wrapper ( 'img/avatar.png', IMG_PATH ) . "\"> <a style='cursor:pointer' onclick='js55f846e1d1da3.post(js55f846e1d1da3.this_url,{action:\"logout\"});'>" . sprintf ( _esc ( 'Logoff %s' ), $username ) . "</a>" );
 define ( 'DO_NOT_AFTER_SETTINGS', true ); 
 $settings = loadSettings ();
 require_once CLASS_PATH . 'regactions.php'; 

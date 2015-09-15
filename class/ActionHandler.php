@@ -570,7 +570,7 @@ global $java_scripts;
 empty ( $log_type ) && isset ( $_POST ['log_type'] ) && $log_type = $_POST ['log_type'];
 if (($log = getLogfileByType ( $log_type )) && file_exists ( $log )) {
 @unlink ( $log );
-$java_scripts [] = sprintf ( 'js55f82caaae905.popupWindow("%s","%s");', _esc ( 'Notice' ), sprintf ( _esc ( 'Log file <i>%s</i> deleted successfully!' ), normalize_path ( $log ) ) );
+$java_scripts [] = sprintf ( 'js55f846e1d1da3.popupWindow("%s","%s");', _esc ( 'Notice' ), sprintf ( _esc ( 'Log file <i>%s</i> deleted successfully!' ), normalize_path ( $log ) ) );
 }
 }
 function reset_defaults($forcebly = false) {
@@ -588,7 +588,7 @@ $default_options = getFixedSettings () + getFactorySettings ();
 delete_option_wrapper ( WPMYBACKUP_OPTION_NAME );
 update_option_wrapper ( WPMYBACKUP_OPTION_NAME, $default_options );
 defined ( 'TARGETLIST_DB_PATH' ) && file_exists ( TARGETLIST_DB_PATH ) && @unlink ( TARGETLIST_DB_PATH );
-$java_scripts [] = sprintf ( 'js55f82caaae905.popupWindow("%s","%s",null,null,"#ffb600");', _esc ( 'Confirmation' ), sprintf ( _esc ( 'The application settings were reseted to their factory defaults.<br>%sPlease setup again the application in order to fit your needs.' ), $bak_str ) );
+$java_scripts [] = sprintf ( 'js55f846e1d1da3.popupWindow("%s","%s",null,null,"#ffb600");', _esc ( 'Confirmation' ), sprintf ( _esc ( 'The application settings were reseted to their factory defaults.<br>%sPlease setup again the application in order to fit your needs.' ), $bak_str ) );
 }
 function del_oauth() {
 $service_name = $this->method ['service'];

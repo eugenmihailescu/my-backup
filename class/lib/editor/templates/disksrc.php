@@ -62,7 +62,7 @@ echo getHumanReadableSize ( getDirCacheSize () );
 value=<?php echo "'" . $this->root . "'"; ?> size=40
 <?php echo $this->_readonly;?>><a class='help'
 onclick=<?php
-echo '"js55f82caaae905.popupWindow(\'' . _esc ( 'Help' ) . '\',\'' . sprintf ( _esc ( 'The root directory to backup. When left empty then<br><b>%s</b>' ), addslashes ( WPMYBACKUP_ROOT ) ) . '\');"';
+echo '"js55f846e1d1da3.popupWindow(\'' . _esc ( 'Help' ) . '\',\'' . sprintf ( _esc ( 'The root directory to backup. When left empty then<br><b>%s</b>' ), addslashes ( WPMYBACKUP_ROOT ) ) . '\');"';
 ?>>[?]</a></td>
 <td><input type="button" style='width: 100%' name='btn_wpmybackup_dir'
 class="button" value="<?php _pesc('Read disk');?>"

@@ -107,7 +107,7 @@ $this->java_scripts [] = 'parent.php_setup=function(){parent.asyncRunJob(parent.
 'action' => 'php_setup',
 'nonce' => wp_create_nonce_wrapper ( 'php_setup' ) 
 ) ) . '","PHP Setup",null, null, 4, null, -1,null,false);}';
-$this->java_scripts [] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f82caaae905.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts [] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f846e1d1da3.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 if (! ($this->_init_error || empty ( $this->_addons ))) {
 $this->java_scripts_load [] = $this->_js_addon_install;
 }

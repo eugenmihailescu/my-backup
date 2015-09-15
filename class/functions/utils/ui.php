@@ -77,12 +77,12 @@ function getSSLIcon() {
 if (! isSSL ()) {
 $icon = 'security-high.png';
 $title = _esc ( 'Warning' );
-$function = "js55f82caaae905.popupError";
+$function = "js55f846e1d1da3.popupError";
 $msg = sprintf ( "Password fields present on an insecure (http://) page. This is a security risk that allows user login credentials to be stolen.%s : %s", sprintf ( '<br><br><b>%s</b>', _esc ( 'Solution' ) ), sprintf ( _esc ( "connect the server by using its SSL certificate, ie. replace <i>http</i> with %s in the browser address bar. If your server does not have a SSL certificate yet then you may want to install one (if it does not already exist) in order to:%shide the information that you send/receive from server</li><li>make sure the computer you are talking to is the one<br>you trust" ) . '</li></ol>', 'http' . getSpanE ( 's', 'red', 'bold' ), escape_quotes ( '<ol type="i"><li>' ) ) );
 } else {
 $icon = 'security-low.png';
 $title = _esc ( 'Notice' );
-$function = "js55f82caaae905.popupWindow";
+$function = "js55f846e1d1da3.popupWindow";
 $msg = _esc ( "Password fields present on an secure (https://) page.<br>Thanks to the SSL your password is safe, nobody between this<br>PC and the web server can read/stole your password likewise<br>no other data send/received between these two machines." ) . '<br>';
 }
 $msg .= getAnchorE ( _esc ( 'The short story' ), 'https://www.youtube.com/watch?v=SJJmoDZ3il8' ) . '. ';

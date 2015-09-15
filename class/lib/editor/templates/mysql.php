@@ -38,7 +38,7 @@ namespace MyNixWorld;
 <tr>
 <td><label for="mysql_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="mysql_enabled" id="mysql_enabled" value="1"
-onclick='js55f82caaae905.submitOptions(this,0);'
+onclick='js55f846e1d1da3.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="mysql_enabled" value="0"></td>
@@ -72,7 +72,7 @@ onclick=<?php echoHelp($help_1); ?>>[?]</a>
 id="btn_dwl_script"
 value=<?php echo '"&nbsp;&nbsp;&nbsp;'._esc('Download').' '.($mysqldump?_esc('db dump'):($mysql_format.' '._esc('file'))).'"';?>
 onclick=<?php
-echo '"js55f82caaae905.post(js55f82caaae905.ajaxurl,{action:\'dwl_sql_script\',nonce:\'' . wp_create_nonce_wrapper ( 'dwl_sql_script' ) . '\',tables:\'' . $this->settings ['tables'] . '\',name:\'' . (isset ( $this->settings ['name'] ) && ! empty ( $this->settings ['name'] ) ? $this->settings ['name'] : $this->settings ['url']) . '\',type:' . $this->settings ['compression_type'] . ',level:' . $this->settings ['compression_level'] . '});"';
+echo '"js55f846e1d1da3.post(js55f846e1d1da3.ajaxurl,{action:\'dwl_sql_script\',nonce:\'' . wp_create_nonce_wrapper ( 'dwl_sql_script' ) . '\',tables:\'' . $this->settings ['tables'] . '\',name:\'' . (isset ( $this->settings ['name'] ) && ! empty ( $this->settings ['name'] ) ? $this->settings ['name'] : $this->settings ['url']) . '\',type:' . $this->settings ['compression_type'] . ',level:' . $this->settings ['compression_level'] . '});"';
 ?>
 title='<?php _pesc('Click to download the MySQL script now');?>'
 <?php echo $this->enabled_tag; ?>><a class='help'

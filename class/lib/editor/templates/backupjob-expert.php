@@ -122,7 +122,7 @@ echoHelp ( $help_8 );
 <tr>
 <td colspan="2"><input type="button" class="button"
 value="<?php _pesc('Get the encryption password');?>"
-onclick="js55f82caaae905.asyncGetContent(js55f82caaae905.ajaxurl,'<?php
+onclick="js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl,'<?php
 echo http_build_query ( array (
 'action' => 'encryption_info',
 'nonce' => wp_create_nonce_wrapper ( 'encryption_info' ) 
@@ -131,6 +131,6 @@ echo http_build_query ( array (
 type="file" class="button" id="decrypt_file" name="decrypt_file[]"
 accept=".enc" multiple="multiple" style="display: none"> <input
 type="button" class="button" id="do_decrypt"
-value="<?php _pesc('Decrypt file');?>" onclick="js55f82caaae905.do_decrypt();"></td>
+value="<?php _pesc('Decrypt file');?>" onclick="js55f846e1d1da3.do_decrypt();"></td>
 </tr>
 <?php }?>

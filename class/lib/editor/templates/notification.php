@@ -42,14 +42,14 @@ if ($this->_alerts_count > 0) {
 ?>
 <b>Show : </b> <input type="radio" name="message_show" id="new_messages"
 value="0" checked
-onchange="js55f82caaae905.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==js55f82caaae905.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
+onchange="js55f846e1d1da3.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==js55f846e1d1da3.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
 <label for="new_messages"><?php _pesc('unread messages');?></label> <input
 type="radio" name="message_show" id="old_messages" value="1"
-onchange="js55f82caaae905.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==js55f82caaae905.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
+onchange="js55f846e1d1da3.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==js55f846e1d1da3.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
 <label for="old_messages"><?php _pesc('read messages');?></label> <input
 id="mark_msg_btn" type="button"
 value="<?php _pesc('Mark all as read');?>" class="button"
-onclick="<?php printf("js55f82caaae905.popupConfirm('%s','"._esc('Are you sure you want to mark all messages as %sYou may still find them later in the %s messages%s, though.')."',null,{'%s':'js55f82caaae905.messages_scroll(0,1==js55f82caaae905.getShowWhat()?\'%s\':\'%s\');js55f82caaae905.read_alerts();js55f82caaae905.removePopupLast();','%s':null});",_esc('Confirm'),"'+(1==js55f82caaae905.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'?&lt;br&gt;","&lt;b&gt;'+(0==js55f82caaae905.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'","&lt;/b&gt;",_esc("Yes, I`m pretty sure"),'unread','read',_esc("Cancel"));?>">
+onclick="<?php printf("js55f846e1d1da3.popupConfirm('%s','"._esc('Are you sure you want to mark all messages as %sYou may still find them later in the %s messages%s, though.')."',null,{'%s':'js55f846e1d1da3.messages_scroll(0,1==js55f846e1d1da3.getShowWhat()?\'%s\':\'%s\');js55f846e1d1da3.read_alerts();js55f846e1d1da3.removePopupLast();','%s':null});",_esc('Confirm'),"'+(1==js55f846e1d1da3.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'?&lt;br&gt;","&lt;b&gt;'+(0==js55f846e1d1da3.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'","&lt;/b&gt;",_esc("Yes, I`m pretty sure"),'unread','read',_esc("Cancel"));?>">
 <p style="font-weight: bold"><?php echo $message_status_title;?></p>
 <?php }?>
 <div id="message_list"

@@ -47,11 +47,11 @@ echoHelp ( $help_1 );
 <td><input class="button btn_edit_copy" type="button"
 id="btn_edit_copy"
 title="<?_pesc('Set the Google Drive root as the current folder file`s Id');?>"
-onclick="document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value=/(\w)*$/.exec(document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value)[0];document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value=document.getElementsByName('google_root')[0].value;js55f82caaae905.submitOptions(this,0);"
+onclick="document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value=/(\w)*$/.exec(document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value)[0];document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value=document.getElementsByName('google_root')[0].value;js55f846e1d1da3.submitOptions(this,0);"
 name="btn_copy_path" <?php echo $this->enabled_tag;?> /></td>
 <td><input class="button btn_folder" type="button" id="btn_folder"
 title=<?php echo '"Set the Google Drive root as '.GOOGLE_ROOT.'"';?>
-onclick=<?php echo "\"document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value='".GOOGLE_ROOT."';document.getElementsByName('".$this->target_name."_path_id')[0].value='".GOOGLE_ROOT."';js55f82caaae905.submitOptions(this,0);\"";?>
+onclick=<?php echo "\"document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value='".GOOGLE_ROOT."';document.getElementsByName('".$this->target_name."_path_id')[0].value='".GOOGLE_ROOT."';js55f846e1d1da3.submitOptions(this,0);\"";?>
 name="btn_copy_root" <?php echo $this->enabled_tag;?> /></td>
 </tr>
 <tr>

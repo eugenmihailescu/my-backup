@@ -39,25 +39,25 @@ namespace MyNixWorld;
 <td style="width: 0px"></td>
 <td colspan="2" style="white-space: nowrap;"><input type="radio"
 id="schedule_grp_os_cron" name="schedule_grp" value="os_cron"
-onclick="js55f82caaae905.toggle_wp_cron(false);"
+onclick="js55f846e1d1da3.toggle_wp_cron(false);"
 <?php
 if ('os_cron' == $this->settings ['schedule_grp'])
 echo 'checked';
 ?>><label for="schedule_grp_os_cron"><?php _pesc('Schedule by OS-Cron');?></label>
 <a class='help'
 title="<?php _pesc('You should define a schedule/cron task in your OS with a command like the one shown by this option');?>"
-onclick="js55f82caaae905.popupWindow('<?php _pesc('CLI usage');?>',js55f82caaae905.globals.help,700,null,null,null,true);">[?]</a></td>
+onclick="js55f846e1d1da3.popupWindow('<?php _pesc('CLI usage');?>',js55f846e1d1da3.globals.help,700,null,null,null,true);">[?]</a></td>
 </tr>
 <tr id="schedule_cron_row3">
 <td colspan="3"><div
 class='hintbox <?php echo $this->container_shape;?>'
 id="os_cron_hint" style='display: none; background-color: #f0f0f0'
-onmouseover="js55f82caaae905.showClipboardBtn(this,'visible','os_cron_clpb');"
-onmouseout="js55f82caaae905.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
+onmouseover="js55f846e1d1da3.showClipboardBtn(this,'visible','os_cron_clpb');"
+onmouseout="js55f846e1d1da3.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
 <img id="os_cron_clpb"
 src="<?php echo $this->getImgURL ( 'edit-copy-32.png' ) ;?>"
 style="position: relative; float: right; right: 5px; visibility: hidden; cursor: pointer;"
 onmouseover="this.style.visibility='visible'"
-onclick="<?php echo sprintf("js55f82caaae905.popupPrompt('%s','%s', null,{'%s':null},js55f82caaae905.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
+onclick="<?php echo sprintf("js55f846e1d1da3.popupPrompt('%s','%s', null,{'%s':null},js55f846e1d1da3.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
 title='<?php _pesc('Click to copy to clipboard');?>'></td>
 </tr>
