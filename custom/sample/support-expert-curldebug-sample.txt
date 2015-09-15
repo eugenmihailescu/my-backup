@@ -1,0 +1,39 @@
+--------------------------------------------------------------------------------
+[2014-12-19 11:39:13] URL=https://www.googleapis.com/drive/v2/about
+--------------------------------------------------------------------------------
+* Hostname was NOT found in DNS cache
+*   Trying 74.125.136.95...
+* Connected to www.googleapis.com (74.125.136.95) port 443 (#594)
+* successfully set certificate verify locations:
+*   CAfile: none
+  CApath: /etc/ssl/certs
+* SSL connection using TLSv1.2 / ECDHE-RSA-AES128-GCM-SHA256
+* Server certificate:
+* 	 subject: C=US; ST=California; L=Mountain View; O=Google Inc; CN=*.googleapis.com
+* 	 start date: 2014-12-10 11:36:56 GMT
+* 	 expire date: 2015-03-10 00:00:00 GMT
+* 	 issuer: C=US; O=Google Inc; CN=Google Internet Authority G2
+* 	 SSL certificate verify ok.
+> GET /drive/v2/about HTTP/1.1
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:32.0) Gecko/20100101 Firefox/32.0
+Host: www.googleapis.com
+Accept: */*
+Authorization: Bearer ya29.4QCe3pie1ORB9JxmdfWKgNO44x5o_86WyaRP6GKRL6hZv2ZtaPZ46FQ_Cf_GftWauWAq3IKogWfZ1Q
+
+< HTTP/1.1 200 OK
+< Expires: Fri, 19 Dec 2014 11:39:18 GMT
+< Date: Fri, 19 Dec 2014 11:39:18 GMT
+< Cache-Control: private, max-age=0, must-revalidate, no-transform
+< ETag: "Lie3Y624-6bAlCGsnUSYyb6P-dU/eT19-CfZtegpeD9xPrK5xqJyd5o"
+< Vary: Origin
+< Vary: X-Origin
+< Content-Type: application/json; charset=UTF-8
+< X-Content-Type-Options: nosniff
+< X-Frame-Options: SAMEORIGIN
+< X-XSS-Protection: 1; mode=block
+< Content-Length: 9231
+* Server GSE is not blacklisted
+< Server: GSE
+< Alternate-Protocol: 443:quic,p=0.02
+< 
+* Connection #594 to host www.googleapis.com left intact

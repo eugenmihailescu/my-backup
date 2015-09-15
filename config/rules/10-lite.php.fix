@@ -1,0 +1,9 @@
+<?php
+function check_is_activated() {
+return true;
+}
+function feature_is_licensed() {
+return true;
+}
+! defined ( 'LICENSE_REGISTRAR_URL' ) && define ( 'LICENSE_REGISTRAR_URL', 'http://api.mynixworld.info/' );
+?>

@@ -1,0 +1,51 @@
+If you want to add a new language translation or to update an existent translation you
+should know that this is possible with the aid of PoEdit program (http://poedit.net/).
+
+=============================
+- How to add a new language -
+=============================
+
+1) Open the lang-codes.txt and add the language code coresponding to the language you
+   want to add (eg. `de_DE.utf8,Deutsch`)
+2) create a file called `default.po` in ./lang/<lang-code>/LC_MESSAGES/default.po
+   You may use the ./lang/default.po sample file as a starting point.
+3) Open that default.po file by using the PoEdit application
+4) open the `Catalog -> Properties` menu and edit the translation properties and source 
+   path
+5) Open the `Catalog -> Update from sources` menu; it will scan the .php sources and will
+   create a list with the default English strings (on the top) that you may translate one
+   by one (on the bottom)
+6) Start translating each string you select on the top list (Source text) at the bottom
+   (the Translation). Read also the `Notes for translators`|`Comment` note (where available)
+   because it just might help you to translate properly the piece of string you've just
+   selected.
+7) Once you`ve finished save the changes (the File -> Save menu). It will generate a .mo
+   file at the default.po location. That is the machine readable object file that the 
+   application will actually use. You may continue from the step 3) above at a later time.
+8) To make sure the new translated text will be used make sure you restart your web server
+   application (ie. restart the Apache/IIS/Nginx service).
+   
+NOTE: if you want to take advantage of the PoEdit automatic translation then open the
+   `Edit -> Preferences` menu then choose the `Translation Memory` tab. Add a new language
+   then press the `Generate database` button. It will scan your system for source|object
+   files that might be used to create a ad-hoc language dictionary.
+   
+PoEdit (how-to) references:
+* http://localization-guide.readthedocs.org/en/latest/guide/poedit.html
+* http://wiki.lxde.org/en/Translate_*.po_files_with_Poedit
+* https://wiki.tine20.org/Contributors/Howtos/PoEdit
+* https://en.opensuse.org/SDB:Configuring_poedit 
+* https://www.youtube.com/results?search_query=poedit
+
+======================================
+- How to update an existent language -
+======================================
+
+1) Go to our website and grab the .po source file:
+	- http://wpmybackup.mynixworld.info/lang/<lang-code>.po
+
+Ex: for the Swedish language the language code is sv_SE so you should download the file
+http://wpmybackup.mynixworld.info/lang/sv_SE.po
+
+2) open the PoEdit program then open the *.po file
+3) follow the step 6) above

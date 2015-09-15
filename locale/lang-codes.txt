@@ -1,0 +1,42 @@
+########################################################################################
+# Add a definition line for each language installed in `lang` folder
+# The definition has the following format: [lang-code].[codeset],[lang-name],[percentage]
+# where:
+# - `lang-code` is the language code (eg. en_US, en_GB)
+# - `codeset` is the codeset/charmap used for the specified language (eg. UTF-8,ISO-8859-15) 
+# - `lang-name` is the name of the language as it will be shown on the web page
+# - `percentage` (optional) is the percentage of translation (if missing then 100%)
+# 
+# NOTE that the (default) predefined English language has `lang-code`=`` (ie. empty)
+# 
+# Each line should be terminated with CRLF. Whitespaces will be stripped.
+# Any line that starts with `#` will be ignored (is regarded as a comment) as well
+# any other empty line.
+#
+# NOTE: in order to make these locales to work they should be supported/installed on the
+# host OS.
+#
+# The supported locale on LINUX are found at: /usr/share/i18n/SUPPORTED
+# A list of supported locale on WINDOWS (XP, 2K3) can be found at: 
+# 		https://msdn.microsoft.com/en-us/goglobal/bb895996.aspx
+# For WINDOWS you may also see this: http://www.science.co.il/language/locale-codes.asp
+#
+# The display language on WINDOWS depends on the OS version you have:
+# - XP		: http://windows.microsoft.com/en-us/windows/language-packs#lptabs=xp
+# - Vista	: http://windows.microsoft.com/en-us/windows/language-packs#lptabs=vista
+# - Win7	: http://windows.microsoft.com/en-us/windows/language-packs#lptabs=win7
+# - Win8+	: http://windows.microsoft.com/en-us/windows/language-packs#lptabs=win8
+#
+# On LINUX:
+# - to determine which locale are installed run this command: locale -a
+# - to determine the current running locale run this command: locale
+# 		- it should be the same as per /etc/locale/conf
+# For more info check your distro manual.
+#
+# You might also want to check the PHP manual regarding setlocale or binding the domain`s codeset:
+# 		http://php.net/setlocale, http://php.net/manual/en/function.bind-textdomain-codeset.php 
+########################################################################################
+
+,English
+ro_RO.utf8,Româna,58
+sv_SE.utf8,Svenska,1

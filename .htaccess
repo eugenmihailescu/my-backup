@@ -1,0 +1,18 @@
+
+#  Added automatically by MyBackup			
+<Files ~ "\.(htaccess|php|log)$">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ "(index|regactions|WPMyBackup)\.php$">
+  Order allow,deny
+  Allow from all
+</Files>			
+
+# Turn off output buffering/compression
+SetEnv no-gzip 1
+
+<IfModule buffer_module>
+	BufferSize 1
+</IfModule>
+		

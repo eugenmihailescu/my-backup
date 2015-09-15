@@ -1,0 +1,7 @@
+#0  CurlWrapper->_setCurlOptions() called at [wpmybackup/class/lib/CurlWrapper.php:342]
+#1  CurlWrapper->curlPOST() called at [wpmybackup/class/utils.php:1853]
+#2  check_is_activated() called at [wpmybackup/wpmybackup-admin.php:259]
+#3  getSelectedTab() called at [wpmybackup/wpmybackup-admin.php:328]
+#4  include_once(wpmybackup/wpmybackup-admin.php) called at [wpmybackup/test.php:103]
+
+So just by looking at these lines a programmer understands where everything started and exactly where the error occured, although not exactly why it happend.

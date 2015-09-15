@@ -1,0 +1,21 @@
+--------------------------------------------------------------------------------
+[2015-01-06 12:49:53] select count(*) as count, date from (select job_state,started_time-started_time%86400 as date
+from wpmybk_jobs where started_time>=1417910400 and finish_time<=1420588799 and job_state=1)A group by date,job_state
+--------------------------------------------------------------------------------
+Array
+(
+    [count] => 1
+    [date] => 1420502400
+)
+--------------------------------------------------------------------------------
+[2015-01-06 12:49:53] BackupState30dChart(from  to , ct=1, zf=1)
+--------------------------------------------------------------------------------
+<script>function drawchart_54abd9f128061090254468(){var data = google.visualization.arrayToDataTable([
+	['date', 'completed','failed','partial'],[6,0,1,0]]);
+	var options = {width: '100%',height:200,title: 'State of backup within last 30 days',hAxis: {title: 'Day of month',
+	ticks: [1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31]},vAxis: {title: 'Jobs count'},isStacked:true,
+	trendlines:{0:{type: 'polynomial',degree: 3,opacity: 0.5,color: '#0000a0'}}};
+	var chart = new google.visualization.ColumnChart(document.getElementById('chart_54abd9f128061090254468'));
+	chart.draw(data, options);}document.getElementById('chart_54abd9f128061090254468d1').value='2014-12-07';
+	document.getElementById('chart_54abd9f128061090254468d2').value='2015-01-06';</script>
+--------------------------------------------------------------------------------
