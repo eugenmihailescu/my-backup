@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : config-custom.php $
  * 
- * @id      : config-custom.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-custom.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -63,8 +63,8 @@ if (! function_exists ( 'add_management_page' )) {
 define ( 'SSL_ENFORCE', false ); 
 define ( 'DEFAULT_BACKUP_LIFESPAN', 5 ); 
 define ( 'GIT_BRANCH_TYPE', '' ); 
-define ( 'APP_VERSION_NO', '0.2.0-10' ); 
+define ( 'APP_VERSION_NO', '0.2.2-0' ); 
 define ( 'APP_VERSION_TYPE', '' ); 
-define ( 'APP_VERSION_ID', '0.2.0-10 - ' ); 
-define ( 'APP_VERSION_DATE', '2015-09-14' ); 
+define ( 'APP_VERSION_ID', '0.2.2-0 - ' ); 
+define ( 'APP_VERSION_DATE', '2015-09-16' ); 
 ?>

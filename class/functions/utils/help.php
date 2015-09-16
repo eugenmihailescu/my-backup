@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : help.php $
  * 
- * @id      : help.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : help.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -144,11 +144,11 @@ $msg = "'$msg'";
 echo getHelpCall ( $msg, $quote_enclosed, $reuse_div, $title );
 }
 function getHelpCall($msg, $quote_enclosed = true, $reuse_div = false, $title = null) {
-return ($quote_enclosed ? '"' : '') . "js55f846e1d1da3.popupWindow('" . (empty ( $title ) ? _esc ( 'Help' ) : $title) . "'," . $msg . ',' . DEFAULT_JSPOPUP_WIDTH . ($reuse_div ? 'null,null,' . $reuse_div : '') . ");" . ($quote_enclosed ? '"' : '');
+return ($quote_enclosed ? '"' : '') . "js55f93aab8f090.popupWindow('" . (empty ( $title ) ? _esc ( 'Help' ) : $title) . "'," . $msg . ',' . DEFAULT_JSPOPUP_WIDTH . ($reuse_div ? 'null,null,' . $reuse_div : '') . ");" . ($quote_enclosed ? '"' : '');
 }
 function getPopup($caption, $msg, $escaped = true) {
 $escape_char = $escaped ? "\\" : '';
-return "<a class=$escape_char'help$escape_char' onclick=$escape_char'js55f846e1d1da3.popupWindow(&quot;" . _esc ( 'Help' ) . "&quot;,$msg," . DEFAULT_JSPOPUP_WIDTH . ");$escape_char'>$caption</a>";
+return "<a class=$escape_char'help$escape_char' onclick=$escape_char'js55f93aab8f090.popupWindow(&quot;" . _esc ( 'Help' ) . "&quot;,$msg," . DEFAULT_JSPOPUP_WIDTH . ");$escape_char'>$caption</a>";
 }
 function highlight_inner_keys($s, $array, $escaped = true) {
 foreach ( $array as $key => $value ) {
@@ -194,7 +194,7 @@ function getExample($caption, $message, $collapsed = true, $escape = true, $img_
 global $container_shape;
 $id = uniqid ( 'ex_' );
 $result = "<div class='postbox $container_shape' id='$id' style='padding:10px'><h4 class='hintbox $container_shape' style='border-radius:5px 5px 0 0;'><div style='display:inline-block'><b>$caption</b></div></h4><div class='inside $container_shape' style='padding:10px;border:1px solid #c0c0c0;border-top:none;background-color:#f5f5f5;margin:0;border-radius:0 0 5px 5px;'>$message</div></div>";
-$script = "<script>var el=document.getElementById('$id');js55f846e1d1da3.addHeaderToggle(el.getElementsByTagName('h4'),true,'" . (empty ( $img_path ) ? plugins_url_wrapper ( 'img/', IMG_PATH ) : $img_path) . "');" . ($collapsed ? '' : "el.getElementsByTagName('h4')[0].click();") . '</script>';
+$script = "<script>var el=document.getElementById('$id');js55f93aab8f090.addHeaderToggle(el.getElementsByTagName('h4'),true,'" . (empty ( $img_path ) ? plugins_url_wrapper ( 'img/', IMG_PATH ) : $img_path) . "');" . ($collapsed ? '' : "el.getElementsByTagName('h4')[0].click();") . '</script>';
 $x = $return_array ? '' : $script;
 $result = $escape ? preg_replace ( '/[\'"]/', '&quot;', $result . $x ) : $result . $x;
 if ($return_array)

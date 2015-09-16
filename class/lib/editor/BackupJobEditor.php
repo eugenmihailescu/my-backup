@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : BackupJobEditor.php $
  * 
- * @id      : BackupJobEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupJobEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -43,7 +43,7 @@ $this->java_scripts [] = "parent.toggle_backup_name(document.getElementById('url
 if (defined ( 'JOB_BENCHMARK' ))
 $this->java_scripts [] = "parent.do_benchmark=function(opt){parent.asyncRunBenchmark('compression_benchmark&type='+(2-opt),'" . _esc ( 'Benchmark' ) . "','" . wp_create_nonce_wrapper ( 'compression_benchmark' ) . "','" . wp_create_nonce_wrapper ( 'get_progress' ) . "','" . wp_create_nonce_wrapper ( 'cleanup_progress' ) . "','" . wp_create_nonce_wrapper ( 'abort_job' ) . "');};";
 if (! empty ( $registered_ciphres ) && isset ( $this->settings ['encryption'] ) && ! empty ( $this->settings ['encryption'] )) {
-$this->java_scripts [] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f846e1d1da3.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts [] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f93aab8f090.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 $this->java_scripts [] = "parent.do_decrypt=function(){var b=document.getElementById('do_decrypt'),e=document.getElementById('decrypt_file');e.onchange=function(){b.className='button-primary';b.style.display='inline-block';b.value='" . _esc ( 'Decrypt Now' ) . "';};if('none'==e.style.display){e.style.display='inline-block';b.style.display='none';}else{parent.decrypt_action('decrypt_file','" . wp_create_nonce_wrapper ( 'decrypt_file' ) . "');document.getElementById('wpmybackup_admin_form').submit();}}";
 }
 $this->java_scripts [] = getBackupSourcesJS ( $PROGRESS_PROVIDER );

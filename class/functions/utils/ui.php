@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : ui.php $
  * 
- * @id      : ui.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ui.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -77,12 +77,12 @@ function getSSLIcon() {
 if (! isSSL ()) {
 $icon = 'security-high.png';
 $title = _esc ( 'Warning' );
-$function = "js55f846e1d1da3.popupError";
+$function = "js55f93aab8f090.popupError";
 $msg = sprintf ( "Password fields present on an insecure (http://) page. This is a security risk that allows user login credentials to be stolen.%s : %s", sprintf ( '<br><br><b>%s</b>', _esc ( 'Solution' ) ), sprintf ( _esc ( "connect the server by using its SSL certificate, ie. replace <i>http</i> with %s in the browser address bar. If your server does not have a SSL certificate yet then you may want to install one (if it does not already exist) in order to:%shide the information that you send/receive from server</li><li>make sure the computer you are talking to is the one<br>you trust" ) . '</li></ol>', 'http' . getSpanE ( 's', 'red', 'bold' ), escape_quotes ( '<ol type="i"><li>' ) ) );
 } else {
 $icon = 'security-low.png';
 $title = _esc ( 'Notice' );
-$function = "js55f846e1d1da3.popupWindow";
+$function = "js55f93aab8f090.popupWindow";
 $msg = _esc ( "Password fields present on an secure (https://) page.<br>Thanks to the SSL your password is safe, nobody between this<br>PC and the web server can read/stole your password likewise<br>no other data send/received between these two machines." ) . '<br>';
 }
 $msg .= getAnchorE ( _esc ( 'The short story' ), 'https://www.youtube.com/watch?v=SJJmoDZ3il8' ) . '. ';

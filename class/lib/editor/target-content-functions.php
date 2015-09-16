@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : target-content-functions.php $
  * 
- * @id      : target-content-functions.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : target-content-functions.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -44,7 +44,7 @@ $is_win = isWin ();
 if ('fssource' == $method ['sender'])
 if (DIRECTORY_SEPARATOR != $root && ! $is_win || $is_win && strlen ( $root ) > 3) {
 $div_id = uniqid ( "dwl_spin_", MORE_ENTROPY );
-$folder_up_onclick = 'js55f846e1d1da3.navFilesList("' . normalize_path ( dirname ( $root ) ) . '",-1,"' . wp_create_nonce_wrapper ( 'auto_save' ) . '");';
+$folder_up_onclick = 'js55f93aab8f090.navFilesList("' . normalize_path ( dirname ( $root ) ) . '",-1,"' . wp_create_nonce_wrapper ( 'auto_save' ) . '");';
 echo sprintf ( "<tr  onclick='%s'><td><div class='folderup' style='background-image: url(img/go-back.png)' id='%s' onclick='%s'></div><a>&nbsp;..</a></td>", $folder_up_onclick, $div_id, $folder_up_onclick );
 if ($dir_show_size)
 echo '<td align="center" class="caption">' . _esc ( 'Size' ) . '</td>';
@@ -53,7 +53,7 @@ echo '</tr>';
 echo '<tr><td class="caption">' . _esc ( 'Folder' ) . '</td><td class="caption" align="center">' . _esc ( 'Size' ) . '</td></tr>';
 $chk = ("" == $method ["excludedirs"] ? "checked='checked'" : "");
 $root_id = uniqid ( 'f_', MORE_ENTROPY );
-echo "<tr ><td><input type='checkbox' id='root_dir' onclick='js55f846e1d1da3.toggle_children(this);' name='$root_id' $chk>" . getSpanE ( $root, null, 'bold' ) . "</td>";
+echo "<tr ><td><input type='checkbox' id='root_dir' onclick='js55f93aab8f090.toggle_children(this);' name='$root_id' $chk>" . getSpanE ( $root, null, 'bold' ) . "</td>";
 if ($dir_show_size)
 echo '<td align="center">' . getHumanReadableSize ( getDirSizeFromCache ( $root ) ) . '</td>';
 echo '</tr>';
@@ -93,7 +93,7 @@ $fsize = $dir ['size'];
 isset ( $dir ['desc'] ) && $fdesc = $dir ['desc'];
 isset ( $dir ['style'] ) && $style = $dir ['style'];
 isset ( $dir ['class'] ) && $class = $dir ['class'];
-$onclick = isset ( $dir ['click'] ) ? trim ( $dir ['click'] ) : 'js55f846e1d1da3.refreshFileList(this);';
+$onclick = isset ( $dir ['click'] ) ? trim ( $dir ['click'] ) : 'js55f93aab8f090.refreshFileList(this);';
 }
 $chk_id = $parent_id . '.' . $i ++;
 $indent = 2 * $level . 'em';
@@ -103,7 +103,7 @@ $chk = "checked='checked'";
 else
 $style ['link'] .= ';text-decoration:line-through';
 $title = ! empty ( $fdesc ) ? " title='$fname' " : '';
-echo "<tr" . (! isset ( $style ['row'] ) ? '' : " style='{$style['row']}'") . "><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='js55f846e1d1da3.toggle_children(this);' $chk><a " . (empty ( $class ) ? '' : " class=\"$class\"") . $title . (empty ( $onclick ) ? '' : 'onclick="' . $onclick . '"') . (! empty ( $style ['link'] ) ? 'style="' . $style ['link'] . '"' : '') . ">" . (empty ( $fdesc ) ? $fname : $fdesc) . "</a></td>";
+echo "<tr" . (! isset ( $style ['row'] ) ? '' : " style='{$style['row']}'") . "><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='js55f93aab8f090.toggle_children(this);' $chk><a " . (empty ( $class ) ? '' : " class=\"$class\"") . $title . (empty ( $onclick ) ? '' : 'onclick="' . $onclick . '"') . (! empty ( $style ['link'] ) ? 'style="' . $style ['link'] . '"' : '') . ">" . (empty ( $fdesc ) ? $fname : $fdesc) . "</a></td>";
 if ($dir_show_size)
 echo '<td align="center">' . getHumanReadableSize ( $fsize ) . '</td>';
 echo '</tr>';

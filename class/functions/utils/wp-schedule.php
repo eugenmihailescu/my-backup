@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : wp-schedule.php $
  * 
- * @id      : wp-schedule.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-schedule.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -68,7 +68,7 @@ $params = array (
 'nonce' => wp_create_nonce_wrapper ( 'set_wpcron_schedule' ),
 'schedule' => $job_props ['schedule'] 
 );
-$img_click = 'js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
+$img_click = 'js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
 $img_title = _esc ( 'Click to update the schedule datetime' );
 $img = "<img id='img_$uniq_id' src='" . plugins_url_wrapper ( 'img/save.png', IMG_PATH ) . "' style='display:none;cursor:pointer;' onclick='$img_click' title='$img_title'>";
 $input = "<input type='datetime' id='edt_$uniq_id' value='$timestamp' maxlength='19' size='19' style='display:none'>";

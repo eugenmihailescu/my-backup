@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : job-history-functions.php $
  * 
- * @id      : job-history-functions.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : job-history-functions.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -81,11 +81,11 @@ $rst = $stat_mngr->queryData ( $sql );
 $i = 0;
 while ( $row = $stat_mngr->fetchArray ( $rst, SQLITE3_ASSOC ) ) {
 $onclick = "
-js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", null );";
+js55f93aab8f090.asyncGetMediaInfo ( " . $row ['id'] . ", null );";
 $onclick .= "
-js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", 'd' );";
+js55f93aab8f090.asyncGetMediaInfo ( " . $row ['id'] . ", 'd' );";
 $onclick .= "
-js55f846e1d1da3.asyncGetMediaInfo ( " . $row ['id'] . ", 'sysinfo' );";
+js55f93aab8f090.asyncGetMediaInfo ( " . $row ['id'] . ", 'sysinfo' );";
 $events = array (
 'onclick="' . $onclick . '"' 
 );
@@ -95,7 +95,7 @@ case JOB_STATUS_RUNNING :
 if (time () - $row ['started_time'] > LONG_RUNNING_JOB_TIMEOUT) {
 $status = 'suspect';
 $bg = 'rgba(255,0,0,0.25)';
-$events [] = "oncontextmenu='js55f846e1d1da3.onHistoryListContextMenu(event);'";
+$events [] = "oncontextmenu='js55f93aab8f090.onHistoryListContextMenu(event);'";
 } else
 $bg = '#FFC';
 break;
@@ -111,7 +111,7 @@ $bg = 'rgba(255,0,0,0.25)';
 break;
 default :
 $status = 'unknown';
-$events [] = "oncontextmenu='js55f846e1d1da3.onHistoryListContextMenu(event);'";
+$events [] = "oncontextmenu='js55f93aab8f090.onHistoryListContextMenu(event);'";
 break;
 }
 $style = empty ( $bg ) ? '' : 'style="background-color:' . $bg . ';"';
@@ -276,7 +276,7 @@ class='help' onclick=<?php echoHelp ( $help_2 ); ?>>[?]</a></td>
 <td>:</td>
 <td colspan="4"><img class="help"
 src="<?php echo plugins_url_wrapper('img/report.png', IMG_PATH);?>"
-onclick="js55f846e1d1da3.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
+onclick="js55f93aab8f090.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
 <a class="help" onclick=<?php echoHelp ( $help_3 ); ?>><?php echo $row['unique_id'];?></a></td>
 </tr>
 <tr>
@@ -488,7 +488,7 @@ while ( $row = $stat_mngr->fetchArray ( $rst, SQLITE3_ASSOC ) ) {
 if ($row ['operation'] < 0)
 continue;
 if (null !== $row ['operation']) {
-$onclick = "js55f846e1d1da3.asyncGetMediaInfo(" . $params ['id'] . "," . $row ['operation'] / 2 . ");";
+$onclick = "js55f93aab8f090.asyncGetMediaInfo(" . $params ['id'] . "," . $row ['operation'] / 2 . ");";
 $onclick .= "document.getElementById('folder_info').style.display='inline-block';";
 } else
 $onclick = '';

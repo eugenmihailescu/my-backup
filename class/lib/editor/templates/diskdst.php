@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : diskdst.php $
  * 
- * @id      : diskdst.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : diskdst.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -40,7 +40,7 @@ namespace MyNixWorld;
 <td colspan="3"><table style="width: 100%">
 <tr>
 <td><input type="checkbox" name="disk_enabled" id="disk_enabled"
-value="1" onclick='js55f846e1d1da3.submitOptions(this,0);'
+value="1" onclick='js55f93aab8f090.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="disk_enabled" value="0"></td>
@@ -63,7 +63,7 @@ value=<?php
 echo "'" . $this->root . "'";
 ?> size=40
 <?php echo $this->enabled_tag; ?>><a class='help'
-onclick=<?php echo '"js55f846e1d1da3.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
+onclick=<?php echo '"js55f93aab8f090.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
 <td><input type="button" id='update_disk_dir' class="button"
 value="<?php _pesc('Read disk');?>"
 onclick="<?php echo $this->getRefreshFolderJS();?>"

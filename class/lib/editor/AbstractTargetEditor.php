@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : AbstractTargetEditor.php $
  * 
- * @id      : AbstractTargetEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractTargetEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -149,7 +149,7 @@ ob_end_clean ();
 return $result;
 }
 protected function getRefreshFolderJS() {
-return $this->enabled && ! $this->hideEditorContent () ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)js55f846e1d1da3.refreshFolderList(t.value,tid.value,js55f846e1d1da3.isNull(sb.value,null),js55f846e1d1da3.isNull(sa.value,null));" : ("submitOptions(this,0);");
+return $this->enabled && ! $this->hideEditorContent () ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)js55f93aab8f090.refreshFolderList(t.value,tid.value,js55f93aab8f090.isNull(sb.value,null),js55f93aab8f090.isNull(sa.value,null));" : ("submitOptions(this,0);");
 }
 function __construct($target_item) {
 if (null == $target_item)

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : mysql-expert.php $
  * 
- * @id      : mysql-expert.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -53,7 +53,7 @@ echoHelp ( $help_1 );
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
 title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="js55f846e1d1da3.run_mysql_maint();"
+name="mysql_maint_run" onclick="js55f93aab8f090.run_mysql_maint();"
 id="btn_mysql_maint" <?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : oauth.php $
  * 
- * @id      : oauth.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : oauth.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -39,14 +39,14 @@ namespace MyNixWorld;
 <td><label for=<?php echo $enabled_name;?>><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name=<?php echo $enabled_name;?>
 id=<?php echo $enabled_name;?> value='1'
-onclick='js55f846e1d1da3.submitOptions(this,0);'
+onclick='js55f93aab8f090.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name=<?php echo $enabled_name;?>></td>
 <td><input id="unlinkacc" type="button" class="button-primary"
 value="<?php _pesc('Unlink account');?>"
 onclick="<?php
-printf ( "js55f846e1d1da3.popupConfirm('%s','%s &lt;b&gt;%s&lt/b&gt; %s &lt;b&gt;%s&lt;/b&gt;?&lt;br&gt;&lt;b&gt;%s&lt;/b&gt;%s',null,{'%s':'window.location.assign(\'%s&%s_unlink\');js55f846e1d1da3.removePopupLast();','%s':null});", _esc ( 'Confirm' ), _esc ( 'Are you sure you want to unlink' ), WPMYBACKUP, _esc ( 'from' ), $service_name, _esc ( 'Note:' ), _esc ( 'If you want to use it later you have to reauthenticate (not that it would be a big deal, though).' ), _esc ( 'Yes, I`m pretty sure' ), $this->_stripOAuthFromURL (), $this->target_name, _esc ( 'Cancel' ) );
+printf ( "js55f93aab8f090.popupConfirm('%s','%s &lt;b&gt;%s&lt/b&gt; %s &lt;b&gt;%s&lt;/b&gt;?&lt;br&gt;&lt;b&gt;%s&lt;/b&gt;%s',null,{'%s':'window.location.assign(\'%s&%s_unlink\');js55f93aab8f090.removePopupLast();','%s':null});", _esc ( 'Confirm' ), _esc ( 'Are you sure you want to unlink' ), WPMYBACKUP, _esc ( 'from' ), $service_name, _esc ( 'Note:' ), _esc ( 'If you want to use it later you have to reauthenticate (not that it would be a big deal, though).' ), _esc ( 'Yes, I`m pretty sure' ), $this->_stripOAuthFromURL (), $this->target_name, _esc ( 'Cancel' ) );
 ?>"></td>
 </tr>
 <tr>
@@ -57,7 +57,7 @@ id=<?php echo $service_edit_name;?>
 value=<?php echo "'" . $this->root . "'"; ?> size="30"
 <?php echo $this->enabled_tag; if(defined('FILE_EXPLORER')) echo ' readonly';?>><a
 class='help'
-onclick=<?php printf( '"js55f846e1d1da3.popupWindow(\'%s\',\'%s\');"',_esc('Help'),sprintf(_esc('The %s folder where to upload the backup'),$service_name));?>>[?]</a></td>
+onclick=<?php printf( '"js55f93aab8f090.popupWindow(\'%s\',\'%s\');"',_esc('Help'),sprintf(_esc('The %s folder where to upload the backup'),$service_name));?>>[?]</a></td>
 <td><input style='width: 100%;' type="button"
 id=<?php echo "'update_".$this->target_name."_dir'";?> class="button"
 value="<?php _pesc('Read folder');?>"
@@ -73,6 +73,6 @@ value=<?php
 echo "'" . $this->settings [$this->target_name . '_age'] . "'";
 ?>
 size="3" <?php echo $this->enabled_tag; ?> min="0"><a class='help'
-onclick=<?php printf('"js55f846e1d1da3.popupWindow(\'%s\',\'%s\');"',_esc('Help'),sprintf(_esc('Keep only the last n-days backups on %s'),$service_name));?>
+onclick=<?php printf('"js55f93aab8f090.popupWindow(\'%s\',\'%s\');"',_esc('Help'),sprintf(_esc('Keep only the last n-days backups on %s'),$service_name));?>
 min="0">[?]</a></td>
 </tr>

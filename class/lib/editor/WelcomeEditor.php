@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : WelcomeEditor.php $
  * 
- * @id      : WelcomeEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WelcomeEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -107,7 +107,7 @@ $this->java_scripts [] = 'parent.php_setup=function(){parent.asyncRunJob(parent.
 'action' => 'php_setup',
 'nonce' => wp_create_nonce_wrapper ( 'php_setup' ) 
 ) ) . '","PHP Setup",null, null, 4, null, -1,null,false);}';
-$this->java_scripts [] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f846e1d1da3.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts [] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js55f93aab8f090.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 if (! ($this->_init_error || empty ( $this->_addons ))) {
 $this->java_scripts_load [] = $this->_js_addon_install;
 }

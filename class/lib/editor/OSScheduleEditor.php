@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : OSScheduleEditor.php $
  * 
- * @id      : OSScheduleEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : OSScheduleEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -65,7 +65,7 @@ PHP_EOL,
 "</span>" 
 ), ob_get_contents () );
 @ob_end_clean ();
-$this->java_scripts [] = "js55f846e1d1da3.globals.help='" . str_replace ( "'", '"', $help ) . "';";
+$this->java_scripts [] = "js55f93aab8f090.globals.help='" . str_replace ( "'", '"', $help ) . "';";
 ob_start ();
 echo 'parent.globals.root="' . normalize_path ( $this->settings ['dir'] ) . '";';
 echo 'parent.globals.OS_CRON_STR=';

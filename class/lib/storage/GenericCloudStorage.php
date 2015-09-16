@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : GenericCloudStorage.php $
  * 
- * @id      : GenericCloudStorage.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : GenericCloudStorage.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -104,6 +104,7 @@ $result = 0;
 if (is_array ( $propname )) {
 $kpn = array_keys ( $propname );
 $vpn = array_values ( $propname );
+if (isset ( $metadata [$kpn [0]] ) && isset ( $metadata [$kpn [0]] [$vpn [0]] ))
 $result = $metadata [$kpn [0]] [$vpn [0]];
 } elseif (isset ( $metadata [$propname] ))
 $result = $metadata [$propname];
@@ -183,7 +184,7 @@ abstract protected function _getURI($function);
 abstract protected function renameFile($file_id, $new_name);
 abstract protected function createFolder($path_id, $name);
 protected function _getCachedMetadata($basePath, $query) {
-if (isset( $this->_cached_metadata [ $basePath])) {
+if (isset ( $this->_cached_metadata [$basePath] )) {
 $keys = array_keys ( $this->_cached_metadata [$basePath] );
 $match = false;
 foreach ( $keys as $key )

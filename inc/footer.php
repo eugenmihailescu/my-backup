@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : footer.php $
  * 
- * @id      : footer.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : footer.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -70,6 +70,6 @@ title='<?php echo !empty($copyright[0])?$copyright[0].' Copyright':'';?>'>&copy;
 echo $footer_banner;
 $allow_cookie = isset ( $_COOKIE ['cookie_accept'] ) && strToBool ( $_COOKIE ['cookie_accept'] );
 if ($allow_cookie && (! isset ( $_COOKIE ['lang'] ) || $sel_lang_code != $_COOKIE ['lang']))
-printf ( '<script type="text/javascript">js55f846e1d1da3.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
+printf ( '<script type="text/javascript">js55f93aab8f090.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
 insertHTMLSection ( $section_name, true );
 ?>

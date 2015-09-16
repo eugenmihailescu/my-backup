@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : backupjob-expert.php $
  * 
- * @id      : backupjob-expert.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -122,7 +122,7 @@ echoHelp ( $help_8 );
 <tr>
 <td colspan="2"><input type="button" class="button"
 value="<?php _pesc('Get the encryption password');?>"
-onclick="js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl,'<?php
+onclick="js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,'<?php
 echo http_build_query ( array (
 'action' => 'encryption_info',
 'nonce' => wp_create_nonce_wrapper ( 'encryption_info' ) 
@@ -131,6 +131,6 @@ echo http_build_query ( array (
 type="file" class="button" id="decrypt_file" name="decrypt_file[]"
 accept=".enc" multiple="multiple" style="display: none"> <input
 type="button" class="button" id="do_decrypt"
-value="<?php _pesc('Decrypt file');?>" onclick="js55f846e1d1da3.do_decrypt();"></td>
+value="<?php _pesc('Decrypt file');?>" onclick="js55f93aab8f090.do_decrypt();"></td>
 </tr>
 <?php }?>

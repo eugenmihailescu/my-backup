@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : support.php $
  * 
- * @id      : support.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : support.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -50,7 +50,7 @@ namespace MyNixWorld;
 <tr>
 <td colspan="3" style='text-align: center'><input type="button"
 class="button" value="<?php _pesc('Check PHP setup');?>"
-onclick="js55f846e1d1da3.php_setup();"><a style='vertical-align: middle' class='help'
+onclick="js55f93aab8f090.php_setup();"><a style='vertical-align: middle' class='help'
 onclick=<?php echo echoHelp($help_3 );?>> [?]</a></td>
 </tr>
 <tr>

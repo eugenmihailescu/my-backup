@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : sys-tools.php $
  * 
- * @id      : sys-tools.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : sys-tools.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -111,6 +111,7 @@ return ! empty ( $cmd ) ? (isWin () ? $cygwin_cmd : $cmd) : false;
 }
 function unixTarNZip($src_filename, $dst_filename, $method = 2, $level = 9, $vol_size = 0, $remove_source = false, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null, $bzip_version = null, $cygwin = null) {
 global $COMPRESSION_NAMES;
+$result = false;
 $arc = createTarNZipFilename ( $dst_filename, $method );
 if (file_exists ( $arc ))
 unlink ( $arc );

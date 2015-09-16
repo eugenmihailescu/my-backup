@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : index.php $
  * 
- * @id      : index.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : index.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -87,7 +87,7 @@ $login_obj->onCheckJavaScript = 'checkJavaScriptAvailable';
 $login_obj->setEnforceStrongPassword ();
 $login_obj->allowPasswordRecovery ( true, selfURL () );
 $login_obj->setLoginTitle ( sprintf ( _esc ( 'Login into %s' ), WPMYBACKUP ) );
-$login_obj->setOnPasswordStrength ( 'js55f846e1d1da3.passwordEntropy' );
+$login_obj->setOnPasswordStrength ( 'js55f93aab8f090.passwordEntropy' );
 $is_logged = $login_obj->isLogged ();
 ! $is_logged && _kill_too_many_requests ( $login_obj );
 ! empty ( $_POST ['action'] ) && $_POST ['action'] == 'login_recovery' && _do_password_recovery ( $login_obj );
@@ -114,7 +114,7 @@ $login_obj->logout ();
 $is_logged = false;
 }
 if ($is_logged) {
-define ( "WPMYBACKUP_LOGOFF", "<img src=\"" . plugins_url_wrapper ( 'img/avatar.png', IMG_PATH ) . "\"> <a style='cursor:pointer' onclick='js55f846e1d1da3.post(js55f846e1d1da3.this_url,{action:\"logout\"});'>" . sprintf ( _esc ( 'Logoff %s' ), $username ) . "</a>" );
+define ( "WPMYBACKUP_LOGOFF", "<img src=\"" . plugins_url_wrapper ( 'img/avatar.png', IMG_PATH ) . "\"> <a style='cursor:pointer' onclick='js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\"logout\"});'>" . sprintf ( _esc ( 'Logoff %s' ), $username ) . "</a>" );
 define ( 'DO_NOT_AFTER_SETTINGS', true ); 
 $settings = loadSettings ();
 require_once CLASS_PATH . 'regactions.php'; 

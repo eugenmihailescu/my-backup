@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogsEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -48,11 +48,11 @@ $clear_id = 'clear_' . $log_type . '_log';
 echo '<tr>';
 echo "<td><label for='$view_id'>" . ucwords ( $log_name ) . " log</label></td>";
 echo '<td>:</td>';
-echo '<td ' . ($log_exists ? '' : 'colspan="4"') . '>' . ($log_exists ? str_replace ( $this->root, '<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="js55f846e1d1da3.helpROOT();">ROOT</span>' . DIRECTORY_SEPARATOR, $logfile ) : '(log file does not exist)') . '</td>';
+echo '<td ' . ($log_exists ? '' : 'colspan="4"') . '>' . ($log_exists ? str_replace ( $this->root, '<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="js55f93aab8f090.helpROOT();">ROOT</span>' . DIRECTORY_SEPARATOR, $logfile ) : '(log file does not exist)') . '</td>';
 if ($log_exists) {
-echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='js55f846e1d1da3.post(js55f846e1d1da3.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" . (isWin () ? addslashes ( $logfile ) : $logfile) . "\",nonce:\"" . wp_create_nonce_wrapper ( 'dwl_file' ) . "\"});' title='Click to read this log file now'></td>";
-printf ( "<td><input type='button' name='%s' value='%s' class='button' onclick='js55f846e1d1da3.clearLog(\"%s\",\"%s\");' title='%s'></td>", $clear_id, _esc ( 'Clear' ), $log_type, $log_name, sprintf ( _esc ( 'Click to clear the %s log' ), $log_name ) );
-echo "<td><input type='button' id='btn_monitor{$this->_index}' title='" . sprintf ( _esc ( 'Spy the %s log' ), $log_name ) . "' onclick='js55f846e1d1da3.spy(\"log_read\",\"$log_type\",\"" . wp_create_nonce_wrapper ( 'log_read' ) . "\",\"" . wp_create_nonce_wrapper ( 'get_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'clean_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'log_read_abort' ) . "\");' class='button btn_monitor' style='display:$spy_shown'></td>";
+echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" . (isWin () ? addslashes ( $logfile ) : $logfile) . "\",nonce:\"" . wp_create_nonce_wrapper ( 'dwl_file' ) . "\"});' title='Click to read this log file now'></td>";
+printf ( "<td><input type='button' name='%s' value='%s' class='button' onclick='js55f93aab8f090.clearLog(\"%s\",\"%s\");' title='%s'></td>", $clear_id, _esc ( 'Clear' ), $log_type, $log_name, sprintf ( _esc ( 'Click to clear the %s log' ), $log_name ) );
+echo "<td><input type='button' id='btn_monitor{$this->_index}' title='" . sprintf ( _esc ( 'Spy the %s log' ), $log_name ) . "' onclick='js55f93aab8f090.spy(\"log_read\",\"$log_type\",\"" . wp_create_nonce_wrapper ( 'log_read' ) . "\",\"" . wp_create_nonce_wrapper ( 'get_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'clean_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'log_read_abort' ) . "\");' class='button btn_monitor' style='display:$spy_shown'></td>";
 $this->_index ++;
 }
 echo '</tr>';
@@ -75,7 +75,7 @@ $this->java_scripts [] = "parent.plugin_dir='" . addslashes ( dirname ( realpath
 $this->java_scripts [] = "var d = document.getElementById('monitor_job'),
 spy_status = document.getElementById('td_job_status').innerHTML,
 callback = function () {
-js55f846e1d1da3.or = function () {
+js55f93aab8f090.or = function () {
 var status = document.getElementById('td_job_status').innerHTML;
 if (status && status != spy_status) {
 d = d && d.style && d.style.display == 'none' ? 'block' : 'none';
@@ -88,7 +88,7 @@ spy_status = status;
 };" . $this->_fct_chk_status . "}";
 $this->java_scripts [] = "setInterval(callback," . LOG_CHECK_TIMEOUT . ");";
 $this->java_scripts [] = "parent.helpROOT=function(){" . getHelpCall ( "'This is the root folder where the application is installed, that is:<br><i>" . normalize_path ( $this->root ) . "</i>'", false ) . "}";
-$clear_log_click = sprintf ( 'js55f846e1d1da3.post(js55f846e1d1da3.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', wp_create_nonce_wrapper ( 'clear_log' ) );
+$clear_log_click = sprintf ( 'js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', wp_create_nonce_wrapper ( 'clear_log' ) );
 $this->java_scripts [] = "parent.clearLog=function(log_type, log_name){" . sprintf ( "parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", _esc ( 'Log clear confirmation' ), sprintf ( _esc ( 'Are you sure you want to clear the %s log file?' ), "<b>'+log_name+'</b>" ), _esc ( 'Yes' ), $clear_log_click, _esc ( 'No' ) ) . "}";
 $this->java_scripts [] = getBackupSourcesJS ( $PROGRESS_PROVIDER );
 }
@@ -97,7 +97,7 @@ parent::initTarget ();
 $this->_index = 0;
 $this->_is_running = isJobRunning ();
 $this->root = ROOT_PATH;
-$this->_fct_chk_status = "js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl,'action=chk_status&tab=logs&nonce=" . wp_create_nonce_wrapper ( 'chk_status' ) . "','td_job_status',js55f846e1d1da3.or);";
+$this->_fct_chk_status = "js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,'action=chk_status&tab=logs&nonce=" . wp_create_nonce_wrapper ( 'chk_status' ) . "','td_job_status',js55f93aab8f090.or);";
 $this->inBetweenContent = $this->_getDebugTemplate ();
 $this->_getJavaScripts ();
 }

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ActionHandler.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -570,7 +570,7 @@ global $java_scripts;
 empty ( $log_type ) && isset ( $_POST ['log_type'] ) && $log_type = $_POST ['log_type'];
 if (($log = getLogfileByType ( $log_type )) && file_exists ( $log )) {
 @unlink ( $log );
-$java_scripts [] = sprintf ( 'js55f846e1d1da3.popupWindow("%s","%s");', _esc ( 'Notice' ), sprintf ( _esc ( 'Log file <i>%s</i> deleted successfully!' ), normalize_path ( $log ) ) );
+$java_scripts [] = sprintf ( 'js55f93aab8f090.popupWindow("%s","%s");', _esc ( 'Notice' ), sprintf ( _esc ( 'Log file <i>%s</i> deleted successfully!' ), normalize_path ( $log ) ) );
 }
 }
 function reset_defaults($forcebly = false) {
@@ -588,7 +588,7 @@ $default_options = getFixedSettings () + getFactorySettings ();
 delete_option_wrapper ( WPMYBACKUP_OPTION_NAME );
 update_option_wrapper ( WPMYBACKUP_OPTION_NAME, $default_options );
 defined ( 'TARGETLIST_DB_PATH' ) && file_exists ( TARGETLIST_DB_PATH ) && @unlink ( TARGETLIST_DB_PATH );
-$java_scripts [] = sprintf ( 'js55f846e1d1da3.popupWindow("%s","%s",null,null,"#ffb600");', _esc ( 'Confirmation' ), sprintf ( _esc ( 'The application settings were reseted to their factory defaults.<br>%sPlease setup again the application in order to fit your needs.' ), $bak_str ) );
+$java_scripts [] = sprintf ( 'js55f93aab8f090.popupWindow("%s","%s",null,null,"#ffb600");', _esc ( 'Confirmation' ), sprintf ( _esc ( 'The application settings were reseted to their factory defaults.<br>%sPlease setup again the application in order to fit your needs.' ), $bak_str ) );
 }
 function del_oauth() {
 $service_name = $this->method ['service'];

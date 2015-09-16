@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : notification-expert.php $
  * 
- * @id      : notification-expert.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : notification-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -55,7 +55,7 @@ echoHelp ( $help_2 );
 <tr>
 <td colspan="3"><input type="button" class="button"
 value="<?php _pesc('Flush ALL messages');?>"
-onclick="js55f846e1d1da3.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js55f846e1d1da3.read_alerts();js55f846e1d1da3.messages_scroll(1);js55f846e1d1da3.message_info();});js55f846e1d1da3.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
+onclick="js55f93aab8f090.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js55f93aab8f090.read_alerts();js55f93aab8f090.messages_scroll(1);js55f93aab8f090.message_info();});js55f93aab8f090.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
 class='help' onclick=<?php
 echoHelp ( $help_3 );
 ?>> [?]</a></td>

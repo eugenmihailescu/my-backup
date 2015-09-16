@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : disksrc.php $
  * 
- * @id      : disksrc.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : disksrc.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -62,7 +62,7 @@ echo getHumanReadableSize ( getDirCacheSize () );
 value=<?php echo "'" . $this->root . "'"; ?> size=40
 <?php echo $this->_readonly;?>><a class='help'
 onclick=<?php
-echo '"js55f846e1d1da3.popupWindow(\'' . _esc ( 'Help' ) . '\',\'' . sprintf ( _esc ( 'The root directory to backup. When left empty then<br><b>%s</b>' ), addslashes ( WPMYBACKUP_ROOT ) ) . '\');"';
+echo '"js55f93aab8f090.popupWindow(\'' . _esc ( 'Help' ) . '\',\'' . sprintf ( _esc ( 'The root directory to backup. When left empty then<br><b>%s</b>' ), addslashes ( WPMYBACKUP_ROOT ) ) . '\');"';
 ?>>[?]</a></td>
 <td><input type="button" style='width: 100%' name='btn_wpmybackup_dir'
 class="button" value="<?php _pesc('Read disk');?>"

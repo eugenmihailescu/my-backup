@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : mysql-remote.php $
  * 
- * @id      : mysql-remote.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql-remote.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -60,7 +60,7 @@ value=<?php echo '"'.$this->_mysql_pwd.'" '.$this->enabled_tag; echo " style='".
 <td>
 <?php
 $ctrl_type = empty ( $this->_db_list ) ? 'input' : 'select';
-echo "<$ctrl_type style='width: 100%' name='mysql_db' id='mysql_db'" . (empty ( $this->_db_list ) ? ' value="' . $this->_mysql_db . '"' : '') . " $this->enabled_tag onchange='js55f846e1d1da3.submitOptions(this,0);'>";
+echo "<$ctrl_type style='width: 100%' name='mysql_db' id='mysql_db'" . (empty ( $this->_db_list ) ? ' value="' . $this->_mysql_db . '"' : '') . " $this->enabled_tag onchange='js55f93aab8f090.submitOptions(this,0);'>";
 foreach ( $this->_db_list as $db )
 echo '<option value="' . $db . '" ' . ($db == $this->_mysql_db ? 'selected' : '') . '>' . $db . '</option>';
 echo "</$ctrl_type>";
@@ -70,7 +70,7 @@ echo "</$ctrl_type>";
 <td style='text-align: right;'><label for="mysqldump"><?php _pesc('Use mysqldump');?></label></td>
 <td><input type="checkbox" name="mysqldump" id="mysqldump"
 <?php if($mysqldump)echo ' checked ';echo $this->enabled_tag;?>
-onclick="document.getElementById('tables').disabled=this.checked;js55f846e1d1da3.submitOptions(this,0);">
+onclick="document.getElementById('tables').disabled=this.checked;js55f93aab8f090.submitOptions(this,0);">
 <input type="hidden" name="mysqldump" value="0"><a class='help'
 onclick=<?php
 echoHelp ( $help_2 );

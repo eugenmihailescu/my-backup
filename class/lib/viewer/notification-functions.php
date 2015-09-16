@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : notification-functions.php $
  * 
- * @id      : notification-functions.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : notification-functions.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -115,7 +115,7 @@ $bg = ';background-color:#00ADEE';
 $tooltip = _esc ( 'Click the scrollbar to move the slider' );
 } else 
 if ($show_arrow && ! empty ( $arrow ))
-$onclick = "onclick='js55f846e1d1da3.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js55f846e1d1da3.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js55f846e1d1da3.globals.slider_down);'";
+$onclick = "onclick='js55f93aab8f090.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js55f93aab8f090.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js55f93aab8f090.globals.slider_down);'";
 elseif ($count > $max_top && $i != $offset && ! $draw_slider)
 $style .= 'row_id:' . ($i - $offset);
 $style = "$style$bg";

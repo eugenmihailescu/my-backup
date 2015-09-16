@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : ScheduleEditor.php $
  * 
- * @id      : ScheduleEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ScheduleEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -40,7 +40,7 @@ protected $_options_help;
 protected $_is_oscron_disabled;
 protected function _encloseHelpLink($str) {
 if (isset ( $this->_options_help [$str] ))
-$onclick = "onclick=\'js55f846e1d1da3.popupWindow(&quot;Help $str&quot;,&quot;{$this->_options_help[$str]}&quot;);\'";
+$onclick = "onclick=\'js55f93aab8f090.popupWindow(&quot;Help $str&quot;,&quot;{$this->_options_help[$str]}&quot;);\'";
 else
 $onclick = '';
 return '<span class=\'help schedule_param\' ' . $onclick . '>' . $str . '</span>';

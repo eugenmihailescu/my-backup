@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : ssh.php $
  * 
- * @id      : ssh.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ssh.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -38,7 +38,7 @@ namespace MyNixWorld;
 <tr>
 <td><label for="ssh_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="ssh_enabled" id="ssh_enabled"
-value="1" onclick='js55f846e1d1da3.submitOptions(this,0);'
+value="1" onclick='js55f93aab8f090.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ssh_enabled"></td>
@@ -121,7 +121,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ssh_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote SSH command');?>'
-onclick="<?php printf( "js55f846e1d1da3.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js55f846e1d1da3.ftpExecCmd(js55f846e1d1da3.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
+onclick="<?php printf( "js55f93aab8f090.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js55f93aab8f090.ftpExecCmd(js55f93aab8f090.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
 <?php echo $this->enabled_tag; ?>></td>
 <?php }?>
 </tr>

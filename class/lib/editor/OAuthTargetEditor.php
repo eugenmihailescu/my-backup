@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : OAuthTargetEditor.php $
  * 
- * @id      : OAuthTargetEditor.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : OAuthTargetEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -104,7 +104,7 @@ $this->_session = null;
 $target_auth_file = ROOT_OAUTH_FILE . $this->target_name . '.auth';
 if (isset ( $_GET [$this->target_name . '_unlink'] ) && file_exists ( $target_auth_file )) {
 unlink ( $target_auth_file );
-$this->java_scripts [] = "js55f846e1d1da3.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
+$this->java_scripts [] = "js55f93aab8f090.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
 }
 $this->_authInfo = null;
 if (file_exists ( $target_auth_file )) {
@@ -138,7 +138,7 @@ if (null == $this->_authInfo) {
 require_once OAUTH_PATH . $session_class . '.php';
 echo "<!-- Storage-Cloud auth-box -->" . PHP_EOL;
 echo '<div id="storage_authorize_div"><p class="redcaption">' . sprintf ( _esc ( '%s is not yet configured</p><p>Before using this option you have to authorize %s this application to upload files to your %s account :' ), $this->target_name_name, WPMYBACKUP, $this->target_name_name );
-echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js55f846e1d1da3.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
+echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js55f93aab8f090.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
 if ('google' == $this->target_name)
 echo '<br>' . readMoreHere ( 'https://developers.google.com/accounts/docs/OAuth2WebServer#offline', sprintf ( _esc ( 'about %s authorization scope' ), $this->target_name_name ) );
 echo '</div>' . PHP_EOL;
@@ -162,7 +162,7 @@ locationRedirect ( $this->_stripOAuthFromURL () );
 $this->_authInfo = null;
 echo "<div class='hintbox {$this->container_shape}' style='display:inline-block'>" . _esc ( 'An unexpected error occured while tried to authenticate at ' ) . ucwords ( $this->target_name ) . ":<br><p class='redcaption'>" . $e->getMessage () . '</p>';
 echo '<b>' . _esc ( 'Solution:' ) . '</b>';
-printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js55f846e1d1da3.asyncGetContent(js55f846e1d1da3.ajaxurl,\'' . http_build_query ( array (
+printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,\'' . http_build_query ( array (
 'action' => 'del_oauth',
 'service' => $this->target_name,
 'nonce' => wp_create_nonce_wrapper ( 'del_oauth' ) 

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.0-10 $
- * @commit  : bc79573e2975a220cb1cfbb08b16615f721a68c5 $
+ * @version : 0.2.2 $
+ * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Sep 14 21:14:57 2015 +0200 $
+ * @date    : Wed Sep 16 11:33:37 2015 +0200 $
  * @file    : welcome.php $
  * 
- * @id      : welcome.php | Mon Sep 14 21:14:57 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : welcome.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyNixWorld;
@@ -56,7 +56,7 @@ $err = error_get_last ();
 $err = sprintf ( _esc ( 'An unexpected error occured while initializing the application: %s' ), $err ['message'] );
 echo '<p style="color:red">', $err, '</p>';
 if (! empty ( $this->_addons ))
-printf ( '<p>' . _esc ( 'Click %s to continue.' ) . '</p>', '<input type="button" class="button" value="' . _esc ( 'this button' ) . '" onclick="' . htmlspecialchars ( str_replace ( 'parent.', 'js55f846e1d1da3.', $this->_js_addon_install ) ) . '">' );
+printf ( '<p>' . _esc ( 'Click %s to continue.' ) . '</p>', '<input type="button" class="button" value="' . _esc ( 'this button' ) . '" onclick="' . htmlspecialchars ( str_replace ( 'parent.', 'js55f93aab8f090.', $this->_js_addon_install ) ) . '">' );
 ?>
 </td>
 </tr>
@@ -132,7 +132,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <td><a id="requirements"></a>
 <h4>I. <?php _pesc('Check if your system meets the requirements');?></h4>
 <p>
-<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js55f846e1d1da3.php_setup();">');?>
+<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js55f93aab8f090.php_setup();">');?>
 </p></td>
 </tr>
 <tr>
@@ -312,7 +312,7 @@ style="list-style-type: decimal">
 </li>
 <li><?php _pesc('if the problem seems to be related to some options not saved you may check the <b>Trace Action log</b>; this log traces all requests (like save, tab changed, etc) sent from your browser to this application; if you are a (former) sysadmin or coder you might eventually hack the problem');?>
 </li>
-<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the <b>Support</b> tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js55f846e1d1da3.php_setup();">'._esc('Check PHP setup').'</a>');?>
+<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the <b>Support</b> tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js55f93aab8f090.php_setup();">'._esc('Check PHP setup').'</a>');?>
 </li>
 </ul></li>
 </ol></li>
