@@ -115,7 +115,7 @@ $bg = ';background-color:#00ADEE';
 $tooltip = _esc ( 'Click the scrollbar to move the slider' );
 } else 
 if ($show_arrow && ! empty ( $arrow ))
-$onclick = "onclick='js56816a36b58dc.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js56816a36b58dc.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js56816a36b58dc.globals.slider_down);'";
+$onclick = "onclick='js56816af34b4f1.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js56816af34b4f1.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js56816af34b4f1.globals.slider_down);'";
 elseif ($count > $max_top && $i != $offset && ! $draw_slider)
 $style .= 'row_id:' . ($i - $offset);
 $style = "$style$bg";

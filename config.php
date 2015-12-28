@@ -35,7 +35,7 @@
 
 namespace MyBackup;
 
-!defined(__NAMESPACE__."\\JS_NAMESPACE") && define ( __NAMESPACE__."\\JS_NAMESPACE" , "js56816a36b58dc" );
+!defined(__NAMESPACE__."\\JS_NAMESPACE") && define ( __NAMESPACE__."\\JS_NAMESPACE" , "js56816af34b4f1" );
 !defined(__NAMESPACE__.'\\ROOT_PATH') && define(__NAMESPACE__.'\\ROOT_PATH',dirname(__FILE__).DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\TMP_PATH') && define(__NAMESPACE__.'\\TMP_PATH',ROOT_PATH.'tmp'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\LOGS_PATH') && define(__NAMESPACE__.'\\LOGS_PATH',TMP_PATH.'logs'.DIRECTORY_SEPARATOR);

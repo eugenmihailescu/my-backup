@@ -105,7 +105,7 @@ if ( $this->is_wp ) {
 $restore_action = 'wp_restore';
 $title = _esc( 'WP Restore' );
 $on_restore_click = sprintf( 
-"js56816a36b58dc.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'job_id='+js56816a36b58dc.last_job_id+'&wp_components='+js56816a36b58dc.get_selected_wp_components());", 
+"js56816af34b4f1.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'job_id='+js56816af34b4f1.last_job_id+'&wp_components='+js56816af34b4f1.get_selected_wp_components());", 
 $restore_action, 
 $title, 
 wp_create_nonce_wrapper( $restore_action ), 
@@ -144,7 +144,7 @@ $script .= "if (parent.last_job.hasOwnProperty('files') && parent.last_job.files
 $script .= "result += '<ol style=\"list-style-type: none\">';";
 $script .= "for (j in parent.last_job.files[i])";
 $script .= "if (parent.last_job.files[i].hasOwnProperty(j))";
-$script .= "result += '<li><input type=\"checkbox\" id=\"'+j+'\" onchange=\"js56816a36b58dc.set_wp_restore_components(id,this.checked);\"><label for=\"'+j+'\">' + parent.last_job.files[i][j][0].replace(/.*[\\\/](.*)/, '$1') + '</label><span>('+parent.last_job.files[i][j][1]+')</span></li>';";
+$script .= "result += '<li><input type=\"checkbox\" id=\"'+j+'\" onchange=\"js56816af34b4f1.set_wp_restore_components(id,this.checked);\"><label for=\"'+j+'\">' + parent.last_job.files[i][j][0].replace(/.*[\\\/](.*)/, '$1') + '</label><span>('+parent.last_job.files[i][j][1]+')</span></li>';";
 $script .= "result += '</ol>'";
 $script .= "}";
 $script .= "result += '</li>';";
@@ -164,7 +164,7 @@ $this->_stat_manager = getJobsStatManager( $this->settings );
 protected function getEditorTemplate() {
 $backup_action = 'run_backup';
 $on_backup_click = sprintf( 
-"js56816a36b58dc.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,null,js56816a36b58dc.get_last_jobinfo);", 
+"js56816af34b4f1.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,null,js56816af34b4f1.get_last_jobinfo);", 
 $backup_action, 
 _esc( 'Backup' ), 
 wp_create_nonce_wrapper( $backup_action ), 
@@ -184,7 +184,7 @@ _esc( 'Press %s to start restoring the chosen WP components or %s to abort this 
 '<strong>' . $cancel_btn . '</strong>' );
 $html .= '</div>';
 $on_restore_click = sprintf( 
-"js56816a36b58dc.wp_restore_components={};js56816a36b58dc.popupConfirm('%s','%s'+js56816a36b58dc.get_wp_restore_components_html(),null,{'%s':'js56816a36b58dc.removePopupLast();js56816a36b58dc.run_wp_restore();','%s':null},null);", 
+"js56816af34b4f1.wp_restore_components={};js56816af34b4f1.popupConfirm('%s','%s'+js56816af34b4f1.get_wp_restore_components_html(),null,{'%s':'js56816af34b4f1.removePopupLast();js56816af34b4f1.run_wp_restore();','%s':null},null);", 
 _esc( 'WP Restore' ), 
 htmlspecialchars( $html ), 
 $restore_btn, 
@@ -192,7 +192,7 @@ $cancel_btn );
 } elseif ( defined( __NAMESPACE__.'\\JOB_RESTORE' ) ) {
 $on_restore_click = sprintf( '' );
 }
-$on_viewlog_click = 'js56816a36b58dc.asyncGetJobLog(js56816a36b58dc.last_job_id);';
+$on_viewlog_click = 'js56816af34b4f1.asyncGetJobLog(js56816af34b4f1.last_job_id);';
 $next_schedule = $this->is_wp ? wp_next_scheduled( WPCRON_SCHEDULE_HOOK_NAME ) : 'TBD';
 $next_schedule = empty( $next_schedule ) ? _esc( 'undefined' ) : date( DATETIME_FORMAT, $next_schedule );
 require_once $this->getTemplatePath( 'dashboard.php' );

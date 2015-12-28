@@ -50,7 +50,7 @@ namespace MyBackup;
 <tr>
 <td colspan="3" style='text-align: center'><input type="button"
 class="button" value="<?php _pesc('Check PHP setup');?>"
-onclick="js56816a36b58dc.php_setup();"><a style='vertical-align: middle' class='help'
+onclick="js56816af34b4f1.php_setup();"><a style='vertical-align: middle' class='help'
 onclick=<?php echo echoHelp($help_3 );?>> [?]</a></td>
 </tr>
 <tr>

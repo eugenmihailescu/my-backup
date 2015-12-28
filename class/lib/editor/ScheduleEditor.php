@@ -40,7 +40,7 @@ protected $_options_help;
 protected $_is_oscron_disabled;
 protected function _encloseHelpLink($str) {
 if (isset ( $this->_options_help [$str] ))
-$onclick = "onclick=\'js56816a36b58dc.popupWindow(&quot;Help $str&quot;,&quot;{$this->_options_help[$str]}&quot;);\'";
+$onclick = "onclick=\'js56816af34b4f1.popupWindow(&quot;Help $str&quot;,&quot;{$this->_options_help[$str]}&quot;);\'";
 else
 $onclick = '';
 return '<span class=\'help schedule_param\' ' . $onclick . '>' . $str . '</span>';

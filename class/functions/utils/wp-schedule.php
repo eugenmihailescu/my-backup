@@ -68,7 +68,7 @@ $params = array (
 'nonce' => wp_create_nonce_wrapper ( 'set_wpcron_schedule' ),
 'schedule' => $job_props ['schedule'] 
 );
-$img_click = 'js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
+$img_click = 'js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
 $img_title = _esc ( 'Click to update the schedule datetime' );
 $img = "<img id='img_$uniq_id' src='" . plugins_url_wrapper ( 'img/save.png', IMG_PATH ) . "' style='display:none;cursor:pointer;' onclick='$img_click' title='$img_title'>";
 $input = "<input type='datetime' id='edt_$uniq_id' value='$timestamp' maxlength='19' size='19' style='display:none'>";

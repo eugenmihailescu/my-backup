@@ -166,7 +166,7 @@ ob_end_clean();
 return $result;
 }
 protected function getRefreshFolderJS() {
-return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)js56816a36b58dc.refreshFolderList(t.value,tid.value,js56816a36b58dc.isNull(sb.value,null),js56816a36b58dc.isNull(sa.value,null));" : ( "submitOptions(this,0);" );
+return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)js56816af34b4f1.refreshFolderList(t.value,tid.value,js56816af34b4f1.isNull(sb.value,null),js56816af34b4f1.isNull(sa.value,null));" : ( "submitOptions(this,0);" );
 }
 function __construct( $target_item ) {
 if ( null == $target_item )

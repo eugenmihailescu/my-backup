@@ -62,7 +62,7 @@ echo getHumanReadableSize( getDirCacheSize() );
 value=<?php echo "'" . $this->root . "'"; ?> size=40
 <?php echo $this->_readonly;?>><a class='help'
 onclick=<?php
-echo '"js56816a36b58dc.popupWindow(\'' . _esc( 'Help' ) . '\',\'' .
+echo '"js56816af34b4f1.popupWindow(\'' . _esc( 'Help' ) . '\',\'' .
 sprintf( 
 _esc( 'The root directory to backup. When left empty then<br><b>%s</b>' ), 
 addslashes( WPMYBACKUP_ROOT ) ) . '\');"';

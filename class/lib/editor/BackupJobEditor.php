@@ -52,7 +52,7 @@ wp_create_nonce_wrapper( 'get_progress' ) . "','" . wp_create_nonce_wrapper( 'cl
 "','" . wp_create_nonce_wrapper( 'abort_job' ) . "');};";
 if ( ! empty( $registered_ciphres ) && isset( $this->settings['encryption'] ) &&
 ! empty( $this->settings['encryption'] ) ) {
-$this->java_scripts[] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js56816a36b58dc.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts[] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js56816af34b4f1.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 $this->java_scripts[] = "parent.do_decrypt=function(){var b=document.getElementById('do_decrypt'),e=document.getElementById('decrypt_file');e.onchange=function(){b.className='button-primary';b.style.display='inline-block';b.value='" .
 _esc( 'Decrypt Now' ) .
 "';};if('none'==e.style.display){e.style.display='inline-block';b.style.display='none';}else{parent.decrypt_action('decrypt_file','" .

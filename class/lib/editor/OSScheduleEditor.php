@@ -65,7 +65,7 @@ PHP_EOL,
 "</span>" 
 ), ob_get_contents () );
 @ob_end_clean ();
-$this->java_scripts [] = "js56816a36b58dc.globals.help='" . str_replace ( "'", '"', $help ) . "';";
+$this->java_scripts [] = "js56816af34b4f1.globals.help='" . str_replace ( "'", '"', $help ) . "';";
 ob_start ();
 echo 'parent.globals.root="' . normalize_path ( $this->settings ['dir'] ) . '";';
 echo 'parent.globals.OS_CRON_STR=';

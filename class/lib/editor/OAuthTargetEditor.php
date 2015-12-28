@@ -104,7 +104,7 @@ $this->_session = null;
 $target_auth_file = ROOT_OAUTH_FILE . $this->target_name . '.auth';
 if (isset ( $_GET [$this->target_name . '_unlink'] ) && file_exists ( $target_auth_file )) {
 unlink ( $target_auth_file );
-$this->java_scripts [] = "js56816a36b58dc.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
+$this->java_scripts [] = "js56816af34b4f1.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
 }
 $this->_authInfo = null;
 if (file_exists ( $target_auth_file )) {
@@ -138,7 +138,7 @@ if (null == $this->_authInfo) {
 require_once OAUTH_PATH . $session_class . '.php';
 echo "<!-- Storage-Cloud auth-box -->" . PHP_EOL;
 echo '<div id="storage_authorize_div"><p class="redcaption">' . sprintf ( _esc ( '%s is not yet configured</p><p>Before using this option you have to authorize %s to upload files to your %s account :' ), $this->target_name_name, WPMYBACKUP, $this->target_name_name );
-echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js56816a36b58dc.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
+echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js56816af34b4f1.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
 if ('google' == $this->target_name)
 echo '<br>' . readMoreHere ( 'https://developers.google.com/accounts/docs/OAuth2WebServer#offline', sprintf ( _esc ( 'about %s authorization scope' ), $this->target_name_name ) );
 echo '</div>' . PHP_EOL;
@@ -162,7 +162,7 @@ locationRedirect ( $this->_stripOAuthFromURL () );
 $this->_authInfo = null;
 echo "<div class='hintbox {$this->container_shape}' style='display:inline-block'>" . _esc ( 'An unexpected error occured while tried to authenticate at ' ) . ucwords ( $this->target_name ) . ":<br><p class='redcaption'>" . $e->getMessage () . '</p>';
 echo '<b>' . _esc ( 'Solution:' ) . '</b>';
-printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,\'' . http_build_query ( array (
+printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,\'' . http_build_query ( array (
 'action' => 'del_oauth',
 'service' => $this->target_name,
 'nonce' => wp_create_nonce_wrapper ( 'del_oauth' ) 

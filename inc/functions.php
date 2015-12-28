@@ -152,8 +152,8 @@ if ( ! empty( $java_scripts_unload ) )
 $js .= 'parent._addEventListener(window,parent.ie<9?"on":"")+"unload",function(){' .
 implode( '', $java_scripts_unload ) . '});' . PHP_EOL;
 $js = '<script>' . sprintf( JS_INJECT_COMMENT, 'page' ) .
-'window.js56816a36b58dc.local=(function(window,parent,undefined){' . $js . '})(this,window.js56816a36b58dc);' . PHP_EOL .
-'window.jsnspace=window.js56816a36b58dc;' . PHP_EOL . '</script>' . PHP_EOL;
+'window.js56816af34b4f1.local=(function(window,parent,undefined){' . $js . '})(this,window.js56816af34b4f1);' . PHP_EOL .
+'window.jsnspace=window.js56816af34b4f1;' . PHP_EOL . '</script>' . PHP_EOL;
 $js = ( ! empty( $chart_script ) ? "<script src=\"https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart','gauge']}]}\"></script>" .
 PHP_EOL : '' ) . $js;
 if ( ! defined( __NAMESPACE__."\\YAYUI_HANDLER" ) && YAYUI_COMPRESS && ( "YAYUI_HANDLER" ) &&
@@ -175,7 +175,7 @@ $section_name = 'Debug Statusbar JavaScript';
 $script = insertHTMLSection( $section_name, false, false, ! $enclosed_script );
 $signature = sprintf( JS_INJECT_COMMENT, 'debug' );
 $script .= $enclosed_script ? '<script type="text/javascript">' . $signature .
-'window.js56816a36b58dc.local=(function(window,parent,undefined){' . PHP_EOL : $signature;
+'window.js56816af34b4f1.local=(function(window,parent,undefined){' . PHP_EOL : $signature;
 $script .= '("undefined"==typeof parent)&&window.location.reload(true);';
 $script .= 'Date.now = Date.now || function() { return +new Date; };';
 $script .= "(function(){var el=document.getElementById('notification_debug'),doc=document.documentElement.innerHTML,doc_len=doc.length,dom_ready_time=(Date.now()-window.page_start_loading)/1000,i,yayui='';if(document.children)for(i=0;i<document.children.length;i+=1)if(document.childNodes[i].textContent){var cmt=document.childNodes[i].textContent.match(/.*minified by YAYUI[^\d]+([\d\.]+%)\((\d+).*/);if(cmt){yayui='YAYUI: '+cmt[1]+'(ie. '+cmt[2]+' bytes); ';break;}}if(el)el.innerHTML='PHP debug:" .
@@ -184,7 +184,7 @@ $script .= "(function(){var el=document.getElementById('notification_debug'),doc
 ( defined( __NAMESPACE__.'\\STATISTICS_DEBUG' ) && STATISTICS_DEBUG ? 'on' : 'off' ) .
 "'+el.innerHTML.replace(/\((.*)\)/g,'($1; DOMlength: '+doc_len+' bytes; '+yayui+'DOMready: '+dom_ready_time.toFixed(3)+'s => '+(doc_len/dom_ready_time/1024).toFixed(1)+'KiB/s)');})();parent._addEventListener(window,'load',function(){var el=document.getElementById('notification_debug');if(el && el.innerHTML){var m=el.innerHTML.match(/\([\w\s]+:([\d\.]+)s/i); m=m?m[1]:'0';var server_load_time=parseFloat(m),window_load_time=(Date.now()-window.page_start_loading)/1000,total_time=server_load_time+window_load_time;el.innerHTML=el.innerHTML.replace(/\((.*)\)/,'($1; page loaded: '+window_load_time.toFixed(3)+'s => <b> total time:'+total_time.toFixed(3)+'s</b>)');el.style.display='';}},false);";
 $enclosed_script &&
-$script .= '})(this,window.js56816a36b58dc);' . PHP_EOL . 'window.jsnspace=window.js56816a36b58dc;' . PHP_EOL . '</script>';
+$script .= '})(this,window.js56816af34b4f1);' . PHP_EOL . 'window.jsnspace=window.js56816af34b4f1;' . PHP_EOL . '</script>';
 $script .= insertHTMLSection( $section_name, true, false, ! $enclosed_script );
 $java_scripts[] = $script;
 return $script;
@@ -203,7 +203,7 @@ parent.addHeaderToggle(h4s, true,'$img_path');}";
 function insertWarningBox( $cookie_name, $title, $message, $icon, $buttons, $force = false ) {
 if ( isset( $_COOKIE[$cookie_name] ) && ! $force )
 return;
-$format = "js56816a36b58dc.setCookie('$cookie_name','%s',%d); var el=document.getElementById('{$cookie_name}_box');el.style.position='relative';el.style.top=-100+'px';setTimeout(function(){el.style.display='none';},750);";
+$format = "js56816af34b4f1.setCookie('$cookie_name','%s',%d); var el=document.getElementById('{$cookie_name}_box');el.style.position='relative';el.style.top=-100+'px';setTimeout(function(){el.style.display='none';},750);";
 $accept[false] = sprintf( $format, 'false', COOKIE_NOACCEPT_MAXAGE );
 $accept[true] = sprintf( $format, 'true', COOKIE_ACCEPT_MAXAGE );
 ob_start();
@@ -298,7 +298,7 @@ return $visible_tabs;
 }
 function insertFooterBar() {
 global $tab_orientation, $settings;
-$export = "js56816a36b58dc.post(js56816a36b58dc.ajaxurl,{action:\\'export_settings\\',format:\\'%s\\',nonce:\\'" .
+$export = "js56816af34b4f1.post(js56816af34b4f1.ajaxurl,{action:\\'export_settings\\',format:\\'%s\\',nonce:\\'" .
 wp_create_nonce_wrapper( 'export_settings' ) . "\\'});";
 $section_name = 'Update/Reset buttons';
 insertHTMLSection( $section_name );
@@ -311,20 +311,20 @@ id='btn-container'>
 <td><input type="button" name='update_wpmybackup_option'
 <?php echo $disabled;?> class="button-primary"
 value="<?php _pesc('Save settings');?>"
-onclick="js56816a36b58dc.submitOptions(this,0);"
+onclick="js56816af34b4f1.submitOptions(this,0);"
 title='<?php _pesc('Click to save these options now. It saves also when you click the Run Backup, Read or Download buttons');?>'></td>
 <td><input type="button" name='reset_wpmybackup_option'
 <?php echo $disabled;?> class="button-primary"
 value="<?php _pesc('Reset defaults');?>"
-onclick="<?php echo "js56816a36b58dc.popupConfirm('"._esc('Settings removal confirm')."','"._esc('Are you really,really sure you want to reset &lt;b&gt;ALL options from ALL TABS&lt;/b&gt; to their factory defaults?')."','#ff2c00',{'"._esc('Yes, reset them!')."':'window.onbeforeunload=null;js56816a36b58dc.post(js56816a36b58dc.this_url,{action:\'reset_defaults\',nonce:\'".wp_create_nonce_wrapper('reset_defaults')."\'});js56816a36b58dc.removePopupLast();','"._esc('Cancel')."':null});";?>"
+onclick="<?php echo "js56816af34b4f1.popupConfirm('"._esc('Settings removal confirm')."','"._esc('Are you really,really sure you want to reset &lt;b&gt;ALL options from ALL TABS&lt;/b&gt; to their factory defaults?')."','#ff2c00',{'"._esc('Yes, reset them!')."':'window.onbeforeunload=null;js56816af34b4f1.post(js56816af34b4f1.this_url,{action:\'reset_defaults\',nonce:\'".wp_create_nonce_wrapper('reset_defaults')."\'});js56816af34b4f1.removePopupLast();','"._esc('Cancel')."':null});";?>"
 title='<?php _pesc('Click to reset these options to factory defaults.');?>'></td>
 <td><input type="button" name='dwl_wpmybackup_option' <?php echo $disabled;?>
 class="button-primary" value="<?php _pesc('Export settings');?>"
-onclick="<?php echo "js56816a36b58dc.popupPrompt('"._('Export settings')."','"._esc('Choose the format to export the current settings to a file on your local system.')."',null,{'"._esc('XML format')."':'".sprintf($export,'xml')."','"._esc('JSON format')."':'".sprintf($export,'json')."','"._esc('.ini format')."':'".sprintf($export,'ini')."','"._esc('Cancel')."':null});";?>"></td>
+onclick="<?php echo "js56816af34b4f1.popupPrompt('"._('Export settings')."','"._esc('Choose the format to export the current settings to a file on your local system.')."',null,{'"._esc('XML format')."':'".sprintf($export,'xml')."','"._esc('JSON format')."':'".sprintf($export,'json')."','"._esc('.ini format')."':'".sprintf($export,'ini')."','"._esc('Cancel')."':null});";?>"></td>
 <td><input type="submit" class="button-primary"
 title="<?php _pesc('Allow/disallow changes of settings');?>"
 id="<?php echo $locked?'btn_unlock_settings':'btn_lock_settings';?>"
-onclick="document.getElementById('locked_settings').value='<?php echo !$locked?1:0;?>';js56816a36b58dc.submitOptions(this,0);"
+onclick="document.getElementById('locked_settings').value='<?php echo !$locked?1:0;?>';js56816af34b4f1.submitOptions(this,0);"
 value="<?php echo '&nbsp;&nbsp;&nbsp;'.($locked?_esc('Unlock'):_esc('Lock'));?>"></td>
 <td>
 <div class="spin" id="spin_save"></div>

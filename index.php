@@ -98,7 +98,7 @@ $login_obj->onCheckJavaScript = 'checkJavaScriptAvailable';
 $login_obj->setEnforceStrongPassword();
 $login_obj->allowPasswordRecovery( true, selfURL() );
 $login_obj->setLoginTitle( sprintf( _esc( 'Login into %s' ), WPMYBACKUP ) );
-$login_obj->setOnPasswordStrength( 'js56816a36b58dc.passwordEntropy' );
+$login_obj->setOnPasswordStrength( 'js56816af34b4f1.passwordEntropy' );
 $is_logged = $login_obj->isLogged();
 ! $is_logged && _kill_too_many_requests( $login_obj );
 ! empty( $_POST['action'] ) && $_POST['action'] == 'login_recovery' && _do_password_recovery( $login_obj );
@@ -128,7 +128,7 @@ if ( $is_logged ) {
 define( 
 __NAMESPACE__."\\WPMYBACKUP_LOGOFF", 
 "<img src=\"" . plugins_url_wrapper( 'img/avatar.png', IMG_PATH ) .
-"\"> <a style='cursor:pointer' onclick='js56816a36b58dc.post(js56816a36b58dc.this_url,{action:\"logout\"});'>" .
+"\"> <a style='cursor:pointer' onclick='js56816af34b4f1.post(js56816af34b4f1.this_url,{action:\"logout\"});'>" .
 sprintf( _esc( 'Logoff %s' ), $username ) . "</a>" );
 define( __NAMESPACE__.'\\DO_NOT_AFTER_SETTINGS', true ); 
 $settings = loadSettings();

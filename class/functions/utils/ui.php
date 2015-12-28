@@ -96,7 +96,7 @@ function getSSLIcon() {
 if ( ! isSSL() ) {
 $icon = 'security-high.png';
 $title = _esc( 'Warning' );
-$function = "js56816a36b58dc.popupError";
+$function = "js56816af34b4f1.popupError";
 $msg = sprintf( 
 "Password fields present on an insecure (http://) page. This is a security risk that allows user login credentials to be stolen.%s : %s", 
 sprintf( '<br><br><b>%s</b>', _esc( 'Solution' ) ), 
@@ -109,7 +109,7 @@ escape_quotes( '<ol type="i"><li>' ) ) );
 } else {
 $icon = 'security-low.png';
 $title = _esc( 'Notice' );
-$function = "js56816a36b58dc.popupWindow";
+$function = "js56816af34b4f1.popupWindow";
 $msg = _esc( 
 "Password fields present on an secure (https://) page.<br>Thanks to the SSL your password is safe, nobody between this<br>PC and the web server can read/stole your password likewise<br>no other data send/received between these two machines." ) .
 '<br>';

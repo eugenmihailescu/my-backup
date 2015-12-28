@@ -180,7 +180,7 @@ return ( $quote_enclosed ? '"' : '' ) . "window.jsnspace.popupWindow('" .
 }
 function getPopup( $caption, $msg, $escaped = true ) {
 $escape_char = $escaped ? "\\" : '';
-return "<a class=$escape_char'help$escape_char' onclick=$escape_char'js56816a36b58dc.popupWindow(&quot;" . _esc( 'Help' ) .
+return "<a class=$escape_char'help$escape_char' onclick=$escape_char'js56816af34b4f1.popupWindow(&quot;" . _esc( 'Help' ) .
 "&quot;,$msg," . DEFAULT_JSPOPUP_WIDTH . ");$escape_char'>$caption</a>";
 }
 function highlight_inner_keys( $s, $array, $escaped = true ) {
@@ -238,7 +238,7 @@ function getExample( $caption, $message, $collapsed = true, $escape = true, $img
 global $container_shape;
 $id = uniqid( 'ex_' );
 $result = "<div class='postbox $container_shape' id='$id' style='padding:10px'><h4 class='hintbox $container_shape' style='border-radius:5px 5px 0 0;'><div style='display:inline-block'><b>$caption</b></div></h4><div class='inside $container_shape' style='padding:10px;border:1px solid #c0c0c0;border-top:none;background-color:#f5f5f5;margin:0;border-radius:0 0 5px 5px;'>$message</div></div>";
-$script = "<script>var el=document.getElementById('$id');js56816a36b58dc.addHeaderToggle(el.getElementsByTagName('h4'),true,'" .
+$script = "<script>var el=document.getElementById('$id');js56816af34b4f1.addHeaderToggle(el.getElementsByTagName('h4'),true,'" .
 ( empty( $img_path ) ? plugins_url_wrapper( 'img/', IMG_PATH ) : $img_path ) . "');" .
 ( $collapsed ? '' : "el.getElementsByTagName('h4')[0].click();" ) . '</script>';
 $x = $return_array ? '' : $script;

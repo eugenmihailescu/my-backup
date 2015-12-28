@@ -150,13 +150,13 @@ echoHelp( $help_8 );
 <tr>
 <td colspan="2"><input type="button" class="button"
 value="<?php _pesc('Get the encryption password');?>"
-onclick="js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,'<?php
+onclick="js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,'<?php
 echo http_build_query( 
 array( 'action' => 'encryption_info', 'nonce' => wp_create_nonce_wrapper( 'encryption_info' ) ) );
 ?>',null, null, null, '<?php _esc('Encryption info');?>', false);"> <input
 type="file" class="button" id="decrypt_file" name="decrypt_file[]"
 accept=".enc" multiple="multiple" style="display: none"> <input type="button"
 class="button" id="do_decrypt" value="<?php _pesc('Decrypt file');?>"
-onclick="js56816a36b58dc.do_decrypt();"></td>
+onclick="js56816af34b4f1.do_decrypt();"></td>
 </tr>
 <?php }?>

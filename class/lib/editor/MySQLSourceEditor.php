@@ -195,7 +195,7 @@ parent.removePopupLast();
 parent.mysql_table_selector=function(){
 var e=document.getElementById('tables'),items,i,p='',r,callback;
 if(parent.globals.UNDEFINED==typeof e)return; 
-parent.popupConfirm('Table Selector','<?php echo str_replace(PHP_EOL,'',$tables);?>',null,{ 'Select all' : 'js56816a36b58dc.mysql_table_select(true);','Deselect all' : 'js56816a36b58dc.mysql_table_select(null,true);','Save' : 'js56816a36b58dc.mysql_table_save();','Cancel' :null },'auto');
+parent.popupConfirm('Table Selector','<?php echo str_replace(PHP_EOL,'',$tables);?>',null,{ 'Select all' : 'js56816af34b4f1.mysql_table_select(true);','Deselect all' : 'js56816af34b4f1.mysql_table_select(null,true);','Save' : 'js56816af34b4f1.mysql_table_save();','Cancel' :null },'auto');
 if(i=e.value.indexOf('[')){
 p=e.value.substr(0,i);
 r=new RegExp('^'+p+'.+$');
@@ -287,7 +287,7 @@ $mysql_format = $this->settings['mysql_format'];
 $mysqldump = strToBool( $this->settings['mysqldump'] );
 $prefix_label = empty( $this->_db_prefix ) || count( $this->_db_prefixes ) > 1 ? '[*]' : $this->_db_prefix;
 if ( $this->enabled )
-$prefix_html = sprintf( '<a class="help" onclick="js56816a36b58dc.mysql_table_selector();">%s</a>', $prefix_label );
+$prefix_html = sprintf( '<a class="help" onclick="js56816af34b4f1.mysql_table_selector();">%s</a>', $prefix_label );
 else
 $prefix_html = getSpan( $prefix_label, '#00adee' );
 require_once $this->getTemplatePath( 'mysql.php' );

@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td colspan="3"><input type="checkbox" id="schedule_enabled"
 name="schedule_enabled" value="1"
-onclick="js56816a36b58dc.toggle_enabled('schedule_grp',this.checked);"
+onclick="js56816af34b4f1.toggle_enabled('schedule_grp',this.checked);"
 <?php
 if (strToBool ( $this->settings ['schedule_enabled'] ))
 echo 'checked';

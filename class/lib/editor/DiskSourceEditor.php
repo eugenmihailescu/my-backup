@@ -91,17 +91,17 @@ $help_1 = "'" .
 _esc( 
 'Calculates and displays the file/folder size.<br>It may take some time to complete such task so use it with care.<br>Anyway, I will cache the data so that it will load faster next time.<br>If the data is not accurate you should clear the cache.' ) .
 "'";
-$reload_file_list = "js56816a36b58dc.navFilesList(null,0,'" . wp_create_nonce_wrapper( 'auto_save' ) . "');";
-$reload_file_list1 = 'js56816a36b58dc.submitOptions(this,0);';
+$reload_file_list = "js56816af34b4f1.navFilesList(null,0,'" . wp_create_nonce_wrapper( 'auto_save' ) . "');";
+$reload_file_list1 = 'js56816af34b4f1.submitOptions(this,0);';
 $show_file_size_toggle = sprintf( 
-"if(this.checked)js56816a36b58dc.popupConfirm('%s','%s',null,{'%s':'$reload_file_list1;js56816a36b58dc.removePopupLast();','%s':'document.getElementById(\'dir_show_size\').checked=false;js56816a36b58dc.removePopupLast();'});else $reload_file_list1", 
+"if(this.checked)js56816af34b4f1.popupConfirm('%s','%s',null,{'%s':'$reload_file_list1;js56816af34b4f1.removePopupLast();','%s':'document.getElementById(\'dir_show_size\').checked=false;js56816af34b4f1.removePopupLast();'});else $reload_file_list1", 
 _esc( 'Warning' ), 
 _esc( 
 'On large folders (i.e. thousands of files) displaying the folder size may take some time. Are you really sure you want to reload the list with this option on?' ), 
 _esc( 'Yes, I`m pretty sure' ), 
 _esc( 'Cancel' ) );
 $clear_cache_click = sprintf( 
-"js56816a36b58dc.popupConfirm('%s','%s',null,{'%s':'document.getElementsByName(\'clear_disk_cache\')[0].value=1;$reload_file_list1;','%s':null});", 
+"js56816af34b4f1.popupConfirm('%s','%s',null,{'%s':'document.getElementsByName(\'clear_disk_cache\')[0].value=1;$reload_file_list1;','%s':null});", 
 _esc( 'Confirm' ), 
 _esc( 
 'This command will clear the cache that stores the folder(s) size. The cache improves the speed of loading this page when &lt;b&gt;Show file size&lt;/b&gt; option on. The cache, however, will be automatically recreated whenever is needed.&lt;br;&gt;Are you sure you want do that now?' ), 

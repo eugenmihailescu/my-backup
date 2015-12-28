@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td><label for="ssh_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="ssh_enabled" id="ssh_enabled" value="1"
-onclick='js56816a36b58dc.submitOptions(this,0);'
+onclick='js56816af34b4f1.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ssh_enabled"></td>
@@ -120,7 +120,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ssh_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote SSH command');?>'
-onclick="<?php printf( "js56816a36b58dc.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js56816a36b58dc.ftpExecCmd(js56816a36b58dc.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
+onclick="<?php printf( "js56816af34b4f1.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js56816af34b4f1.ftpExecCmd(js56816af34b4f1.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
 <?php echo $this->enabled_tag; ?>></td>
 <?php }?>
 </tr>

@@ -59,7 +59,7 @@ if ( ! empty( $this->_addons ) )
 printf( 
 '<p>' . _esc( 'Click %s to continue.' ) . '</p>', 
 '<input type="button" class="button" value="' . _esc( 'this button' ) . '" onclick="' .
-htmlspecialchars( str_replace( 'parent.', 'js56816a36b58dc.', $this->_js_addon_install ) ) . '">' );
+htmlspecialchars( str_replace( 'parent.', 'js56816af34b4f1.', $this->_js_addon_install ) ) . '">' );
 ?>
 </td>
 </tr>
@@ -148,7 +148,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <td><a id="requirements"></a>
 <h4>I. <?php _pesc('Check if your system meets the requirements');?></h4>
 <p>
-<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js56816a36b58dc.php_setup();">');?>
+<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js56816af34b4f1.php_setup();">');?>
 </p></td>
 </tr>
 <tr>
@@ -333,7 +333,7 @@ style="list-style-type: decimal">
 </li>
 <li><?php _pesc('if the problem seems to be related to some options not saved you may check the <b>Trace Action log</b>; this log traces all requests (like save, tab changed, etc) sent from your browser to this application; if you are a (former) sysadmin or coder you might eventually hack the problem');?>
 </li>
-<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js56816a36b58dc.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
+<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js56816af34b4f1.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
 </li>
 </ul></li>
 </ol></li>

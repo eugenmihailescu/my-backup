@@ -44,7 +44,7 @@ $is_win = isWin();
 if ( 'fssource' == $method['sender'] )
 if ( DIRECTORY_SEPARATOR != $root && ! $is_win || $is_win && strlen( $root ) > 3 ) {
 $div_id = uniqid( "dwl_spin_", MORE_ENTROPY );
-$folder_up_onclick = 'js56816a36b58dc.navFilesList("' . normalize_path( dirname( $root ) ) . '",-1,"' .
+$folder_up_onclick = 'js56816af34b4f1.navFilesList("' . normalize_path( dirname( $root ) ) . '",-1,"' .
 wp_create_nonce_wrapper( 'auto_save' ) . '");';
 echo sprintf( 
 "<tr  onclick='%s'><td><div class='folderup' style='background-image: url(img/go-back.png)' id='%s' onclick='%s'></div><a>&nbsp;..</a></td>", 
@@ -59,7 +59,7 @@ echo '<tr><td class="caption">' . _esc( 'Folder' ) . '</td><td class="caption" a
 _esc( 'Size' ) . '</td></tr>';
 $chk = ( "" == $method["excludedirs"] ? "checked='checked'" : "" );
 $root_id = uniqid( 'f_', MORE_ENTROPY );
-echo "<tr ><td><input type='checkbox' id='root_dir' onclick='js56816a36b58dc.toggle_children(this);' name='$root_id' $chk>" .
+echo "<tr ><td><input type='checkbox' id='root_dir' onclick='js56816af34b4f1.toggle_children(this);' name='$root_id' $chk>" .
 getSpanE( $root ) . "</td>";
 if ( $dir_show_size )
 echo '<td>' . getHumanReadableSize( getDirSizeFromCache( $root ) ) . '</td>';
@@ -102,7 +102,7 @@ $fsize = $dir['size'];
 isset( $dir['desc'] ) && $fdesc = $dir['desc'];
 isset( $dir['style'] ) && $style = $dir['style'];
 isset( $dir['class'] ) && $class = $dir['class'];
-$onclick = isset( $dir['click'] ) ? trim( $dir['click'] ) : 'js56816a36b58dc.refreshFileList(this);';
+$onclick = isset( $dir['click'] ) ? trim( $dir['click'] ) : 'js56816af34b4f1.refreshFileList(this);';
 }
 $chk_id = $parent_id . '.' . $i++;
 $indent = 2 * $level . 'em';
@@ -115,7 +115,7 @@ else
 $style['link'] .= ';text-decoration:line-through';
 $title = ! empty( $fdesc ) ? " title='$fname' " : '';
 echo "<tr" . ( ! isset( $style['row'] ) ? '' : " style='{$style['row']}'" ) .
-"><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='js56816a36b58dc.toggle_children(this);' $chk><a " .
+"><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='js56816af34b4f1.toggle_children(this);' $chk><a " .
 ( empty( $class ) ? '' : " class=\"$class\"" ) . $title .
 ( empty( $onclick ) ? '' : 'onclick="' . $onclick . '"' ) .
 ( ! empty( $style['link'] ) ? 'style="' . $style['link'] . '"' : '' ) . ">" .

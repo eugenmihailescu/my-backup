@@ -42,7 +42,7 @@ id="mysql_maint"
 if ($enabled)
 echo 'checked';
 if ($this->enabled)
-echo " onclick='js56816a36b58dc.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
+echo " onclick='js56816af34b4f1.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
 echo $this->enabled ? '' : ' disabled';
 ?>><input type="hidden" name="mysql_maint" value="0"></td>
 <td><label for="mysql_maint"><?php _pesc('MySQL Table maintenance');?></label><a
@@ -53,7 +53,7 @@ echoHelp ( $help_1 );
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
 title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="js56816a36b58dc.run_mysql_maint();"
+name="mysql_maint_run" onclick="js56816af34b4f1.run_mysql_maint();"
 id="btn_mysql_maint" <?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>

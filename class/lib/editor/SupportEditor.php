@@ -93,7 +93,7 @@ $this->_getExpertJavaScripts();
 private function _getExpertJavaScripts() {
 $this->java_scripts[] = "parent.print_debug_sample=function(type){parent.asyncGetContent(parent.ajaxurl,'action=print_debug_sample&type='+type+'&nonce=" .
 wp_create_nonce_wrapper( 'print_debug_sample' ) .
-"','__dummy__',function(xmlhttp){js56816a36b58dc.popupWindow('Sample '+type+' log','<div class=\'cui-console\'><pre>'+xmlhttp.responseText+'</pre></div>');});}";
+"','__dummy__',function(xmlhttp){js56816af34b4f1.popupWindow('Sample '+type+' log','<div class=\'cui-console\'><pre>'+xmlhttp.responseText+'</pre></div>');});}";
 $this->java_scripts_load[] = 'parent.toggle_header("support_expert_box");'; 
 }
 protected function initTarget() {
@@ -146,7 +146,7 @@ protected function getExpertEditorTemplate() {
 if ( ! $this->_is_activated )
 return;
 $help_debug_on = "'" . _esc( 
-'This option activates a mechanism by which when an error occurs (no matter if it`s an program error or just an exception, like I/O error, HTTP timeout, etc) its trace is automatically captured and saved into a special trace log file. <a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816a36b58dc.print_debug_sample(&quot;debug&quot;);\\\'>' .
+'This option activates a mechanism by which when an error occurs (no matter if it`s an program error or just an exception, like I/O error, HTTP timeout, etc) its trace is automatically captured and saved into a special trace log file. <a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816af34b4f1.print_debug_sample(&quot;debug&quot;);\\\'>' .
 _esc( 'See example' ) . '</a>.' );
 $help_debug_on .= _esc( 
 "<p style=\'font-weight:bold\'>OK, but what has this to do with me?</p>Well, it has everything to do with you when you`ll got an error and you need support. If you come to me empty-handed I will return to you empty-handed.<br>" );
@@ -155,7 +155,7 @@ $help_debug_on .= _esc(
 "'";
 $help_curl_debug_on = sprintf( 
 _esc( 
-'This option allows (mostly you) to understand how works the communication between your webserver (where %s is installed) and the other server over Internet (like Google Cloud Storage server or Dropbox server, etc). Depending on your webserver system configuration there may occur or not (hopefully not) all kind of situations that no programmer in the world could anticipate. So this option will capture in a special log file all the Curl commands (but NOT the data, thank God! - <a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816a36b58dc.print_debug_sample(&quot;curl&quot;);\\\'>see example</a>) like <i>read the file list</i>, <i>download/upload this file</i>, etc. If there is a problem related to communication between %s and some Internet server (eg. Google`s, Dropbox, FTP, etc) you might take a look at the Curl logginf file or if you think it`s due to a software malfunction just send a bug report by choosing to include (see <i>Attach system info</i>) also the Curl debug information.<br>' ), 
+'This option allows (mostly you) to understand how works the communication between your webserver (where %s is installed) and the other server over Internet (like Google Cloud Storage server or Dropbox server, etc). Depending on your webserver system configuration there may occur or not (hopefully not) all kind of situations that no programmer in the world could anticipate. So this option will capture in a special log file all the Curl commands (but NOT the data, thank God! - <a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816af34b4f1.print_debug_sample(&quot;curl&quot;);\\\'>see example</a>) like <i>read the file list</i>, <i>download/upload this file</i>, etc. If there is a problem related to communication between %s and some Internet server (eg. Google`s, Dropbox, FTP, etc) you might take a look at the Curl logginf file or if you think it`s due to a software malfunction just send a bug report by choosing to include (see <i>Attach system info</i>) also the Curl debug information.<br>' ), 
 WPMYBACKUP, 
 WPMYBACKUP );
 $help_curl_debug_on .= sprintf( 
@@ -183,7 +183,7 @@ _esc(
 $help_stats_debug_on = "'" .
 _esc( 
 'This option will dump to a log file the JavaScript code that represents the datase sent to Google Charts API in order to get back a user-friendly chart.' ) .
-'<br><a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816a36b58dc.print_debug_sample(&quot;stats&quot;);\\\'>' .
+'<br><a class=\\\'help\\\' href=\\\'#\\\' onclick=\\\'js56816af34b4f1.print_debug_sample(&quot;stats&quot;);\\\'>' .
 _esc( 'See example' ) . ".</a>'";
 $help_smtp_debug_on = "'" . _esc( 'This option will allow you to track the SMTP mail communication.' ) . ' ' .
 readMoreHereE( 'https://pear.php.net/manual/en/package.networking.net-smtp.net-smtp.setdebug.php' ) . "'";

@@ -285,7 +285,7 @@ $wp_plugins[$plugin_path] = array(
 }
 if ( ! $return_array ) {
 printf( 
-'<div style="text-align:center"><input type="button" class="button" value="%s" onclick="js56816a36b58dc.copy2clpb(this);" data-altcaption="%s"></div>', 
+'<div style="text-align:center"><input type="button" class="button" value="%s" onclick="js56816af34b4f1.copy2clpb(this);" data-altcaption="%s"></div>', 
 _esc( 'Copy to Clipboard' ), 
 _esc( '<< Back' ) );
 echo '<div class="check-setup-wrapper"><div>'; 
@@ -618,7 +618,7 @@ empty( $log_type ) && isset( $_POST['log_type'] ) && $log_type = $_POST['log_typ
 if ( ( $log = getLogfileByType( $log_type ) ) && file_exists( $log ) ) {
 @unlink( $log );
 $java_scripts[] = sprintf( 
-'js56816a36b58dc.popupWindow("%s","%s");', 
+'js56816af34b4f1.popupWindow("%s","%s");', 
 _esc( 'Notice' ), 
 sprintf( _esc( 'Log file <i>%s</i> deleted successfully!' ), normalize_path( $log ) ) );
 }
@@ -640,7 +640,7 @@ delete_option_wrapper( WPMYBACKUP_OPTION_NAME );
 update_option_wrapper( WPMYBACKUP_OPTION_NAME, $default_options );
 defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) && file_exists( TARGETLIST_DB_PATH ) && @unlink( TARGETLIST_DB_PATH );
 $java_scripts[] = sprintf( 
-'js56816a36b58dc.popupWindow("%s","%s",null,null,"#ffb600");', 
+'js56816af34b4f1.popupWindow("%s","%s",null,null,"#ffb600");', 
 _esc( 'Confirmation' ), 
 sprintf( 
 _esc( 

@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td><label for="ftp_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="ftp_enabled" id="ftp_enabled" value="1"
-onclick='js56816a36b58dc.submitOptions(this,0);'
+onclick='js56816af34b4f1.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ftp_enabled"></td>
@@ -131,7 +131,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ftp_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote FTP command');?>'
-onclick="<?php echo "js56816a36b58dc.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'js56816a36b58dc.ftpExecCmd(js56816a36b58dc.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
+onclick="<?php echo "js56816af34b4f1.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'js56816af34b4f1.ftpExecCmd(js56816af34b4f1.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
 <?php echo $this->enabled_tag; ?>></td>
 </tr>
 </table>
