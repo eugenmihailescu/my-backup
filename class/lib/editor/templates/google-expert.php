@@ -24,17 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : google-expert.php $
  * 
- * @id      : google-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : google-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
- if(defined('FILE_EXPLORER')){?>
+namespace MyBackup;
+ if(defined(__NAMESPACE__.'\\FILE_EXPLORER')){?>
 <tr>
 <td><label for="google_root"><?php _pesc('Google Drive root');?></label></td>
 <td><input type="text" size="30" name="google_root" id="google_root"
@@ -47,11 +47,11 @@ echoHelp ( $help_1 );
 <td><input class="button btn_edit_copy" type="button"
 id="btn_edit_copy"
 title="<?_pesc('Set the Google Drive root as the current folder file`s Id');?>"
-onclick="document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value=/(\w)*$/.exec(document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value)[0];document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value=document.getElementsByName('google_root')[0].value;js55f93aab8f090.submitOptions(this,0);"
+onclick="document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value=/(\w)*$/.exec(document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value)[0];document.getElementsByName('<?php echo $this->target_name;?>_path_id')[0].value=document.getElementsByName('google_root')[0].value;js56816a36b58dc.submitOptions(this,0);"
 name="btn_copy_path" <?php echo $this->enabled_tag;?> /></td>
 <td><input class="button btn_folder" type="button" id="btn_folder"
 title=<?php echo '"Set the Google Drive root as '.GOOGLE_ROOT.'"';?>
-onclick=<?php echo "\"document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value='".GOOGLE_ROOT."';document.getElementsByName('".$this->target_name."_path_id')[0].value='".GOOGLE_ROOT."';js55f93aab8f090.submitOptions(this,0);\"";?>
+onclick=<?php echo "\"document.getElementsByName('google')[0].value='/';document.getElementsByName('google_root')[0].value='".GOOGLE_ROOT."';document.getElementsByName('".$this->target_name."_path_id')[0].value='".GOOGLE_ROOT."';js56816a36b58dc.submitOptions(this,0);\"";?>
 name="btn_copy_root" <?php echo $this->enabled_tag;?> /></td>
 </tr>
 <tr>
@@ -64,7 +64,7 @@ class='help' onclick=<?php echo echoHelp($help_3);?>> [?]</a></td>
 </tr>
 <?php
 }
-if (defined ( 'BANDWIDTH_THROTTLING' )) {
+if (defined ( __NAMESPACE__.'\\BANDWIDTH_THROTTLING' )) {
 ?>
 <tr>
 <td><label for="google_throttle"><?php _pesc('Upload throttling');?></label></td>

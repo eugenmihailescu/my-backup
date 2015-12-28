@@ -3,7 +3,7 @@ class Array2XML {
 private static $xml = null;
 private static $encoding = 'UTF-8';
 public static function init($version = '1.0', $encoding = 'UTF-8', $format_output = true) {
-self::$xml = new DomDocument($version, $encoding);
+self::$xml = new \DomDocument($version, $encoding);
 self::$xml->formatOutput = $format_output;
 self::$encoding = $encoding;
 }

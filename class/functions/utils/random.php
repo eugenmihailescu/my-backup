@@ -24,112 +24,118 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : random.php $
  * 
- * @id      : random.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : random.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 function isRandomWordsFile() {
-return defined ( 'BENCHMARK_RANDWORDS_FILE' ) && file_exists ( BENCHMARK_RANDWORDS_FILE ) && filesize ( BENCHMARK_RANDWORDS_FILE );
+return defined( __NAMESPACE__.'\\BENCHMARK_RANDWORDS_FILE' ) && file_exists( BENCHMARK_RANDWORDS_FILE ) &&
+filesize( BENCHMARK_RANDWORDS_FILE );
 }
-function createRandomFile($path, $size, $cbk_progress = null, $cbk_abort = null) {
-if ($size <= 0)
+function createRandomFile( $path, $size, $cbk_progress = null, $cbk_abort = null ) {
+if ( $size <= 0 )
 return false;
-$bs = $size > MB ? MB : ($size > 8192 ? 8192 : 1);
-if (null == $path)
-$path = sys_get_temp_dir ();
-if (! file_exists ( $path ) || (file_exists ( $path ) && ! is_dir ( $path )))
-mkdir ( $path, 0770, true );
-$tmp_file = tempnam ( addTrailingSlash ( $path ), 'tmp_' );
-if (isRandomWordsFile ())
-$f = createRandomWordsFile ( $tmp_file, $size, $bs, $cbk_progress, $cbk_abort );
-elseif (isWin ())
-$f = createRandomFileWin ( $tmp_file, $size, $bs, $cbk_progress, $cbk_abort );
+$bs = $size > MB ? MB : ( $size > 8192 ? 8192 : 1 );
+if ( null == $path )
+$path = defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir();
+if ( ! file_exists( $path ) || ( file_exists( $path ) && ! is_dir( $path ) ) )
+mkdir( $path, 0770, true );
+$tmp_file = tempnam( addTrailingSlash( $path ), 'tmp_' );
+if ( isRandomWordsFile() )
+$f = createRandomWordsFile( $tmp_file, $size, $bs, $cbk_progress, $cbk_abort );
+elseif ( isWin() )
+$f = createRandomFileWin( $tmp_file, $size, $bs, $cbk_progress, $cbk_abort );
 else
-$f = createRandomFileUnix ( $tmp_file, $size, $bs, $cbk_progress );
-return file_exists ( $f ) ? $f : false;
+$f = createRandomFileUnix( $tmp_file, $size, $bs, $cbk_progress );
+return file_exists( $f ) ? $f : false;
 }
-function createRandomWordsFile($tmp_file = null, $size = 0, $bs = 0, $cbk_progress = null, $cbk_abort = null) {
-$rw = file ( BENCHMARK_RANDWORDS_FILE );
-$wc = count ( $rw );
+function createRandomWordsFile( $tmp_file = null, $size = 0, $bs = 0, $cbk_progress = null, $cbk_abort = null ) {
+$rw = file( BENCHMARK_RANDWORDS_FILE );
+$wc = count( $rw );
 $fs = 0;
-$fh = fopen ( $tmp_file, 'wb' );
+$fh = fopen( $tmp_file, 'wb' );
 $abort_signal_received = false;
-if ($fh) {
+if ( $fh ) {
 while ( $fs < $size ) {
-if (is_array ( $cbk_abort ) && _is_callable ( $cbk_abort [0] ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $cbk_abort [0], $cbk_abort [1], $cbk_abort [2] )))
+if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) &&
+( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $cbk_abort[0], $cbk_abort[1], $cbk_abort[2] ) ) )
 break;
 $bfs = 0;
 $bw = '';
 while ( $bfs < $bs ) {
-$w = $rw [rand ( 0, $wc - 1 )];
+$w = $rw[rand( 0, $wc - 1 )];
 $bw .= "$w ";
-$bfs += strlen ( $w ) + 1;
+$bfs += strlen( $w ) + 1;
 }
-fwrite ( $fh, $bw ) && $fs += $bfs;
-_is_callable ( $cbk_progress ) && _call_user_func ( $cbk_progress, TMPFILE_SOURCE, $tmp_file, $fs, $size, 4 );
+fwrite( $fh, $bw ) && $fs += $bfs;
+_is_callable( $cbk_progress ) && _call_user_func( $cbk_progress, TMPFILE_SOURCE, $tmp_file, $fs, $size, 4 );
 }
-fclose ( $fh );
+fclose( $fh );
 }
 return $tmp_file;
 }
-function createRandomFileUnix($tmp_file = null, $size = 0, $bs = 0) {
-$cmd = 'dd if=/dev/urandom of=' . $tmp_file . ' bs=' . $bs . ' count=' . ceil ( $size / $bs );
-($io = popen ( $cmd, 'r' )) && fgets ( $io, 4096 ) && pclose ( $io );
+function createRandomFileUnix( $tmp_file = null, $size = 0, $bs = 0 ) {
+$cmd = 'dd if=/dev/urandom of=' . $tmp_file . ' bs=' . $bs . ' count=' . ceil( $size / $bs );
+( $io = popen( $cmd, 'r' ) ) && fgets( $io, 4096 ) && pclose( $io );
 return $tmp_file;
 }
-function createRandomFileWin($tmp_file = null, $size = 0, $bs = 0, $cbk_progress = null, $cbk_abort = null) {
+function createRandomFileWin( $tmp_file = null, $size = 0, $bs = 0, $cbk_progress = null, $cbk_abort = null ) {
 $buffer = '';
 $abort_signal_received = false;
-for($i = 0; $i < $bs; $i ++)
-$buffer .= chr ( rand ( 1, 255 ) );
+for ( $i = 0; $i < $bs; $i++ )
+$buffer .= chr( rand( 1, 255 ) );
 $remaining = $size;
-$handle = fopen ( $tmp_file, 'wb' );
+$handle = fopen( $tmp_file, 'wb' );
 while ( $remaining > 0 ) {
-if (is_array ( $cbk_abort ) && _is_callable ( $cbk_abort [0] ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $cbk_abort [0], $cbk_abort [1], $cbk_abort [2] )))
+if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) &&
+( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $cbk_abort[0], $cbk_abort[1], $cbk_abort[2] ) ) )
 break;
-$remaining -= fwrite ( $handle, str_shuffle ( $buffer ) );
-_is_callable ( $cbk_progress ) && _call_user_func ( $cbk_progress, TMPFILE_SOURCE, $tmp_file, $size - $remaining, $size, 4 );
+$remaining -= fwrite( $handle, str_shuffle( $buffer ) );
+_is_callable( $cbk_progress ) &&
+_call_user_func( $cbk_progress, TMPFILE_SOURCE, $tmp_file, $size - $remaining, $size, 4 );
 }
-$handle && fclose ( $handle );
+$handle && fclose( $handle );
 return $tmp_file;
 }
-function create_alphabet($alphabet_start = 1, $alphabet_end = 255) {
+function create_alphabet( $alphabet_start = 1, $alphabet_end = 255 ) {
 $alphabet = '';
-for($i = $alphabet_start; $i <= $alphabet_end; $i ++)
-$alphabet .= chr ( $i );
+for ( $i = $alphabet_start; $i <= $alphabet_end; $i++ )
+$alphabet .= chr( $i );
 return $alphabet;
 }
-function random_pseudo_bytes($key_len) {
-$alphabet = str_shuffle ( create_alphabet () );
-$alphabet_len = strlen ( $alphabet );
+function random_pseudo_bytes( $key_len ) {
+$alphabet = str_shuffle( create_alphabet() );
+$alphabet_len = strlen( $alphabet );
 $key = '';
-for($i = 0; $i < $key_len; $i ++)
-$key .= $alphabet [rand ( 0, $alphabet_len - 1 )];
-return str_shuffle ( $key );
+for ( $i = 0; $i < $key_len; $i++ )
+$key .= $alphabet[rand( 0, $alphabet_len - 1 )];
+return str_shuffle( $key );
 }
-function password_strength($password, $alphabet_len = 255) {
-$l = strlen ( $password );
+function password_strength( $password, $alphabet_len = 255 ) {
+$l = strlen( $password );
 $n = 1 + $alphabet_len;
-$total = pow ( $n, $l );
-$h = $l * log10 ( $n ) / log ( 2 );
+$total = pow( $n, $l );
+$h = $l * log10( $n ) / log( 2 );
 return $h;
 }
-function password_strength_str($password, $alphabet_len = 255) {
-$strength = password_strength ( $password, $alphabet_len );
-if ($strength < 25)
+function password_strength_str( $password, $alphabet_len = 255 ) {
+$strength = password_strength( $password, $alphabet_len );
+if ( $strength < 25 )
 return 'very weak';
-elseif ($strength < 35)
+elseif ( $strength < 35 )
 return 'weak';
-elseif ($strength < 55)
+elseif ( $strength < 55 )
 return 'fair';
-elseif ($strength < 127)
+elseif ( $strength < 127 )
 return 'strong';
 return 'very strong';
 }

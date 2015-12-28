@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : footer.php $
  * 
- * @id      : footer.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : footer.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 include_once LOCALE_PATH . 'locale.php';
 $copyright = explode ( ',', COPYRIGHT );
@@ -58,11 +58,10 @@ style='width: 100%; margin-top: 10px; margin-left: auto; margin-right: auto; tex
 onchange="window.location.href='<?php echo $lang_url;?>'+this.options[this.selectedIndex].value;"><?php echo $lang_options;?></select></td>
 </tr>
 <tr>
-<td>	<?php echo 'v' . APP_VERSION_ID ; ?>
-</td>
+<td><?php echo 'v' . APP_VERSION_ID ; ?></td>
 <tr>
 <td><abbr
-title='<?php echo !empty($copyright[0])?$copyright[0].' Copyright':'';?>'>&copy;</abbr><?php echo $copyright[0];?>
+title='<?php echo !empty($copyright[0])?$copyright[0].' Copyright':'';?>'>&copy;</abbr><?php echo $copyright[0]." ";?>
 <a href='<?php echo $copyright[2];?>'><?php echo $copyright[1];?></a></td>
 </tr>
 </table>
@@ -70,6 +69,6 @@ title='<?php echo !empty($copyright[0])?$copyright[0].' Copyright':'';?>'>&copy;
 echo $footer_banner;
 $allow_cookie = isset ( $_COOKIE ['cookie_accept'] ) && strToBool ( $_COOKIE ['cookie_accept'] );
 if ($allow_cookie && (! isset ( $_COOKIE ['lang'] ) || $sel_lang_code != $_COOKIE ['lang']))
-printf ( '<script type="text/javascript">js55f93aab8f090.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
+printf ( '<script type="text/javascript">js56816a36b58dc.setCookie("lang", "%s", 30);</script>', $sel_lang_code );
 insertHTMLSection ( $section_name, true );
 ?>

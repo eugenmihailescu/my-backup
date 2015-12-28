@@ -24,133 +24,218 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : sys-tools.php $
  * 
- * @id      : sys-tools.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : sys-tools.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-function getTarExclusionPattern($root_dir, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null) {
+function getTarExclusionPattern( $root_dir, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null ) {
 $pattern = ' ';
 $inerquot = "'";
-if (is_array ( $exclude_files ))
+if ( is_array( $exclude_files ) )
 foreach ( $exclude_files as $f )
-if (null == $exclude_dirs || (is_array ( $exclude_dirs ) && ! empty ( $f ) && ! array_search ( dirname ( $f ), $exclude_dirs )))
-$pattern .= sprintf ( "--exclude=%s%s%s ", $inerquot, $f, $inerquot );
-if (is_array ( $exclude_ext ))
+if ( null == $exclude_dirs ||
+( is_array( $exclude_dirs ) && ! empty( $f ) && ! array_search( dirname( $f ), $exclude_dirs ) ) )
+$pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, $f, $inerquot );
+if ( is_array( $exclude_ext ) )
 foreach ( $exclude_ext as $e )
-if (! empty ( $e ))
-$pattern .= sprintf ( "--exclude=%s*.%s%s ", $inerquot, $e, $inerquot );
-if (is_array ( $exclude_dirs ))
+if ( ! empty( $e ) )
+$pattern .= sprintf( "--exclude=%s*.%s%s ", $inerquot, $e, $inerquot );
+if ( is_array( $exclude_dirs ) )
 foreach ( $exclude_dirs as $d )
-if (! empty ( $d ) && false !== strpos ( $d, $root_dir ))
-$pattern .= sprintf ( "--exclude=%s%s%s ", $inerquot, delTrailingSlash ( $d ), $inerquot );
+if ( ! empty( $d ) && false !== strpos( $d, $root_dir ) )
+$pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, delTrailingSlash( $d ), $inerquot );
 return $pattern;
 }
-function escapeCygwinPath($str) {
-if (preg_match_all ( '/([a-z]:)([^\'"]+)/i', $str, $matches )) {
-foreach ( $matches [1] as $match )
-$str = str_replace ( $match, '/cygdrive/' . strtolower ( $match [0] ), $str );
-foreach ( $matches [2] as $match )
-$str = str_replace ( $match, str_replace ( array (
-DIRECTORY_SEPARATOR,
-' ' 
-), array (
-'/',
-'\\ ' 
-), $match ), $str );
+function escapeCygwinPath( $str ) {
+if ( preg_match_all( '/([a-z]:)([^\'"]+)/i', $str, $matches ) ) {
+foreach ( $matches[1] as $match )
+$str = str_replace( $match, '/cygdrive/' . strtolower( $match[0] ), $str );
+foreach ( $matches[2] as $match )
+$str = str_replace( 
+$match, 
+str_replace( array( DIRECTORY_SEPARATOR, ' ' ), array( '/', '\\ ' ), $match ), 
+$str );
 }
 return $str;
 }
-function getTarNZipCmd($src_filename, $arc_filename, $method = 2, $level = 9, $vol_size = 0, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null, $bzip_version = null, $cygwin = null) {
-return getUnixCmd ( $src_filename, $arc_filename, $method, $level, $vol_size, $exclude_files, $exclude_dirs, $exclude_ext, $bzip_version, $cygwin );
+function getTarNZipCmd( 
+$src_filename, 
+$arc_filename, 
+$method = 2, 
+$level = 9, 
+$vol_size = 0, 
+$exclude_files = null, 
+$exclude_dirs = null, 
+$exclude_ext = null, 
+$bzip_version = null, 
+$cygwin = null ) {
+return getUnixCmd( 
+$src_filename, 
+$arc_filename, 
+$method, 
+$level, 
+$vol_size, 
+$exclude_files, 
+$exclude_dirs, 
+$exclude_ext, 
+$bzip_version, 
+$cygwin );
 }
-function getUnixCmd($src_filename, $arc_filename, $method = 2, $level = 9, $vol_size = 0, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null, $bzip_version = null, $cygwin = null, $html = false) {
+function getUnixCmd( 
+$src_filename, 
+$arc_filename, 
+$method = 2, 
+$level = 9, 
+$vol_size = 0, 
+$exclude_files = null, 
+$exclude_dirs = null, 
+$exclude_ext = null, 
+$bzip_version = null, 
+$cygwin = null, 
+$html = false ) {
 global $COMPRESSION_APPS, $COMPRESSION_NAMES;
-if (! empty ( $bzip_version ) && 'pbzip2' == $bzip_version && isWin ())
+if ( ! empty( $bzip_version ) && 'pbzip2' == $bzip_version && isWin() )
 $bzip_version .= '.exe';
-$arc = createTarNZipFilename ( $arc_filename, $method );
-$arc = isWin () ? escapeCygwinPath ( $arc ) : $arc;
-$arc_filename = isWin () ? escapeCygwinPath ( $arc_filename ) : $arc_filename;
+$arc = createTarNZipFilename( $arc_filename, $method );
+$arc = isWin() ? escapeCygwinPath( $arc ) : $arc;
+$arc_filename = isWin() ? escapeCygwinPath( $arc_filename ) : $arc_filename;
 $vol_size /= 1024; 
 $cmd = null;
-if ($method <= BZ2) {
+if ( $method <= BZ2 ) {
 $cmd = "tar";
-if ($vol_size >= 1)
+if ( $vol_size >= 1 )
 $cmd .= " -ML " . $vol_size;
-$excl_pattern = getTarExclusionPattern ( is_dir ( $src_filename ) ? $src_filename : dirname ( $src_filename ), $exclude_files, $exclude_dirs, $exclude_ext );
-$cmd .= isWin () ? escapeCygwinPath ( $excl_pattern ) : $excl_pattern;
-$cmd .= " -cf " . ($vol_size >= 1 ? $arc_filename . ".tar" : "-") . " " . (isWin () ? escapeCygwinPath ( $src_filename ) : $src_filename) . " 2>/dev/null " . ($vol_size >= 1 ? "&& for f in `ls " . $arc_filename . "*.tar`;do cat \$f" : '') . '|';
-if (NONE != $method) {
-$cmd .= BZ2 == $method ? $bzip_version : $COMPRESSION_APPS [$method];
-if ($level > 0)
+$excl_pattern = getTarExclusionPattern( 
+is_dir( $src_filename ) ? $src_filename : dirname( $src_filename ), 
+$exclude_files, 
+$exclude_dirs, 
+$exclude_ext );
+$cmd .= isWin() ? escapeCygwinPath( $excl_pattern ) : $excl_pattern;
+$cmd .= " -cf " . ( $vol_size >= 1 ? $arc_filename . ".tar" : "-" ) . " " .
+( isWin() ? escapeCygwinPath( $src_filename ) : $src_filename ) . " 2>/dev/null " .
+( $vol_size >= 1 ? "&& for f in `ls " . $arc_filename . "*.tar`;do cat \$f" : '' ) . '|';
+if ( NONE != $method ) {
+$cmd .= BZ2 == $method ? $bzip_version : $COMPRESSION_APPS[$method];
+if ( $level > 0 )
 $cmd .= " -" . $level;
-$redirect = ">" . $arc_filename . ".tar." . $COMPRESSION_NAMES [$method];
-$cmd .= " -fq" . (BZ2 == $method ? 'k' : '') . " " . ($vol_size >= 1 ? ">\$f." . $COMPRESSION_NAMES [$method] . ";done" : ($redirect));
+$redirect = ">" . $arc_filename . ".tar." . $COMPRESSION_NAMES[$method];
+$cmd .= " -fq" . ( BZ2 == $method ? 'k' : '' ) . " " .
+( $vol_size >= 1 ? ">\$f." . $COMPRESSION_NAMES[$method] . ";done" : ( $redirect ) );
 }
-$cmd = str_replace ( "%arcname%", NONE != $method ? '-' : $arc, $cmd );
-if ($vol_size >= 1 && (file_exists ( $src_filename ) || is_dir ( $src_filename ))) {
-$fs = is_file ( $src_filename ) ? filesize ( $src_filename ) : getDirSize ( $src_filename );
-$vol_count = ceil ( $fs / ($vol_size * 1024) );
-if ($vol_count > 1)
-$cmd = "printf 'n " . $arc_filename . "-%d.tar\\n' {1.." . ($vol_count - 1) . "} | " . $cmd;
+$cmd = str_replace( "%arcname%", NONE != $method ? '-' : $arc, $cmd );
+if ( $vol_size >= 1 && ( file_exists( $src_filename ) || is_dir( $src_filename ) ) ) {
+$fs = is_file( $src_filename ) ? filesize( $src_filename ) : getDirSize( $src_filename );
+$vol_count = ceil( $fs / ( $vol_size * 1024 ) );
+if ( $vol_count > 1 )
+$cmd = "printf 'n " . $arc_filename . "-%d.tar\\n' {1.." . ( $vol_count - 1 ) . "} | " . $cmd;
 }
-} else if (BZ2 + 1 == $method) { // ZIP
-$cmd = $COMPRESSION_APPS [$method];
-if ($vol_size >= 1)
-$cmd .= " -s " . ($vol_size) . "k";
-$cmd .= " -" . $level . " -q -r " . $arc . " " . (isWin () ? escapeCygwinPath ( $src_filename ) : $src_filename) . " 2>/dev/null";
+} else 
+if ( BZ2 + 1 == $method ) { // ZIP
+$cmd = $COMPRESSION_APPS[$method];
+if ( $vol_size >= 1 )
+$cmd .= " -s " . ( $vol_size ) . "k";
+$cmd .= " -" . $level . " -q -r " . $arc . " " .
+( isWin() ? escapeCygwinPath( $src_filename ) : $src_filename ) . " 2>/dev/null";
 }
-$cygwin_cmd = sprintf ( '%s "%s"', (! empty ( $cygwin ) ? $cygwin : CYGWIN_PATH) . ' --login -c', $cmd );
-return ! empty ( $cmd ) ? (isWin () ? $cygwin_cmd : $cmd) : false;
+$cygwin_cmd = sprintf( '%s "%s"', ( ! empty( $cygwin ) ? $cygwin : CYGWIN_PATH ) . ' --login -c', $cmd );
+return ! empty( $cmd ) ? ( isWin() ? $cygwin_cmd : $cmd ) : false;
 }
-function unixTarNZip($src_filename, $dst_filename, $method = 2, $level = 9, $vol_size = 0, $remove_source = false, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null, $bzip_version = null, $cygwin = null) {
+function unixTarNZip( 
+$src_filename, 
+$dst_filename, 
+$method = 2, 
+$level = 9, 
+$vol_size = 0, 
+$remove_source = false, 
+$exclude_files = null, 
+$exclude_dirs = null, 
+$exclude_ext = null, 
+$bzip_version = null, 
+$cygwin = null ) {
 global $COMPRESSION_NAMES;
 $result = false;
-$arc = createTarNZipFilename ( $dst_filename, $method );
-if (file_exists ( $arc ))
-unlink ( $arc );
-$cmd = getTarNZipCmd ( $src_filename, $dst_filename, $method, $level, $vol_size, $exclude_files, $exclude_dirs, $exclude_ext, $bzip_version, $cygwin );
-$io = @popen ( $cmd, 'r' );
-if ($io) {
-while ( (fgets ( $io, 4096 )) !== false )
+if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) ) {
+$arc = createTarNZipFilename( $dst_filename, $method );
+if ( file_exists( $arc ) )
+unlink( $arc );
+$cmd = getTarNZipCmd( 
+$src_filename, 
+$dst_filename, 
+$method, 
+$level, 
+$vol_size, 
+$exclude_files, 
+$exclude_dirs, 
+$exclude_ext, 
+$bzip_version, 
+$cygwin );
+$io = @popen( $cmd, 'r' );
+if ( $io ) {
+while ( ( fgets( $io, 4096 ) ) !== false )
 ; 
-$result = file_exists ( $arc );
-pclose ( $io );
+$result = file_exists( $arc );
+pclose( $io );
 }
-if ($remove_source && file_exists ( $src_filename ) && ! is_dir ( $src_filename ))
-unlink ( $src_filename );
-if ($result)
-if (0 < $vol_size) {
-$ext = $COMPRESSION_NAMES [$method];
-$pattern = '/' . str_replace ( '/', '\/', preg_replace ( "/\\\\.tar\\\\.$ext$/", ".*\\.tar\\.$ext", preg_quote ( $arc ) ) ) . '/';
-$result = getFileListByPattern ( dirname ( $dst_filename ), $pattern, false, false, false, 2 ); 
+}
+if ( $remove_source && file_exists( $src_filename ) && ! is_dir( $src_filename ) )
+unlink( $src_filename );
+if ( $result )
+if ( 0 < $vol_size ) {
+$ext = $COMPRESSION_NAMES[$method];
+$pattern = '/' . str_replace( 
+'/', 
+'\/', 
+preg_replace( "/\\\\.tar\\\\.$ext$/", ".*\\.tar\\.$ext", preg_quote( $arc ) ) ) . '/';
+$result = getFileListByPattern( dirname( $dst_filename ), $pattern, false, false, false, 2 ); 
 return $result;
 } else
-return array (
-$arc 
-);
+return array( $arc );
 else
 return false;
 }
-function createTarNZipFilename($file, $method = 2) {
+function createTarNZipFilename( $file, $method = 2 ) {
 global $COMPRESSION_NAMES;
-$ext = $method != NONE ? '.' . $COMPRESSION_NAMES [$method] : '';
-return sprintf ( '%s.%s%s', delTrailingSlash ( $file ), $method <= BZ2 ? 'tar' : '', $ext );
+$ext = $method != NONE ? '.' . $COMPRESSION_NAMES[$method] : '';
+return sprintf( '%s.%s%s', delTrailingSlash( $file ), $method <= BZ2 ? 'tar' : '', $ext );
 }
-function testOSTools($workdir = null, $method = 2, $level = 9, $vol_size = 0, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null, $bzip_version = null, $cygwin = null) {
-$src_file = tempnam ( addTrailingSlash ( empty ( $workdir ) || ! file_exists ( $workdir ) ? sys_get_temp_dir () : $workdir ), 'tmp_' );
+function testOSTools( 
+$workdir = null, 
+$method = 2, 
+$level = 9, 
+$vol_size = 0, 
+$exclude_files = null, 
+$exclude_dirs = null, 
+$exclude_ext = null, 
+$bzip_version = null, 
+$cygwin = null ) {
+$src_file = tempnam( 
+addTrailingSlash( 
+empty( $workdir ) || ! file_exists( $workdir ) ? ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() ) : $workdir ), 
+'tmp_' );
 $result = false;
-if (file_put_contents ( $src_file, str_repeat ( "0", 100 ) ))
-$result = unixTarNZip ( $src_file, $src_file, $method, $level, $vol_size, true, $exclude_files, $exclude_dirs, $exclude_ext, $bzip_version, $cygwin );
-if (is_array ( $result ) && count ( $result ) > 0) {
-$result = end ( $result ); 
-unlink ( $result );
+if ( file_put_contents( $src_file, str_repeat( "0", 100 ) ) )
+$result = unixTarNZip( 
+$src_file, 
+$src_file, 
+$method, 
+$level, 
+$vol_size, 
+true, 
+$exclude_files, 
+$exclude_dirs, 
+$exclude_ext, 
+$bzip_version, 
+$cygwin );
+if ( is_array( $result ) && count( $result ) > 0 ) {
+$result = end( $result ); 
+unlink( $result );
 return $result;
 } else
 return false;

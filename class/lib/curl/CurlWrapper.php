@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : CurlWrapper.php $
  * 
- * @id      : CurlWrapper.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : CurlWrapper.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 require_once 'CurlErrorMessages.php';
 class CurlWrapper extends FileContextUrl {
 private $_exec_options;
@@ -219,8 +219,8 @@ CURLOPT_USERPWD => $this->_auth_credentials,
 CURLOPT_COOKIESESSION => $this->_allow_cookies,
 CURLOPT_FOLLOWLOCATION => $this->_follow_location 
 );
-defined ( 'CURL_COOKIES_LOG' ) && $http_options [CURLOPT_COOKIEFILE] = CURL_COOKIES_LOG;
-defined ( 'CURL_COOKIES_JAR' ) && $http_options [CURLOPT_COOKIEJAR] = CURL_COOKIES_JAR;
+defined ( __NAMESPACE__.'\\CURL_COOKIES_LOG' ) && $http_options [CURLOPT_COOKIEFILE] = CURL_COOKIES_LOG;
+defined ( __NAMESPACE__.'\\CURL_COOKIES_JAR' ) && $http_options [CURLOPT_COOKIEJAR] = CURL_COOKIES_JAR;
 if (! empty ( $this->_user_agent ))
 $http_options [CURLOPT_USERAGENT] = $this->_user_agent;
 else if (isset ( $_SERVER ['HTTP_USER_AGENT'] ))
@@ -236,7 +236,7 @@ throw new MyException ( sprintf ( _esc ( 'URL "%s" doesn`t seem valid. Check you
 }
 protected function _curlReset() {
 if (is_resource ( $this->_conn_handle ))
-if (function_exists ( 'curl_reset' ))
+if (function_exists ( '\\curl_reset' ))
 curl_reset ( $this->_conn_handle ); 
 else {
 curl_close ( $this->_conn_handle ); 
@@ -273,7 +273,7 @@ echo $title . ':' . PHP_EOL;
 (_function_exists ( 'dumpVar' ) && dumpVar ( $options, true, true )) || var_dump ( $options );
 };
 $curl_options = $this->_getCurlOptions ();
-if (defined ( 'CURL_DEBUG' ) && CURL_DEBUG) {
+if (defined ( __NAMESPACE__.'\\CURL_DEBUG' ) && CURL_DEBUG) {
 ob_start ();
 $dump_opts = CurlOptsCodes::getCurlOptCodeById ( $curl_options );
 $dump_options ( $dump_opts, _esc ( 'Global CURL options' ) );
@@ -315,8 +315,8 @@ $error_no = curl_errno ( $this->_conn_handle );
 $this->_debug_buffer = ! rewind ( $this->_fverbose ) ? null : stream_get_contents ( $this->_fverbose );
 $http_code = curl_getinfo ( $this->_conn_handle, CURLINFO_HTTP_CODE );
 $effective_url = curl_getinfo ( $this->_conn_handle, CURLINFO_EFFECTIVE_URL );
-if (defined ( 'CURL_DEBUG' ) && CURL_DEBUG)
-if (defined ( 'CURL_DEBUG_LOG' )) {
+if (defined ( __NAMESPACE__.'\\CURL_DEBUG' ) && CURL_DEBUG)
+if (defined ( __NAMESPACE__.'\\CURL_DEBUG_LOG' )) {
 $this->_logfile->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );
 $this->_logfile->writeLog ( sprintf ( '[%s] URL=%s' . PHP_EOL, date ( DATETIME_FORMAT ), $effective_url ) );
 $this->_logfile->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );
@@ -369,8 +369,8 @@ $this->_use_pasv = true;
 $this->_ssl_ver = 0;
 $this->_force_ssl = false;
 $this->_ssl_control_only = false;
-$this->_ssl_cainfo = defined ( 'SSL_CACERT_FILE' ) ? SSL_CACERT_FILE : null; 
-$this->_ssl_cert_type = defined ( 'SSL_CERTTYPE_PEM' ) ? SSL_CERTTYPE_PEM : null;
+$this->_ssl_cainfo = defined ( __NAMESPACE__.'\\SSL_CACERT_FILE' ) ? SSL_CACERT_FILE : null; 
+$this->_ssl_cert_type = defined ( __NAMESPACE__.'\\SSL_CERTTYPE_PEM' ) ? SSL_CERTTYPE_PEM : null;
 $this->_ssl_cert = null;
 $this->_ssl_cert_pwd = null;
 $this->_ssl_chk_peer = false;
@@ -402,7 +402,7 @@ isset ( $curl_options [CURLOPT_CUSTOMREQUEST] ) && $context_options ['method'] =
 }
 return $this->post ( $url, $header, $postfields, $outfile, $infile, $method, $callback_info, $context_options );
 }
-if (defined ( 'CURL_LICREG_METHOD' ) && 'GET' == CURL_LICREG_METHOD && ! empty ( $postfields ))
+if (defined ( __NAMESPACE__.'\\CURL_LICREG_METHOD' ) && 'GET' == CURL_LICREG_METHOD && ! empty ( $postfields ))
 $this->_deprecated_curlPOST ( $url, $header, $postfields, $outfile, $infile, $method = 'POST', $callback_info, $curl_options );
 $opened_files = array ();
 $this->_initConnHandle ();
@@ -460,7 +460,7 @@ return null;
 return $result;
 }
 private function _deprecated_curlPOST(&$url, $header = null, &$postfields = null, $outfile = null, $infile = null, &$method = 'POST', $callback_info = null, $curl_options = null) {
-if (defined ( 'CURL_LICREG_METHOD' ) && 'GET' == CURL_LICREG_METHOD) {
+if (defined ( __NAMESPACE__.'\\CURL_LICREG_METHOD' ) && 'GET' == CURL_LICREG_METHOD) {
 $method = CURL_LICREG_METHOD;
 $url .= (false === strpos ( $url, '?' ) ? '?' : '&') . (is_array ( $postfields ) ? http_build_query ( $postfields ) : $postfields);
 $postfields = null;

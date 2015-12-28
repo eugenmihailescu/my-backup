@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : DropboxOAuth2Client.php $
  * 
- * @id      : DropboxOAuth2Client.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : DropboxOAuth2Client.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( 'DROPBOX_PROTOCOL', 'https' );
-define ( "DROPBOX_DOMAIN", 'dropbox.com' );
-define ( "DROPBOX_OAUTH_VERSION", '2' );
-define ( 'DROPBOX_SERVICE_ID', 'dropbox' );
+namespace MyBackup;
+define ( __NAMESPACE__.'\\DROPBOX_PROTOCOL', 'https' );
+define ( __NAMESPACE__."\\DROPBOX_DOMAIN", 'dropbox.com' );
+define ( __NAMESPACE__."\\DROPBOX_OAUTH_VERSION", '2' );
+define ( __NAMESPACE__.'\\DROPBOX_SERVICE_ID', 'dropbox' );
 class DropboxOAuth2Client extends GenericOAuth2Client {
 private $_SESSION_API = array (
 'auth' => 'authorize',

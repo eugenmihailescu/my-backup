@@ -24,29 +24,29 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : YayuiCompressor.php $
  * 
- * @id      : YayuiCompressor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : YayuiCompressor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'JSHINTS', 'jshints' );
-define ( 'SEMICOLON', 'semicolon' );
-define ( 'SINGLE_COMMENT', 'scomment' );
-define ( 'BLOCK_COMMENT', 'bcomment' );
-define ( 'CURLY_BRACE', 'curlybrace' );
-define ( 'WHITESPACE', 'whitespace' );
-define ( 'LINE_SEPARATOR', 'crlf' );
-define ( 'FUNCTION_ARGUMENT', 'fargs' );
-define ( 'FUNCTION_VARIABLE', 'fvars' );
-define ( 'MINIFY', 'minify' );
-define ( 'OBFUSCATE', 'obfuscate' );
-define ( 'PRESERVE_STRINGS', 'strings' );
+define ( __NAMESPACE__.'\\JSHINTS', 'jshints' );
+define ( __NAMESPACE__.'\\SEMICOLON', 'semicolon' );
+define ( __NAMESPACE__.'\\SINGLE_COMMENT', 'scomment' );
+define ( __NAMESPACE__.'\\BLOCK_COMMENT', 'bcomment' );
+define ( __NAMESPACE__.'\\CURLY_BRACE', 'curlybrace' );
+define ( __NAMESPACE__.'\\WHITESPACE', 'whitespace' );
+define ( __NAMESPACE__.'\\LINE_SEPARATOR', 'crlf' );
+define ( __NAMESPACE__.'\\FUNCTION_ARGUMENT', 'fargs' );
+define ( __NAMESPACE__.'\\FUNCTION_VARIABLE', 'fvars' );
+define ( __NAMESPACE__.'\\MINIFY', 'minify' );
+define ( __NAMESPACE__.'\\OBFUSCATE', 'obfuscate' );
+define ( __NAMESPACE__.'\\PRESERVE_STRINGS', 'strings' );
 function requesting_class() {
 foreach ( debug_backtrace ( true ) as $stack ) {
 if (isset ( $stack ['object'] )) {

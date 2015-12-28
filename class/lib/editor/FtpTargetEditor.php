@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : FtpTargetEditor.php $
  * 
- * @id      : FtpTargetEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : FtpTargetEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class FtpTargetEditor extends AbstractTargetEditor {
 private $_ftphost;
 private $_ftpuser;
@@ -51,7 +51,7 @@ $this->_getExpertJavaScripts ();
 }
 protected function initTarget() {
 parent::initTarget ();
-$this->hasInfoBanner = defined('FILE_EXPLORER');
+$this->hasInfoBanner = defined(__NAMESPACE__.'\\FILE_EXPLORER');
 $this->_ftphost = $this->settings ['ftphost'];
 $this->_ftpuser = $this->settings ['ftpuser'];
 $this->_ftppasv = strToBool ( $this->settings ['ftppasv'] );
@@ -85,7 +85,7 @@ bindSSLInfo ( 'ftphost', $_SESSION ['ftp_ssl_cert_info'], $this->java_scripts, $
 echo $e->getMessage ();
 if (false === $this->_ftppasv && CURLE_OPERATION_TIMEDOUT == $e->getCode ()) {
 $help_3 = sprintf ( _esc ( 'You are using an active FTP connection (the <i>Passive mode</i> option is off). If this was not done by porpose then read my final thoughts at bottom. Otherwise please continue reading. Although I`m thousands km away you are only one click away from my help :-)<br>You may get timed-out also when your webserver`s firewall is not corectly configured for this connection type (active FTP connection). The way that the webserver`s (%s) firewall should be configured is out of this scope. Anyway %s as always ;-)<br>If you still have not found anything helpfull then you might want to %s and/or %s.<br>' ), PHP_OS, $this->_ftppasv ? 'passive' : 'active', getAnchorE ( 'GIYF', 'http://lmgtfy.com/?q=%s+ftp+firewall' ), getAnchorE ( 'read this', 'http://www.mdjnet.dk/ftp.html' ), getAnchorE ( 'this', 'http://slacksite.com/other/ftp.html' ) );
-$help_3 .= (defined ( 'CURL_DEBUG' ) && CURL_DEBUG ? sprintf ( _esc ( 'It seems that the Curl debug option is ON. Good!!! So go and %s, it might give you useful information.' ), getAnchorE ( 'check the Curl debug log', getTabLink ( $TARGET_NAMES[APP_LOGS] ) ) ) : sprintf ( _esc ( 'I see that %s. You might want to set the Curl debug ON then try again. If the problem still persist then you can read the Curl debug log and trace the problem. Sometimes it helps.' ), getAnchorE ( 'your Curl debug option is off', getTabLink ( $TARGET_NAMES[APP_LOGS] ) ) )) . _esc ( '<p style=\\\'font-weight:bold\\\'>Final thoughts</p>If you haven`t choose the active type FTP connection by purpose then you might want to try the passive one. It will certainly work. Why? <a href=\\\'#\\\' onclick=\\\'document.getElementById(&quot;passive_ftp_help&quot;).click();\\\'>Read here</a>.' );
+$help_3 .= (defined ( __NAMESPACE__.'\\CURL_DEBUG' ) && CURL_DEBUG ? sprintf ( _esc ( 'It seems that the Curl debug option is ON. Good!!! So go and %s, it might give you useful information.' ), getAnchorE ( 'check the Curl debug log', getTabLink ( $TARGET_NAMES[APP_LOGS] ) ) ) : sprintf ( _esc ( 'I see that %s. You might want to set the Curl debug ON then try again. If the problem still persist then you can read the Curl debug log and trace the problem. Sometimes it helps.' ), getAnchorE ( 'your Curl debug option is off', getTabLink ( $TARGET_NAMES[APP_LOGS] ) ) )) . _esc ( '<p style=\\\'font-weight:bold\\\'>Final thoughts</p>If you haven`t choose the active type FTP connection by purpose then you might want to try the passive one. It will certainly work. Why? <a href=\\\'#\\\' onclick=\\\'document.getElementById(&quot;passive_ftp_help&quot;).click();\\\'>Read here</a>.' );
 echo '<a class="help" onclick=' . getHelpCall ( "'$help_3'" ) . '>' . _esc ( 'Read this' ) . '</a>';
 }
 }

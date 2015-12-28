@@ -24,67 +24,96 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : backupjob-expert.php $
  * 
- * @id      : backupjob-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-
-if (defined ( 'OPER_COMPRESS_EXTERN' ) && isWin ()) {
+namespace MyBackup;
+ if($this->is_wp){?>
+<tr>
+<td><label for="wp_core_backup"><?php _pesc('Backup on WP update');?></label></td>
+<td><input type="checkbox" id="wp_core_backup" name="wp_core_backup" value="1"
+<?php strToBool($this->settings['wp_core_backup'])&&print('checked');?>><input
+type="hidden" value="0" name="wp_core_backup"><a class='help'
+onclick=<?php echoHelp( $help_11 );?>> [?]</a></td>
+</tr>
+<?php }?>
+<tr>
+<td><label for="relative_path"><?php _pesc('Use file relative path');?></label></td>
+<td><input type="checkbox" id="relative_path" name="relative_path" value="1"
+<?php strToBool($this->settings['relative_path'])&&print('checked');?>><input
+type="hidden" value="0" name="relative_path"><a class='help'
+onclick=<?php
+echoHelp( $help_10 );
+?>> [?]</a></td>
+</tr>
+<?php
+if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) && isWin() ) {
 ?>
 <tr>
 <td><label for="cygwin"><?php _pesc('CygWin path/params');?></label></td>
 <td><input type="text" name="cygwin" id="cygwin" size="40"
 value=<?php
-echo "'" . $this->settings ['cygwin'] . "'";
+echo "'" . $this->settings['cygwin'] . "'";
 ?>><a class='help' onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
 </tr>
 <?php
 }
-if (2 == $this->settings ['compression_type'] && 'extern' == $this->settings ['toolchain']) {
+if ( 2 == $this->settings['compression_type'] && 'extern' == $this->settings['toolchain'] ) {
 ?>
 <tr>
 <td><label for="bzipver"><?php _pesc('BZIP version');?></label></td>
 <td><select name="bzipver" id="bzipver"><option value="bzip2"
 <?php
-if ('bzip2' == $this->settings ['bzipver'])
+if ( 'bzip2' == $this->settings['bzipver'] )
 echo 'selected';
 ?>>BZip2</option>
 <option value="pbzip2"
 <?php
-if ('pbzip2' == $this->settings ['bzipver'])
+if ( 'pbzip2' == $this->settings['bzipver'] )
 echo 'selected';
 ?>>PBZip2</option></select><a class='help'
 onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>>[?]</a></td>
 </tr>
 <?php
 }
-if (defined ( 'CPU_THROTTLING' ) && CPU_THROTTLING && 'intern' == $this->settings ['toolchain']) {
+if ( defined( __NAMESPACE__.'\\CPU_THROTTLING' ) && CPU_THROTTLING && 'intern' == $this->settings['toolchain'] ) {
 ?>
 <tr>
 <td><label for="cpusleep"><?php _pesc('CPU throttling (ms)');?></label></td>
 <td><input type="number" name="cpusleep" id="cpusleep" size="5"
-value=<?php echo "'" . $this->settings['cpusleep'] . "'"; ?>><a
-class='help' onclick=<?php
-echoHelp ( $help_3 );
+value=<?php echo "'" . $this->settings['cpusleep'] . "'"; ?>><a class='help'
+onclick=<?php
+echoHelp( $help_3 );
 ?>>[?]</a></td>
 </tr>
 <?php } ?>
 <tr>
+<td><label for="memory_limit"><?php _pesc('Script memory limit (MiB)');?></label></td>
+<td><input type="number" name="memory_limit" id="memory_limit"
+value="<?php echo $this->settings["memory_limit"];?>"
+min="<?php echo $memory_limit_min;?>" max="<?php echo $memory_limit_max;?>"
+pattern="[1-7]\d{3}|\d{3}|[3-9]\d"><a class='help'
+onclick=<?php
+echoHelp( $help_9 );
+?>>[?]</a></td>
+</tr>
+<tr>
 <td><label for="max_exec_time"><?php _pesc('Max. execution time (s)');?></label></td>
 <td><input type="number" name="max_exec_time" id="max_exec_time"
-value="<?php echo $this->settings["max_exec_time"];?>"><a class='help'
-onclick=<?php
-echoHelp ( $help_7 );
+value="<?php echo $this->settings["max_exec_time"];?>"
+min="<?php echo $max_exec_time_min;?>" max="<?php echo $max_exec_time_max;?>"><a
+class='help' onclick=<?php
+echoHelp( $help_7 );
 ?>>[?]</a></td>
 </tr>
 <tr>
@@ -92,45 +121,42 @@ echoHelp ( $help_7 );
 <td><input type="number" name="retry" id="retry" disabled="disabled"
 value=<?php echo '"'.$this->settings['retry'].'"';?>><a class='help'
 onclick=<?php
-echoHelp ( $help_5 );
+echoHelp( $help_5 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="retrywait"><?php _pesc('Retrial wait time (s)');?></label></td>
-<td><input type="number" name="retrywait" id="retrywait"
-disabled="disabled"
-value=<?php echo '"'.$this->settings['retrywait'].'"';?>><a
-class='help' onclick=<?php
-echoHelp ( $help_6 );
+<td><input type="number" name="retrywait" id="retrywait" disabled="disabled"
+value=<?php echo '"'.$this->settings['retrywait'].'"';?>><a class='help'
+onclick=<?php
+echoHelp( $help_6 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="mode"><?php _pesc('Backup mode');?></label></td>
 <td><select name="mode" id="mode"><?php echo $backup_modes;?>
 </select> <a class='help' onclick=<?php
-echoHelp ( $help_4 );
+echoHelp( $help_4 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="encryption"><?php _pesc('Encrypt backup');?></label></td>
 <td><select name="encryption" id="encryption"><?php echo $encryption_opts;?>
 </select> <a class='help' onclick=<?php
-echoHelp ( $help_8 );
+echoHelp( $help_8 );
 ?>>[?]</a></td>
 </tr>
 <?php if(isset($this->settings ['encryption'] )&&!empty($this->settings ['encryption'] )){?>
 <tr>
 <td colspan="2"><input type="button" class="button"
 value="<?php _pesc('Get the encryption password');?>"
-onclick="js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,'<?php
-echo http_build_query ( array (
-'action' => 'encryption_info',
-'nonce' => wp_create_nonce_wrapper ( 'encryption_info' ) 
-) );
+onclick="js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,'<?php
+echo http_build_query( 
+array( 'action' => 'encryption_info', 'nonce' => wp_create_nonce_wrapper( 'encryption_info' ) ) );
 ?>',null, null, null, '<?php _esc('Encryption info');?>', false);"> <input
 type="file" class="button" id="decrypt_file" name="decrypt_file[]"
-accept=".enc" multiple="multiple" style="display: none"> <input
-type="button" class="button" id="do_decrypt"
-value="<?php _pesc('Decrypt file');?>" onclick="js55f93aab8f090.do_decrypt();"></td>
+accept=".enc" multiple="multiple" style="display: none"> <input type="button"
+class="button" id="do_decrypt" value="<?php _pesc('Decrypt file');?>"
+onclick="js56816a36b58dc.do_decrypt();"></td>
 </tr>
 <?php }?>

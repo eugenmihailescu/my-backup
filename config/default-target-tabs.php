@@ -24,65 +24,67 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : default-target-tabs.php $
  * 
- * @id      : default-target-tabs.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : default-target-tabs.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 require_once EDITOR_PATH . 'target-functions.php';
 require_once UTILS_PATH . 'arrays.php';
-$BACKUP_TARGETS = array (
-DISK_TARGET => 'disk',
-FTP_TARGET => 'ftp',
-SSH_TARGET => 'ssh',
-DROPBOX_TARGET => 'dropbox',
-WEBDAV_TARGET => 'webdav',
-MAIL_TARGET => 'email' 
-);
-$TARGET_NAMES = array (
-TMPFILE_SOURCE => 'temp files',
-MYSQL_SOURCE => 'mysql',
-APP_LOGS => 'logs',
-APP_SUPPORT => 'support',
-APP_CHANGELOG => 'changelog',
-APP_TABBED_TARGETS => 'target',
-APP_SCHEDULE => 'schedule',
-APP_BACKUP_JOB => 'backup',
-APP_WELCOME => 'welcome' ,
-APP_NOTIFICATION => 'notification'
-) + $BACKUP_TARGETS;
-$NOT_BACKUP_TARGETS = array (
-TMPFILE_SOURCE,
-MYSQL_SOURCE 
-);
-registerTab ( MYSQL_SOURCE, 'MySQLSourceEditor', _esc ( 'MySQL source' ) );
-registerTab ( DISK_TARGET, 'DiskTargetEditor', _esc ( 'File system' ), 'getDiskFiles', 'folder', 'drive-harddisk.png' );
-registerTab ( DROPBOX_TARGET, 'DropboxTargetEditor', _esc ( 'Dropbox' ), 'getDropboxFiles', 'dropbox', 'dropbox.png' );
-registerTab ( APP_SUPPORT, 'SupportEditor', _esc ( 'Support' ) );
-registerTab ( APP_CHANGELOG, 'ChangeLogEditor', _esc ( 'Change log' ) );
-registerTab ( APP_TABBED_TARGETS, 'BackupTargetsEditor', _esc ( 'Backup target' ) );
-registerTab ( APP_SCHEDULE, 'ScheduleEditor', _esc ( 'Schedule' ) );
-registerTab ( WEBDAV_TARGET, 'WebDAVTargetEditor', _esc ( 'WebDAV' ), 'getWebDAVFiles', 'folder', 'dav.png' );
-registerTab ( FTP_TARGET, 'FtpTargetEditor', _esc ( 'FTP/FTPS' ), 'getFtpFiles', 'folder', 'folder-remote.png' );
-registerTab ( SSH_TARGET, 'SSHTargetEditor', _esc ( 'SFTP/SCP' ), 'getSSHFiles', 'folder', 'ssh.png' );
-registerTab ( APP_BACKUP_JOB, 'BackupJobEditor', _esc ( 'Backup' ) );
-registerTab ( APP_LOGS, 'LogsEditor', _esc ( 'Logs' ) );
-registerTab ( MAIL_TARGET, 'MailTargetEditor', _esc ( 'E-mail' ) );
-registerTab ( APP_WELCOME, 'WelcomeEditor', _esc ( 'Welcome' ) );
-registerTab ( APP_NOTIFICATION, 'NotificationEditor', _esc ( 'Notifications' ) );
-$dashboard_tabs = array (
-APP_BACKUP_JOB,
-MYSQL_SOURCE,
-APP_TABBED_TARGETS,
-APP_SCHEDULE,
-APP_LOGS,
-APP_CHANGELOG,
-APP_SUPPORT 
-);
+include_once CONFIG_PATH . 'forward-target-tabs.php';
+$is_multisite = is_multisite_wrapper();
+$BACKUP_TARGETS = array( 
+DISK_TARGET => 'disk', 
+FTP_TARGET => 'ftp', 
+SSH_TARGET => 'ssh', 
+DROPBOX_TARGET => 'dropbox', 
+WEBDAV_TARGET => 'webdav', 
+MAIL_TARGET => 'email' );
+$TARGET_NAMES = array( 
+TMPFILE_SOURCE => 'temp files', 
+MYSQL_SOURCE => 'mysql', 
+APP_LOGS => 'logs', 
+APP_SUPPORT => 'support', 
+APP_CHANGELOG => 'changelog', 
+APP_TABBED_TARGETS => 'target', 
+APP_SCHEDULE => 'schedule', 
+APP_BACKUP_JOB => 'backup', 
+APP_WELCOME => 'welcome', 
+APP_NOTIFICATION => 'notification' ) + $BACKUP_TARGETS;
+$NOT_BACKUP_TARGETS = array( TMPFILE_SOURCE, MYSQL_SOURCE );
+registerDefaultTab( 
+APP_BACKUP_JOB, 
+'BackupJobEditor', 
+$is_multisite ? _esc( 'Site backup' ) : ( is_wp() ? _esc( 'WP backup' ) : _esc( 'Backup settings' ) ) );
+registerTab( 
+MYSQL_SOURCE, 
+'MySQLSourceEditor', 
+$is_multisite ? _esc( 'Site database' ) : ( is_wp() ? _esc( 'WP database' ) : _esc( 'MySQL database' ) ) );
+registerTab( DISK_TARGET, 'DiskTargetEditor', _esc( 'File system' ), 'getDiskFiles', 'folder', 'drive-harddisk.png' );
+registerTab( DROPBOX_TARGET, 'DropboxTargetEditor', _esc( 'Dropbox' ), 'getDropboxFiles', 'dropbox', 'dropbox.png' );
+registerTab( APP_SUPPORT, 'SupportEditor', _esc( 'Support' ) );
+registerTab( APP_CHANGELOG, 'ChangeLogEditor', _esc( 'Change log' ) );
+registerTab( APP_TABBED_TARGETS, 'BackupTargetsEditor', _esc( 'Backup targets' ) );
+registerTab( APP_SCHEDULE, 'ScheduleEditor', _esc( 'Backup Schedule' ) );
+registerTab( WEBDAV_TARGET, 'WebDAVTargetEditor', _esc( 'WebDAV' ), 'getWebDAVFiles', 'folder', 'dav.png' );
+registerTab( FTP_TARGET, 'FtpTargetEditor', _esc( 'FTP/FTPS' ), 'getFtpFiles', 'folder', 'folder-remote.png' );
+registerTab( SSH_TARGET, 'SSHTargetEditor', _esc( 'SFTP/SCP' ), 'getSSHFiles', 'folder', 'ssh.png' );
+registerTab( APP_LOGS, 'LogsEditor', _esc( 'Logs' ) );
+registerTab( MAIL_TARGET, 'MailTargetEditor', _esc( 'E-mail' ) );
+registerTab( APP_WELCOME, 'WelcomeEditor', _esc( 'Welcome' ) );
+registerTab( APP_NOTIFICATION, 'NotificationEditor', _esc( 'Notifications' ) );
+$dashboard_tabs = array( 
+APP_BACKUP_JOB, 
+MYSQL_SOURCE, 
+APP_TABBED_TARGETS, 
+APP_SCHEDULE, 
+APP_LOGS, 
+APP_CHANGELOG, 
+APP_SUPPORT );
 ?>

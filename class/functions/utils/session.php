@@ -24,58 +24,59 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : session.php $
  * 
- * @id      : session.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : session.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-function is_session_started($auto_start = true) {
+function is_session_started( $auto_start = true ) {
 $result = false;
-if (php_sapi_name () !== 'cli') {
-if (version_compare ( phpversion (), '5.4.0', '>=' ))
-$result = session_status () === PHP_SESSION_ACTIVE ? TRUE : FALSE;
+if ( php_sapi_name() !== 'cli' ) {
+if ( version_compare( phpversion(), '5.4.0', '>=' ) )
+$result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
 else
-$result = session_id () === '' ? FALSE : TRUE;
+$result = session_id() === '' ? FALSE : TRUE;
 }
-! $result && $auto_start && session_start ();
+! $result && $auto_start && ! headers_sent() && session_start();
 return $result;
 }
 function check_is_logged() {
-if (is_multisite_wrapper ())
-die ( sprintf ( _esc ( "Oops, you hit a wall. <b>%s</b> does not support %s multisite, yet." ), WPMYBACKUP, getAnchor ( 'WordPress', 'http://en.wikipedia.org/wiki/WordPress' ) ) );
-elseif (is_wp ())
+if ( is_multisite_wrapper() ) {
 return; 
-if (! is_session_started ( false ))
-if (! (isset ( $_SESSION ) && isset ( $_SESSION [SIMPLELOGIN_SESSION_LOGGED] ) && $_SESSION [SIMPLELOGIN_SESSION_LOGGED] == true))
-auth_redirect_wrapper ();
+} elseif ( is_wp() )
+return; 
+if ( ! is_session_started( false ) )
+if ( ! ( isset( $_SESSION ) && isset( $_SESSION[SIMPLELOGIN_SESSION_LOGGED] ) &&
+$_SESSION[SIMPLELOGIN_SESSION_LOGGED] == true ) )
+auth_redirect_wrapper();
 }
 function get_session_varlist() {
-if (isset ( $_SESSION [SESSION_VARLIST_KEY] ))
-return $_SESSION [SESSION_VARLIST_KEY];
+if ( isset( $_SESSION[SESSION_VARLIST_KEY] ) )
+return $_SESSION[SESSION_VARLIST_KEY];
 else
-return array ();
+return array();
 }
-function add_session_var($key, $value) {
-$_SESSION [$key] = $value;
-$session_vars = get_session_varlist ();
-if (! in_array ( $key, $session_vars )) {
-$session_vars [] = $key;
-$_SESSION [SESSION_VARLIST_KEY] = $session_vars;
+function add_session_var( $key, $value ) {
+$_SESSION[$key] = $value;
+$session_vars = get_session_varlist();
+if ( ! in_array( $key, $session_vars ) ) {
+$session_vars[] = $key;
+$_SESSION[SESSION_VARLIST_KEY] = $session_vars;
 }
 }
-function del_session_var($key) {
-if (isset ( $_SESSION [$key] ))
-unset ( $_SESSION [$key] );
-$session_vars = get_session_varlist ();
-if (false !== ($key = array_search ( $key, $session_vars ))) {
-unset ( $session_vars [$key] );
-$_SESSION [SESSION_VARLIST_KEY] = $session_vars;
+function del_session_var( $key ) {
+if ( isset( $_SESSION[$key] ) )
+unset( $_SESSION[$key] );
+$session_vars = get_session_varlist();
+if ( false !== ( $key = array_search( $key, $session_vars ) ) ) {
+unset( $session_vars[$key] );
+$_SESSION[SESSION_VARLIST_KEY] = $session_vars;
 }
 }
 ?>

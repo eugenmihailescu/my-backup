@@ -24,121 +24,117 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : download.php $
  * 
- * @id      : download.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : download.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 include_once 'utils.php';
-if (defined ( 'DROPBOX_TARGET' )) {
+if ( defined( __NAMESPACE__.'\\DROPBOX_TARGET' ) ) {
 }
-if (defined ( 'GOOGLE_TARGET' )) {
+if ( defined( __NAMESPACE__.'\\GOOGLE_TARGET' ) ) {
 }
-define ( 'DENY_DOWNLOAD_EXT', 'php,htaccess,config,conf,json,auth' );
-function downloadAllowed($filename) {
-$extensions = explode ( ',', DENY_DOWNLOAD_EXT );
-if (empty ( $extensions ))
+define( __NAMESPACE__.'\\DENY_DOWNLOAD_EXT', 'php,htaccess,config,conf,json,auth' );
+function downloadAllowed( $filename ) {
+$extensions = explode( ',', DENY_DOWNLOAD_EXT );
+if ( empty( $extensions ) )
 return true;
 $ext = '';
-preg_match ( '/\.([^\.]*)$/', $filename, $matches ) && $ext = $matches [1];
-return ! in_array ( $ext, $extensions );
+preg_match( '/\.([^\.]*)$/', $filename, $matches ) && $ext = $matches[1];
+return ! in_array( $ext, $extensions );
 }
-function redirectError($message, $timeout) {
+function redirectError( $message, $timeout ) {
 echo "<!DOCTYPE html><html><body>$message<script>setTimeout(function(){window.history.go(-1);}, $timeout);</script></body></html>";
-exit ();
+exit();
 }
-function downloadServiceFile($service, $path, $outfile, $settings) {
-if (! downloadAllowed ( $path ))
+function downloadServiceFile( $service, $path, $outfile, $settings, $redirect_error = true ) {
+if ( ! downloadAllowed( $path ) )
 return;
 $session = null;
-switch ($service) {
+switch ( $service ) {
 case 'dropbox' :
-$session = new DropboxOAuth2Client ();
-$api = new DropboxCloudStorage ( $session );
+$session = new DropboxOAuth2Client();
+$api = new DropboxCloudStorage( $session );
 $function = 'downloadFile';
 $oauth_file = 'dropbox.auth';
 break;
 case 'google' :
-$session = new GoogleOAuth2Client ();
-$api = new GoogleCloudStorage ( $session );
-$function = preg_match ( '/^http:\/\//', $path ) ? 'downloadUrl' : 'downloadFile';
+$session = new GoogleOAuth2Client();
+$api = new GoogleCloudStorage( $session );
+$function = preg_match( '/^http:\/\//', $path ) ? 'downloadUrl' : 'downloadFile';
 $oauth_file = 'google.auth';
 $outfile = null;
 break;
 case 'webdav' :
-$api = new WebDAVWebStorage ( $settings );
+$api = new WebDAVWebStorage( $settings );
 $function = 'downloadFile';
 break;
 default :
-throw new MyException ( 'Unknown download file service' );
+throw new MyException( 'Unknown download file service' );
 break;
 }
-if (null != $session) {
-$session->setProxyURI ( OAUTH_PROXY_URL, '' );
-$session->setTimeout ( $settings ['request_timeout'] );
-$session->initFromFile ( ROOT_OAUTH_FILE . $oauth_file );
+if ( null != $session ) {
+$session->setProxyURI( OAUTH_PROXY_URL, '' );
+$session->setTimeout( $settings['request_timeout'] );
+$session->initFromFile( ROOT_OAUTH_FILE . $oauth_file );
 }
 $err = null;
 try {
-$result = _call_user_func ( array (
-$api,
-$function 
-), $path, $outfile );
-if (true !== $result)
+$result = _call_user_func( array( $api, $function ), $path, $outfile );
+if ( true !== $result )
 $err = $result;
 } catch ( MyException $e ) {
-$err = $e->getMessage ();
+$err = $e->getMessage();
 }
-if (! empty ( $err ))
-echo redirectError ( $err, 3000 );
-return _call_user_func ( array (
-$api,
-'getFile' 
-), $path );
+if ( $redirect_error && ! empty( $err ) )
+echo redirectError( $err, 3000 );
+return _call_user_func( array( $api, 'getFile' ), $path );
 }
-function downloadFile($filename = null, $service = null, $settings = null) {
-if (! downloadAllowed ( $filename ))
+function downloadFile( $filename = null, $service = null, $settings = null, $download = true ) {
+if ( ! downloadAllowed( $filename ) ) {
 return;
-if (! (empty ( $service ) || empty ( $filename ))) {
-$unlink = in_array ( $service, array (
-'google',
-'dropbox',
-'ftp',
-'webdav' 
-) );
+}
+if ( ! ( empty( $service ) || empty( $filename ) ) ) {
+$unlink = in_array( $service, array( 'google', 'dropbox', 'ftp', 'webdav', 'test' ) );
 $mime_type = 'application/octet-stream';
-$tmpfile = ! empty ( $filename ) ? addTrailingSlash ( sys_get_temp_dir () ) . basename ( $filename ) : null;
-switch ($service) {
+$tmpfile = ! empty( $filename ) ? addTrailingSlash( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() ) .
+basename( $filename ) : null;
+switch ( $service ) {
 case 'dropbox' :
 case 'google' :
 case 'webdav' :
-$mime_type = downloadServiceFile ( $service, $filename, $tmpfile, $settings );
-$mime_type = ! empty ( $mime_type ['mime_type'] ) ? $mime_type ['mime_type'] : null;
+$mime_type = downloadServiceFile( $service, $filename, $tmpfile, $settings, $download );
+$mime_type = ! empty( $mime_type['mime_type'] ) ? $mime_type['mime_type'] : null;
 break;
 case 'ssh' :
 case 'ftp' :
-$ftp = getFtpObject ( $settings, 'ssh' == $service );
-$ftp->ftpDownload ( $filename, $tmpfile );
+$ftp = getFtpObject( $settings, 'ssh' == $service );
+$ftp->ftpDownload( $filename, $tmpfile );
 break;
+case 'test' :
 case 'disk' :
 $tmpfile = $filename;
 break;
 default :
-echo sprintf ( _esc ( "Download method '%s' not implemented" ), $service );
+echo sprintf( _esc( "Download method '%s' not implemented" ), $service );
 break;
 }
-if (isset ( $tmpfile ) && file_exists ( $tmpfile ) && ! empty ( $mime_type )) {
-redirectFileDownload ( $tmpfile, $mime_type );
-if ($unlink)
-@unlink ( $tmpfile );
+if ( isset( $tmpfile ) && file_exists( $tmpfile ) && ! empty( $mime_type ) ) {
+if ( $download ) {
+redirectFileDownload( $tmpfile, $mime_type );
+if ( $unlink )
+@unlink( $tmpfile );
+} else
+return $tmpfile;
 }
 }
-exit ();
+$download && exit();
+return false;
 }
 ?>

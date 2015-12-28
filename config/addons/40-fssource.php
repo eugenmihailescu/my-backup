@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : 40-fssource.php $
  * 
- * @id      : 40-fssource.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 40-fssource.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'SRCFILE_SOURCE', - 3 );
+define(__NAMESPACE__.'\\SRCFILE_SOURCE', - 3 );
 $TARGET_NAMES [SRCFILE_SOURCE] = 'fssource';
 $NOT_BACKUP_TARGETS [] = SRCFILE_SOURCE;
 registerTab ( SRCFILE_SOURCE, 'DiskSourceEditor', _esc ( 'Backup source' ), 'getDirList' );
-insertArrayBefore ( $dashboard_tabs, defined ( 'WP_SOURCE' ) ? WP_SOURCE : MYSQL_SOURCE, SRCFILE_SOURCE );
+insertArrayBefore ( $dashboard_tabs, defined ( __NAMESPACE__.'\\WP_SOURCE' ) ? WP_SOURCE : MYSQL_SOURCE, SRCFILE_SOURCE );
 ?>

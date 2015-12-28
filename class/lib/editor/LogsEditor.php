@@ -24,58 +24,76 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogsEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class LogsEditor extends AbstractTargetEditor {
 private $_is_running;
 private $_fct_chk_status;
 private $_index;
-private function _getLogfileRow($log_type, $log_name) {
-ob_start ();
-$spy_shown = $this->_is_running [0] ? 'block' : 'none';
-$logfile = getLogfileByType ( $log_type );
-$log_exists = file_exists ( $logfile );
+private function _getLogfileRow( $log_type, $log_name ) {
+ob_start();
+$spy_shown = $this->_is_running[0] ? 'block' : 'none';
+$logfile = getLogfileByType( $log_type );
+$log_exists = is_file( $logfile );
 $view_id = 'view_' . $log_type . '_log';
 $clear_id = 'clear_' . $log_type . '_log';
 echo '<tr>';
-echo "<td><label for='$view_id'>" . ucwords ( $log_name ) . " log</label></td>";
+echo "<td><label for='$view_id'>" . ucwords( $log_name ) . " log</label></td>";
 echo '<td>:</td>';
-echo '<td ' . ($log_exists ? '' : 'colspan="4"') . '>' . ($log_exists ? str_replace ( $this->root, '<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="js55f93aab8f090.helpROOT();">ROOT</span>' . DIRECTORY_SEPARATOR, $logfile ) : '(log file does not exist)') . '</td>';
-if ($log_exists) {
-echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" . (isWin () ? addslashes ( $logfile ) : $logfile) . "\",nonce:\"" . wp_create_nonce_wrapper ( 'dwl_file' ) . "\"});' title='Click to read this log file now'></td>";
-printf ( "<td><input type='button' name='%s' value='%s' class='button' onclick='js55f93aab8f090.clearLog(\"%s\",\"%s\");' title='%s'></td>", $clear_id, _esc ( 'Clear' ), $log_type, $log_name, sprintf ( _esc ( 'Click to clear the %s log' ), $log_name ) );
-echo "<td><input type='button' id='btn_monitor{$this->_index}' title='" . sprintf ( _esc ( 'Spy the %s log' ), $log_name ) . "' onclick='js55f93aab8f090.spy(\"log_read\",\"$log_type\",\"" . wp_create_nonce_wrapper ( 'log_read' ) . "\",\"" . wp_create_nonce_wrapper ( 'get_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'clean_progress' ) . "\",\"" . wp_create_nonce_wrapper ( 'log_read_abort' ) . "\");' class='button btn_monitor' style='display:$spy_shown'></td>";
-$this->_index ++;
+echo '<td ' . ( $log_exists ? '' : 'colspan="4"' ) . '>' . ( $log_exists ? str_replace( 
+LOG_DIR, 
+'<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="js56816a36b58dc.helpROOT();">ROOT</span>' .
+DIRECTORY_SEPARATOR, 
+$logfile ) : '(log file does not exist)' ) . '</td>';
+if ( $log_exists ) {
+echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='js56816a36b58dc.post(js56816a36b58dc.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" .
+( isWin() ? addslashes( $logfile ) : $logfile ) . "\",nonce:\"" . wp_create_nonce_wrapper( 'dwl_file' ) .
+"\"});' title='Click to read this log file now'></td>";
+printf( 
+"<td><input type='button' name='%s' value='%s' class='button' onclick='js56816a36b58dc.clearLog(\"%s\",\"%s\");' title='%s'></td>", 
+$clear_id, 
+_esc( 'Clear' ), 
+$log_type, 
+$log_name, 
+sprintf( _esc( 'Click to clear the %s log' ), $log_name ) );
+printf( "<td style='color:#bbb;'>%s</td>", getHumanReadableSize( @filesize( $logfile ) ) );
+echo "<td><input type='button' id='btn_monitor{$this->_index}' title='" .
+sprintf( _esc( 'Spy the %s log' ), $log_name ) . "' onclick='js56816a36b58dc.spy(\"log_read\",\"$log_type\",\"" .
+wp_create_nonce_wrapper( 'log_read' ) . "\",\"" . wp_create_nonce_wrapper( 'get_progress' ) . "\",\"" .
+wp_create_nonce_wrapper( 'clean_progress' ) . "\",\"" . wp_create_nonce_wrapper( 'log_read_abort' ) .
+"\");' class='button btn_monitor' style='display:$spy_shown'></td>";
+$this->_index++;
 }
 echo '</tr>';
-$result = ob_get_contents ();
-ob_end_clean ();
+$result = ob_get_contents();
+ob_end_clean();
 return $result;
 }
 private function _getDebugTemplate() {
-$template = $this->_getLogfileRow ( 'errors', _esc ( 'debug error' ) );
-$template .= $this->_getLogfileRow ( 'debug', _esc ( 'debug trace' ) );
-$template .= $this->_getLogfileRow ( 'curldebug', _esc ( 'Curl debug' ) );
-$template .= $this->_getLogfileRow ( 'statsdebug', _esc ( 'sql+charts debug' ) );
-$template .= $this->_getLogfileRow ( 'traceaction', _esc ( 'trace action' ) );
-$template .= $this->_getLogfileRow ( 'smtpdebug', _esc ( 'SMTP debug' ) );
-return $this->insertEditorTemplate ( _esc ( 'Debug logs' ), $template, null, true );
+$template = $this->_getLogfileRow( 'errors', _esc( 'debug error' ) );
+$template .= $this->_getLogfileRow( 'debug', _esc( 'debug trace' ) );
+$template .= $this->_getLogfileRow( 'curldebug', _esc( 'Curl debug' ) );
+$template .= $this->_getLogfileRow( 'statsdebug', _esc( 'sql+charts debug' ) );
+$template .= $this->_getLogfileRow( 'traceaction', _esc( 'trace action' ) );
+$template .= $this->_getLogfileRow( 'smtpdebug', _esc( 'SMTP debug' ) );
+return $this->insertEditorTemplate( _esc( 'Debug logs' ), $template, null, true );
 }
 private function _getJavaScripts() {
 global $PROGRESS_PROVIDER;
-$this->java_scripts [] = "parent.plugin_dir='" . addslashes ( dirname ( realpath($_SERVER ['SCRIPT_NAME'] ) )) . "';";
-$this->java_scripts [] = "var d = document.getElementById('monitor_job'),
+$this->java_scripts[] = "parent.plugin_dir='" . addslashes( dirname( realpath( $_SERVER['SCRIPT_NAME'] ) ) ) .
+"';";
+$this->java_scripts[] = "var d = document.getElementById('monitor_job'),
 spy_status = document.getElementById('td_job_status').innerHTML,
 callback = function () {
-js55f93aab8f090.or = function () {
+js56816a36b58dc.or = function () {
 var status = document.getElementById('td_job_status').innerHTML;
 if (status && status != spy_status) {
 d = d && d.style && d.style.display == 'none' ? 'block' : 'none';
@@ -86,39 +104,59 @@ if(el)style.display = d;
 spy_status = status;
 }
 };" . $this->_fct_chk_status . "}";
-$this->java_scripts [] = "setInterval(callback," . LOG_CHECK_TIMEOUT . ");";
-$this->java_scripts [] = "parent.helpROOT=function(){" . getHelpCall ( "'This is the root folder where the application is installed, that is:<br><i>" . normalize_path ( $this->root ) . "</i>'", false ) . "}";
-$clear_log_click = sprintf ( 'js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', wp_create_nonce_wrapper ( 'clear_log' ) );
-$this->java_scripts [] = "parent.clearLog=function(log_type, log_name){" . sprintf ( "parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", _esc ( 'Log clear confirmation' ), sprintf ( _esc ( 'Are you sure you want to clear the %s log file?' ), "<b>'+log_name+'</b>" ), _esc ( 'Yes' ), $clear_log_click, _esc ( 'No' ) ) . "}";
-$this->java_scripts [] = getBackupSourcesJS ( $PROGRESS_PROVIDER );
+$this->java_scripts[] = "setInterval(callback," . LOG_CHECK_TIMEOUT . ");";
+$this->java_scripts[] = "parent.helpROOT=function(){" .
+getHelpCall( "'This is the site log folder, that is:<br><i>" . normalize_path( LOG_DIR ) . "</i>'", false ) .
+"}";
+$clear_log_click = sprintf( 
+'js56816a36b58dc.post(js56816a36b58dc.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', 
+wp_create_nonce_wrapper( 'clear_log' ) );
+$this->java_scripts[] = "parent.clearLog=function(log_type, log_name){" . sprintf( 
+"parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", 
+_esc( 'Log clear confirmation' ), 
+sprintf( _esc( 'Are you sure you want to clear the %s log file?' ), "<b>'+log_name+'</b>" ), 
+_esc( 'Yes' ), 
+$clear_log_click, 
+_esc( 'No' ) ) . "}";
+$this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );
 }
 protected function initTarget() {
-parent::initTarget ();
+parent::initTarget();
 $this->_index = 0;
-$this->_is_running = isJobRunning ();
+$this->_is_running = isJobRunning();
 $this->root = ROOT_PATH;
-$this->_fct_chk_status = "js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,'action=chk_status&tab=logs&nonce=" . wp_create_nonce_wrapper ( 'chk_status' ) . "','td_job_status',js55f93aab8f090.or);";
-$this->inBetweenContent = $this->_getDebugTemplate ();
-$this->_getJavaScripts ();
+$this->_fct_chk_status = "js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,'action=chk_status&tab=logs&nonce=" .
+wp_create_nonce_wrapper( 'chk_status' ) . "','td_job_status',js56816a36b58dc.or);";
+$this->inBetweenContent = $this->_getDebugTemplate();
+$this->_getJavaScripts();
 }
 protected function getEditorTemplate() {
-$help_1 = "'" . sprintf ( _esc ( 'The status is checked automatically (anyhow)<br>at each %s ms and displayed as such.' ), LOG_CHECK_TIMEOUT ) . "'";
-echo $this->_getLogfileRow ( 'jobs', _esc ( 'jobs' ) );
-echo $this->_getLogfileRow ( 'full', _esc ( 'full' ) );
-require_once $this->getTemplatePath ( 'logs.php' );
+$help_1 = "'" . sprintf( 
+_esc( 'The status is checked automatically (anyhow)<br>at each %s ms and displayed as such.' ), 
+LOG_CHECK_TIMEOUT ) . "'";
+echo $this->_getLogfileRow( 'jobs', _esc( 'jobs' ) );
+echo $this->_getLogfileRow( 'full', _esc( 'full' ) );
+require_once $this->getTemplatePath( 'logs.php' );
 }
 protected function getExpertEditorTemplate() {
 global $TARGET_NAMES;
-$help_1 = "'" . _esc ( 'Enter the path where all logs will be created and keept.' ) . "'";
-$help_2 = "'" . _esc ( 'Check this option if you want to rotate the logs when they reach a certain size.' ) . "'";
-$help_3 = "'" . _esc ( 'Enter the log maximum allowed size (in MiB).<br>They will be rotated as soon they reach this limit.' ) . "'";
-$help_4 = "'" . _esc ( 'This option allows you to isolate all the relevant log files per job instead to keep them globally in the same folder (`isolate` ie. they have their own folder) .' );
-$help_4 .= _esc ( ' The main advantage of this approach is that when you want to troubleshoot a job all you have to do is to read the job`s logs from its isolated folder instead of searching the whole log for a fragment corresponding to that job.' );
-$help_4 .= _esc ( ' Furthermore, you have Curl logs, you have debug trace logs and many, many other types. Their content will tell you smth. about that job and only that, which is cool.<br>For parallel backup jobs this is mandatory and default.<br>' );
-$help_4 .= _esc ( 'This kind of isolated logs are written in GZip format so we don`t have to worry about rotating them because sometimes they are small but being so many they will start eating a lot of space on your disk.' ) . "'";
-$log_dir = $this->settings ['logdir'];
-$logbranched = strToBool ( $this->settings ['logbranched'] );
-require_once $this->getTemplatePath ( 'logs-expert.php' );
+$help_1 = "'" . _esc( 'Enter the path where all logs will be created and keept.' ) . "'";
+$help_2 = "'" . _esc( 'Check this option if you want to rotate the logs when they reach a certain size.' ) . "'";
+$help_3 = "'" . _esc( 
+'Enter the log maximum allowed size (in MiB).<br>They will be rotated as soon they reach this limit.' ) . "'";
+$help_4 = "'" .
+_esc( 
+'This option allows you to isolate all the relevant log files per job instead to keep them globally in the same folder (`isolate` ie. they have their own folder) .' );
+$help_4 .= _esc( 
+' The main advantage of this approach is that when you want to troubleshoot a job all you have to do is to read the job`s logs from its isolated folder instead of searching the whole log for a fragment corresponding to that job.' );
+$help_4 .= _esc( 
+' Furthermore, you have Curl logs, you have debug trace logs and many, many other types. Their content will tell you smth. about that job and only that, which is cool.<br>For parallel backup jobs this is mandatory and default.<br>' );
+$help_4 .= _esc( 
+'This kind of isolated logs are written in GZip format so we don`t have to worry about rotating them because sometimes they are small but being so many they will start eating a lot of space on your disk.' ) .
+"'";
+$log_dir = $this->settings['logdir'];
+$logbranched = strToBool( $this->settings['logbranched'] );
+require_once $this->getTemplatePath( 'logs-expert.php' );
 }
 }
 ?>

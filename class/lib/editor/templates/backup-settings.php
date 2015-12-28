@@ -24,40 +24,38 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : backup-settings.php $
  * 
- * @id      : backup-settings.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backup-settings.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="http_proxy"><?php _pesc('HTTP proxy');?></label></td>
 <td><input type="text" name="http_proxy" id="http_proxy"
-value="<?php echo $this->settings['http_proxy'];?>"
-style="width: 100%"></td>
+value="<?php echo $this->settings['http_proxy'];?>" style="width: 100%"></td>
 <td><label for="http_proxy_port"><?php _pesc('Port');?></label></td>
 <td><input type="number" name="http_proxy_port" id="http_proxy_port"
-value="<?php echo $this->settings['http_proxy_port'];?>"
-style="width: 100%"></td>
+value="<?php echo $this->settings['http_proxy_port'];?>" style="width: 100%"
+min="20" max="65535" size="5"></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_4 );
+echoHelp( $help_4 );
 ?>> [?]</a></td>
 </tr>
 <tr>
 <td><label for="http_proxy_user"><?php _pesc('Proxy user');?></label></td>
 <td><input type="text" name="http_proxy_user" id="http_proxy_user"
-value="<?php echo $this->settings['http_proxy_user'];?>"
-style="width: 100%"></td>
+value="<?php echo $this->settings['http_proxy_user'];?>" style="width: 100%"></td>
 <td><label for="http_proxy_pwd"><?php _pesc('Pwd');?></label></td>
 <td><input type="password" name="http_proxy_pwd" id="http_proxy_pwd"
 value="<?php echo $this->settings['http_proxy_pwd']; if(!(isSSL()||empty($http_proxy_pwd))) echo " style='background-color:#FF2C00;'";?>"><?php echo getSSLIcon();?></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_5 );
+echoHelp( $help_5 );
 ?>> [?]</a></td>
 </tr>
 <tr>
@@ -68,18 +66,18 @@ value="<?php echo CURLAUTH_BASIC;?>"
 <option value="<?php echo CURLAUTH_NTLM;?>"
 <?php if(CURLAUTH_NTLM==$this->settings['http_proxy_auth'])echo $selected;?>>NTLM</option></select><a
 class='help' onclick=<?php
-echoHelp ( $help_6 );
+echoHelp( $help_6 );
 ?>> [?]</a></td>
 <td><label for="http_proxy_type"><?php _pesc('Type');?></label></td>
-<td><select name="http_proxy_type" id="http_proxy_type"
-style="width: 100%"><option value="<?php echo CURLPROXY_HTTP;?>"
+<td><select name="http_proxy_type" id="http_proxy_type" style="width: 100%"><option
+value="<?php echo CURLPROXY_HTTP;?>"
 <?php if(CURLPROXY_HTTP==$this->settings['http_proxy_type'])echo $selected;?>>HTTP
 proxy</option>
 <option value="<?php echo CURLPROXY_SOCKS5;?>"
 <?php if(CURLPROXY_SOCKS5==$this->settings['http_proxy_type'])echo $selected;?>>Socks5
 proxy</option></select></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_7 );
+echoHelp( $help_7 );
 ?>> [?]</a></td>
 </tr>
 <tr>
@@ -87,25 +85,24 @@ echoHelp ( $help_7 );
 <td><input type="text" name="ssl_cainfo" id="ssl_cainfo"
 value="<?php echo $this->settings['ssl_cainfo'];?>"><a class='help'
 onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
-<td style="text-align: center"><input type="checkbox"
-name="ssl_chk_peer" id="ssl_chk_peer"
+<td style="text-align: center"><input type="checkbox" name="ssl_chk_peer"
+id="ssl_chk_peer"
 <?php
-echo true === strToBool ( $this->settings ['ssl_chk_peer'] ) ? 'checked' : '';
+echo true === strToBool( $this->settings['ssl_chk_peer'] ) ? 'checked' : '';
 ?>
 value="1"><input type="hidden" name="ssl_chk_peer" value="0"></td>
 <td><label for="ssl_chk_peer"><?php _pesc('Check peers SSL identity');?></label></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_8 );
+echoHelp( $help_8 );
 ?>> [?]</a></td>
 </tr>
 <tr>
 <td><label for="ssl_ver"><?php _pesc('SSL version');?></label></td>
 <td><select name="ssl_ver" id="ssl_ver" style="width: 100%">
 <option value="<?php echo 0;?>"
-<?php if(0==$this->settings['ssl_ver']) echo $selected;?>>Let me
-choose</option>
+<?php if(0==$this->settings['ssl_ver']) echo $selected;?>>Let me choose</option>
 <option value="<?php echo 1;?>"
 <?php if(1==$this->settings['ssl_ver']) echo $selected;?>>TLS v1.x</option>
 <option value="<?php echo 4;?>"
@@ -119,36 +116,34 @@ choose</option>
 <option value="<?php echo  3;?>"
 <?php if( 3==$this->settings['ssl_ver']) echo $selected;?>>SSL v3</option>
 </select><a class='help' onclick=<?php
-echoHelp ( $help_9 );
+echoHelp( $help_9 );
 ?>> [?]</a></td>
-<td style="text-align: center"><input type="checkbox"
-name="ssl_chk_host" id="ssl_chk_host"
+<td style="text-align: center"><input type="checkbox" name="ssl_chk_host"
+id="ssl_chk_host"
 <?php
-echo true === strToBool ( $this->settings ['ssl_chk_host'] ) ? 'checked' : '';
+echo true === strToBool( $this->settings['ssl_chk_host'] ) ? 'checked' : '';
 ?>
 value="1"><input type="hidden" name="ssl_chk_host" value="0"></td>
 <td><label for="ssl_chk_host"><?php _pesc('Check host SSL identity');?></label></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_10 );
+echoHelp( $help_10 );
 ?>> [?]</a></td>
 </tr>
 <tr>
 <td><label for="dwl_throttle"><?php _pesc('Download throttling');?></label></td>
-<td colspan="3"><input type="number" name="dwl_throttle"
-id="dwl_throttle"
-value="<?php echo $this->settings['dwl_throttle'];?>"
-style="width: 70px"> KiBps <a class='help'
-onclick=<?php
-echoHelp ( $help_2 );
+<td colspan="3"><input type="number" name="dwl_throttle" id="dwl_throttle"
+value="<?php echo $this->settings['dwl_throttle'];?>" style="width: 70px">
+KiBps <a class='help' onclick=<?php
+echoHelp( $help_2 );
 ?>> [?]</a></td>
 </tr>
 <tr>
 <td><label for="request_timeout"><?php _pesc('Request timeout');?></label></td>
 <td colspan="3"><input type="number" name="request_timeout"
 id="request_timeout" style="width: 70px"
-value="<?php echo $this->settings['request_timeout'];?>"> sec<a
-class='help' onclick=<?php
-echoHelp ( $help_3 );
+value="<?php echo $this->settings['request_timeout'];?>"> sec<a class='help'
+onclick=<?php
+echoHelp( $help_3 );
 ?>> [?]</a></td>
 </tr>
 <tr>
@@ -156,6 +151,6 @@ echoHelp ( $help_3 );
 <td colspan="3"><input type="text" name="netif_out" id="netif_out"
 value="<?php echo$this->settings['netif_out'];?>"><a class='help'
 onclick=<?php
-echoHelp ( $help_11 );
+echoHelp( $help_11 );
 ?>> [?]</a></td>
 </tr>

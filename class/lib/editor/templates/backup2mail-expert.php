@@ -24,25 +24,24 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : backup2mail-expert.php $
  * 
- * @id      : backup2mail-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backup2mail-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="backup2mail_smtp"><?php _pesc('Use PEAR Mail');?></label></td>
-<td><input type="checkbox" name="backup2mail_smtp"
-id="backup2mail_smtp" value="1"
-<?php echo $backup2mail_smtp?'checked':'';?>> <input type="hidden"
+<td><input type="checkbox" name="backup2mail_smtp" id="backup2mail_smtp"
+value="1" <?php echo $backup2mail_smtp?'checked':'';?>> <input type="hidden"
 name="backup2mail_smtp" value="0"> <a class='help'
 onclick=<?php
-echoHelp ( $help_4 );
+echoHelp( $help_4 );
 ?>>[?]</a></td>
 </tr>
 <tr>
@@ -51,7 +50,7 @@ echoHelp ( $help_4 );
 <?php echo $backup2mail_opts_disabled;?>>
 <?php echo $backend_options;?>
 </select> <a class='help' onclick=<?php
-echoHelp ( $help_5 );
+echoHelp( $help_5 );
 ?>>[?]</a></td>
 </tr>
 <tr>
@@ -60,26 +59,26 @@ echoHelp ( $help_5 );
 value="<?php echo $this->settings['backup2mail_host'];?>"
 <?php echo $backup2mail_opts_disabled;?>><a class='help'
 onclick=<?php
-echoHelp ( $help_6 );
+echoHelp( $help_6 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="backup2mail_port"><?php _pesc('SMTP port');?></label></td>
-<td><input type="text" name="backup2mail_port" id="backup2mail_port"
+<td><input type="number" name="backup2mail_port" id="backup2mail_port"
 value="<?php echo $this->settings['backup2mail_port'];?>"
-<?php echo $backup2mail_opts_disabled;?>><a class='help'
-onclick=<?php
-echoHelp ( $help_7 );
+<?php echo $backup2mail_opts_disabled;?> min="20" max="65535" size="5"><a
+class='help' onclick=<?php
+echoHelp( $help_7 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="backup2mail_auth"><?php _pesc('SMTP authentication');?></label></td>
-<td><input type="checkbox" name="backup2mail_auth"
-id="backup2mail_auth" value="1"
+<td><input type="checkbox" name="backup2mail_auth" id="backup2mail_auth"
+value="1"
 <?php echo strToBool($this->settings['backup2mail_auth'])?'checked':'';echo ' '. $backup2mail_opts_disabled;?>><input
 type="hidden" name="backup2mail_auth" value="0"> <a class='help'
 onclick=<?php
-echoHelp ( $help_8 );
+echoHelp( $help_8 );
 ?>>[?]</a></td>
 </tr>
 <tr>
@@ -88,13 +87,14 @@ echoHelp ( $help_8 );
 value="<?php echo $this->settings['backup2mail_user'];?>"
 <?php echo $backup2mail_auth_disabled;?>><a class='help'
 onclick=<?php
-echoHelp ( $help_9 );
+echoHelp( $help_9 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="backup2mail_pwd"><?php _pesc('SMTP password');?></label></td>
 <td><input type="password" name="backup2mail_pwd" id="backup2mail_pwd"
-<?php echo $backup2mail_auth_disabled;echo ' value="'.$this->settings['backup2mail_pwd'].'"'; if(!(isSSL()||empty($this->settings['backup2mail_pwd']))) echo " style='background-color:#FF2C00;'";?>><a class='help' onclick=<?php
-echoHelp ( $help_10 );
+<?php echo $backup2mail_auth_disabled;echo ' value="'.$this->settings['backup2mail_pwd'].'"'; if(!(isSSL()||empty($this->settings['backup2mail_pwd']))) echo " style='background-color:#FF2C00;'";?>><a
+class='help' onclick=<?php
+echoHelp( $help_10 );
 ?>>[?]</a><?php echo getSSLIcon();?></td>
 </tr>

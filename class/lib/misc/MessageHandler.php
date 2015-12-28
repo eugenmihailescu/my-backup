@@ -24,22 +24,22 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : MessageHandler.php $
  * 
- * @id      : MessageHandler.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MessageHandler.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'MESSAGE_ITEM_UNREAD', 0 );
-define ( 'MESSAGE_ITEM_READ', 1 );
-define ( 'MESSAGE_TYPE_NORMAL', 0 );
-define ( 'MESSAGE_TYPE_WARNING', 1 );
-define ( 'MESSAGE_TYPE_ERROR', 2 );
+define ( __NAMESPACE__.'\\MESSAGE_ITEM_UNREAD', 0 );
+define ( __NAMESPACE__.'\\MESSAGE_ITEM_READ', 1 );
+define ( __NAMESPACE__.'\\MESSAGE_TYPE_NORMAL', 0 );
+define ( __NAMESPACE__.'\\MESSAGE_TYPE_WARNING', 1 );
+define ( __NAMESPACE__.'\\MESSAGE_TYPE_ERROR', 2 );
 class MessageHandler {
 private $_message_types;
 private $_messages;

@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : welcome.php $
  * 
- * @id      : welcome.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : welcome.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <table class="welcome">
 <tr>
@@ -47,16 +47,19 @@ src="<?php echo $this->getImgURL('mybackup-plugin-banner.png');?>">
 <td><h3 style="margin-top: 2em"><?php _pesc('Thank you for choosing our software!');?></h3></td>
 </tr>
 <?php
-if ($this->_init_error) {
+if ( $this->_init_error ) {
 ?>
 <tr>
 <td style="border: 1px solid #C0C0C0; padding: 10px; border-radius: 5px;">
 <?php
-$err = error_get_last ();
-$err = sprintf ( _esc ( 'An unexpected error occured while initializing the application: %s' ), $err ['message'] );
+$err = error_get_last();
+$err = sprintf( _esc( 'An unexpected error occured while initializing the application: %s' ), $err['message'] );
 echo '<p style="color:red">', $err, '</p>';
-if (! empty ( $this->_addons ))
-printf ( '<p>' . _esc ( 'Click %s to continue.' ) . '</p>', '<input type="button" class="button" value="' . _esc ( 'this button' ) . '" onclick="' . htmlspecialchars ( str_replace ( 'parent.', 'js55f93aab8f090.', $this->_js_addon_install ) ) . '">' );
+if ( ! empty( $this->_addons ) )
+printf( 
+'<p>' . _esc( 'Click %s to continue.' ) . '</p>', 
+'<input type="button" class="button" value="' . _esc( 'this button' ) . '" onclick="' .
+htmlspecialchars( str_replace( 'parent.', 'js56816a36b58dc.', $this->_js_addon_install ) ) . '">' );
 ?>
 </td>
 </tr>
@@ -65,32 +68,45 @@ printf ( '<p>' . _esc ( 'Click %s to continue.' ) . '</p>', '<input type="button
 ?>
 <tr>
 <td><p><?php
-_pesc ( 'Before using the application for the first time please read the instructions below. They will help understand how it works. The more you know about its features and functionalities the happier you will be later.' );
+_pesc( 
+'Before using the application for the first time please read the instructions below. They will help understand how it works. The more you know about its features and functionalities the happier you will be later.' );
 ?></p></td>
 </tr>
 <?php
-if ($issue_count = count ( $setup_issues )) {
+$schedule_tabs = array();
+defined( __NAMESPACE__.'\\APP_WP_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_WP_SCHEDULE' );
+defined( __NAMESPACE__.'\\APP_OS_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_OS_SCHEDULE' );
+if ( ! $this->_nocheck && $issue_count = count( $setup_issues ) ) {
 echo '<tr><td class="highlight-box hintbox rounded-container"><p>';
-printf ( _esc ( 'The following %s issues were found while checked if your system supports this application:' ), '<strong>' . $issue_count . '</strong>' );
+printf( 
+_esc( 'The following %s issues were found while checked if your system supports this application:' ), 
+'<strong>' . $issue_count . '</strong>' );
 echo '<ol style="list-style-type:decimal">';
 foreach ( $setup_issues as $ext => $issue ) {
-printf ( '<li><strong>%s</strong> - %s</li><ul>', $ext, $issue [CHKSETUP_ENABLED_HINT] );
+printf( '<li><strong>%s</strong> - %s</li><ul>', $ext, $issue[CHKSETUP_ENABLED_HINT] );
 foreach ( $issue as $k => $v ) {
-if (CHKSETUP_ENABLED_HINT == $k)
+if ( CHKSETUP_ENABLED_HINT == $k )
 continue; 
-if (CHKSETUP_ENABLED_SETTINGS == $k || CHKSETUP_ENABLED_WRITABLE == $k || CHKSETUP_ENABLED_KEY == $k) {
-$val_style = " style='color:" . (1 == $v ? 'green' : 'red') . "'";
-$val_str = 1 == $v ? (CHKSETUP_ENABLED_SETTINGS == $k ? _esc ( 'ok' ) : _esc ( 'passed' )) : (CHKSETUP_ENABLED_SETTINGS == $k ? _esc ( 'not working' ) : _esc ( 'failed' ));
+if ( CHKSETUP_ENABLED_SETTINGS == $k || CHKSETUP_ENABLED_WRITABLE == $k || CHKSETUP_ENABLED_KEY == $k ) {
+$val_style = " style='color:" . ( 1 == $v ? 'green' : 'red' ) . "'";
+$val_str = 1 == $v ? ( CHKSETUP_ENABLED_SETTINGS == $k ? _esc( 'ok' ) : _esc( 'passed' ) ) : ( CHKSETUP_ENABLED_SETTINGS ==
+$k ? _esc( 'not working' ) : _esc( 'failed' ) );
 } else {
 $val_style = '';
 $val_str = $v;
 }
-printf ( '<li>%s : %s</li>', $k, $val_style ? sprintf ( '<issue%s>%s</issue>', $val_style, $val_str ) : $val_str );
+printf( 
+'<li>%s : %s</li>', 
+$k, 
+$val_style ? sprintf( '<issue%s>%s</issue>', $val_style, $val_str ) : $val_str );
 }
 echo '</ul></li>';
 }
 echo '</ol>';
-printf ( _esc ( 'Use the %s on %s tab for an exhaustive report.' ), '<strong>' . _esc ( 'Check PHP setup' ) . '</strong>', getTabAnchor ( APP_SUPPORT ) );
+printf( 
+_esc( 'Use the %s on %s tab for an exhaustive report.' ), 
+'<strong>' . _esc( 'Check PHP setup' ) . '</strong>', 
+getTabAnchor( APP_SUPPORT ) );
 echo '</p>';
 echo '</td></tr>';
 }
@@ -132,7 +148,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <td><a id="requirements"></a>
 <h4>I. <?php _pesc('Check if your system meets the requirements');?></h4>
 <p>
-<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js55f93aab8f090.php_setup();">');?>
+<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js56816a36b58dc.php_setup();">');?>
 </p></td>
 </tr>
 <tr>
@@ -142,7 +158,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <?php  _pesc ( 'Before you do anything else make sure your set the following global options:' );?>
 </p>
 <ol style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>Backup</b> tab then set:');?>
+<li><?php echo sprintf(_esc('go to the %s tab then set:'),getTabAnchor(APP_BACKUP_JOB));?>
 <ul>
 <li><?php _pesc('either the backup name or the backup prefix');?></li>
 <li><?php _pesc('the temporary working directory (make sure you are read/write access)');?></li>
@@ -156,9 +172,9 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <h4>III. <?php _pesc('Define the backup job');?></h4>
 <p><?php _pesc('A backup job represents the totality of those options that together instruct the application what to backup, how to backup and where to copy the backup. Normally these steps should be done only once (at install time) but also when you decide to change the backup source/destination:');?></p>
 <ol style="list-style-type: decimal">
-<li><a id="define_source"></a><?php _pesc('go to the <b>Backup source</b> tab then set the directory you want to backup');?></li>
-<li><a id="define_mysql"></a><?php _pesc('go to the <b>MySQL source</b> tab then check the <b>Enabled</b> checkbox');?></li>
-<li><a id="define_target"></a><?php _pesc('go to the <b>Backup target</b> tab and for each destination (aka target) where you want to store your backup archives make sure that you:');?>
+<li><a id="define_source"></a><?php echo sprintf(_esc('go to the %s tab then set the directory you want to backup'),getTabAnchorByConstant(is_wp()?'WP_SOURCE':'SRCFILE_SOURCE'));?></li>
+<li><a id="define_mysql"></a><?php echo sprintf(_esc('go to the %s tab then check the <b>Enabled</b> checkbox'),getTabAnchor(MYSQL_SOURCE));?></li>
+<li><a id="define_target"></a><?php echo sprintf(_esc('go to the %s tab and for each destination (aka target) where you want to store your backup archives make sure that you:'),getTabAnchor(APP_TABBED_TARGETS));?>
 <ul>
 <li><?php _pesc('check the <b>Enabled</b> checkbox to enable the usage of that target or uncheck it if you don`t want to use it');?>
 </li>
@@ -174,12 +190,12 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <ul>
 <li><?php _pesc('run the backup at your request');?>
 <ol style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>Backup</b> tab and click the button <b>Run Backup Now</b>');?></li>
+<li><?php echo sprintf(_esc('go to the %s tab and click the button <b>Run Backup Now</b>'),getTabAnchor(APP_BACKUP_JOB));?></li>
 <li><?php _pesc('watch its progress; a scrollable window will be shown containing the job events and messages');?></li>
 </ol></li>
 <li><a id="run_schedule"></a><?php _pesc('run the backup automatically at a scheduled time');?>
 <ol style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>Schedule</b> tab and then select the <b>WP-Cron</b> or <b>OS-Cron</b> child tab, depending on what scheduler you want to use:');?>
+<li><?php echo sprintf(_esc('go to the %s tab and then select the %s child tab, depending on what scheduler you want to use:'),getTabAnchor(APP_SCHEDULE),implode(_esc('or'), $schedule_tabs));?>
 <ul>
 <li><b>WP-Cron</b>
 <ol style="list-style-type: decimal">
@@ -227,7 +243,7 @@ style="display:block">
 <?php printf(_esc('However, if you have installed the %s then restoring the backup is like shooting fish in a barrel:'),'<a href="'.APP_ADDONS_SHOP_URI.'shop/restore-wizard/" target="_blank">'._esc('Restore Addon').'</a>');?>
 </p>
 <ul style="list-style-position: inside;">
-<li><?php _pesc('go to the <b>Restore</b> tab then follow the instruction provided there. Basically is just a "next-next-finish" 6-steps task assisted by Wizard.');?></li>
+<li><?php echo sprintf(_esc('go to the %s tab then follow the instruction provided there. Basically is just a "next-next-finish" 6-steps task assisted by Wizard.'),getTabAnchorByConstant('APP_RESTORE'));?></li>
 <li><?php printf(_esc('for restoring an incremental or differential backup make sure you select the restore point %s option and not %s (see step 3 of 6)'),'<strong>'._esc('from a backup target').'</strong>','<strong>'._esc('from a date interval').'</strong>');?></li>
 </ul>
 </box></td>
@@ -240,7 +256,7 @@ style="display:block">
 </p>
 <p><?php printf(_esc('Sometimes you want to create different backup jobs for different purposes. For instance a job that will pack your images into a ZIP archive then upload it to your Google Drive, another job that will pack with GZIP compression and encrypt your MySQL database and then upload it to your Dropbox drive, a job that will pack with BZip2 compresssion some other directory then upload it to a FTP server.</p>Using the backup procedure(s) described above this wouldn`t work. It requires a tool that allows you to define and run in a batch all these different backup jobs. The %s is just what we need. Defining such a job is just a 6-steps task where you are assisted by a Wizard:'),'<a href="'.APP_ADDONS_SHOP_URI.'shop/backup-wizard/" target="_blank">'._esc('Advanced backup Wizard').'</a>');?></p>
 <ol style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>Target list</b> tab then start defining a new job by clicking the <b>Add new</b> button');?>
+<li><?php echo sprintf(_esc('go to the %s tab then start defining a new job by clicking the <b>Add new</b> button'),getTabAnchorByConstant('APP_LISTVIEW_TARGETS'));?>
 </li>
 <li><?php printf(_esc('select the target type (ie. disk,FTP,Dropbox,etc) and also set a short description of your job (like "%s")'),'domain.com PNGs @ Dropbox');?></li>
 <li><?php printf(_esc('set the job global options (like %s)'),'<a href="#configure">I '._esc('above').'</a>');?>
@@ -260,25 +276,30 @@ style="display:block">
 <h4>VII. <?php _pesc('Install an addon');?></h4>
 <p>
 <?php
-$a1 = getAnchor ( WPMYBACKUP . ' Pro', '' . APP_ADDONS_SHOP_URI . 'shop/wp-mybackup-pro' );
-$a2 = getAnchor ( _esc ( '20+ available addons' ), APP_ADDONS_SHOP_URI . 'product-category/addons/' );
-$a3 = getAnchor ( _esc ( 'HTML5 compatible browsers only' ), 'http://www.w3schools.com/tags/att_input_multiple.asp' );
-printf ( _esc ( 'The %s version allows you to extend its core functionality by installing any of those %s.' ), $a1, $a2 );
-_pesc ( 'The installation procees is straightforward:' );
+$a1 = getAnchor( WPMYBACKUP . ' Pro', '' . APP_ADDONS_SHOP_URI . 'shop/wp-mybackup-pro' );
+$a2 = getAnchor( _esc( '20+ available addons' ), APP_ADDONS_SHOP_URI . 'product-category/addons/' );
+$a3 = getAnchor( 
+_esc( 'HTML5 compatible browsers only' ), 
+'http://www.w3schools.com/tags/att_input_multiple.asp' );
+printf( 
+_esc( 'The %s version allows you to extend its core functionality by installing any of those %s.' ), 
+$a1, 
+$a2 );
+_pesc( 'The installation procees is straightforward:' );
 ?>
 </p>
 <ol style="list-style-type: decimal">
 <li><?php printf(_esc('Install one or multiple addons at once (multiple available on %s)'),$a3);?><ol
 style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>License</b> tab and expand the <b>Export settings</b> panel');?></li>
+<li><?php echo sprintf(_esc('go to the %s tab and expand the <b>Export settings</b> panel'),getTabAnchorByConstant('APP_LICENSE'));?></li>
 <li><?php _pesc('click the <b>Browse/Choose file</b> button then select the addon files (*.tar.bz2)');?></li>
 <li><?php _pesc('click the <b>Install Add-on</b> button');?></li>
 </ol></li>
 <li><?php printf(_esc('Install multiple addons at once on non-%s'),$a3);?><ol
 style="list-style-type: decimal">
 <li><?php printf(_esc('copy the addon files (*.tar.bz2) to the %s folder'),$dropin_dir);?></li>
-<li><?php printf(_esc('go to the <b>License</b> tab'));?></li>
-<li><?php printf(_esc('the <b>DropIn Addons</b> page should be shown; follow the instructions there'));?></li>
+<li><?php echo sprintf(_esc('go to the %s tab'),getTabAnchorByConstant('APP_LICENSE'));?></li>
+<li><?php echo sprintf(_esc('the %s page should be shown; follow the instructions there'),getTabAnchorByConstant('APP_ADDONDROPIN'));?></li>
 </ol></li>
 </ol></td>
 </tr>
@@ -294,7 +315,7 @@ style="list-style-type: decimal">
 </li>
 <li><?php printf(_esc('if the application shows a warning/error message (%s) that you suspect to be the root of the problem then we have to bring the heavy artillery:'),'<a href="http://php.net/manual/en/internals2.ze1.zendapi.php#internals2.ze1.zendapi.tab.error-messages" target="_blank">'._esc('see example').'</a>');?>
 <ol style="list-style-type: decimal">
-<li><?php _pesc('go to the <b>Support</b> tab then in the <b>Expert settings</b> panel make sure you set ON the following options:');?>
+<li><?php echo sprintf(_esc('go to the %s tab then in the <b>Expert settings</b> panel make sure you set ON the following options:'),getTabAnchor(APP_SUPPORT));?>
 <ul>
 <li><?php _pesc('Debug trace ON');?></li>
 <li><?php _pesc('Curl debug ON');?></li>
@@ -304,7 +325,7 @@ style="list-style-type: decimal">
 <ul>
 <li><?php _pesc('Yayui optimize ON');?></li>
 </ul></li>
-<li><?php _pesc('Re-execute the job or whatever cause the problem you are debugging then check the following log(s) in the <b>Logs</b> tab:');?>
+<li><?php echo sprintf(_esc('Re-execute the job or whatever cause the problem you are debugging then check the following log(s) in the %s tab:'),getTabAnchor(APP_LOGS));?>
 <ul>
 <li><?php _pesc('if the problem seems to be related to network connection/authentication then check the <b>Curl Debug log</b>');?>
 </li>
@@ -312,7 +333,7 @@ style="list-style-type: decimal">
 </li>
 <li><?php _pesc('if the problem seems to be related to some options not saved you may check the <b>Trace Action log</b>; this log traces all requests (like save, tab changed, etc) sent from your browser to this application; if you are a (former) sysadmin or coder you might eventually hack the problem');?>
 </li>
-<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the <b>Support</b> tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js55f93aab8f090.php_setup();">'._esc('Check PHP setup').'</a>');?>
+<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js56816a36b58dc.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
 </li>
 </ul></li>
 </ol></li>
@@ -323,7 +344,7 @@ style="list-style-type: decimal">
 </tr>
 </table>
 <?php
-if (! empty ( $this->_addons )) {
-printf ( '<input type="hidden" name="dropin_files" value="%s">', implode ( ',', $this->_addons ) );
+if ( ! empty( $this->_addons ) ) {
+printf( '<input type="hidden" name="dropin_files" value="%s">', implode( ',', $this->_addons ) );
 }
 ?>

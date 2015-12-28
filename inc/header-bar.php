@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : header-bar.php $
  * 
- * @id      : header-bar.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : header-bar.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <table style="width: 100%" id="header_bar">
 <tr>
@@ -42,7 +42,7 @@ style='font-size: 1.5em; margin: .75em 0; font-weight: bold;'><?php echo $title;
 class='help'
 onclick=<?php
 echoHelp ( sprintf ( $title_desc, escape_quotes ( $title ) ) );
-?>>*</a><?php echo defined('SANDBOX')&&SANDBOX?(sprintf('%s <span style="font-size:0.75em;font-weight:normal">(%s)</span>',_esc('SANDBOX'),sprintf(_esc('%d active sessions'),getActiveSandboxes()))):'';?></span> 
+?>>*</a><?php echo defined(__NAMESPACE__.'\\SANDBOX')&&SANDBOX?(sprintf('%s <span style="font-size:0.75em;font-weight:normal">(%s)</span>',_esc('SANDBOX'),sprintf(_esc('%d active sessions'),getActiveSandboxes()))):'';?></span> 
 <?php
 if (! isSSL ()) {
 echo getSSLIcon ();
@@ -51,8 +51,8 @@ $java_scripts ['ssl'] = "setInterval(parent.fadeSSLIcons," . SSL_ALERT_FADE_INTE
 }
 ?>
 </td>
-<td id="notification_bar" style="text-align: center;">
-<?php if(defined('DEBUG_STATUSBAR')&&DEBUG_STATUSBAR){?>
+<td id="notification_bar" style="text-align: center;width:100%;">
+<?php if(defined(__NAMESPACE__.'\\DEBUG_STATUSBAR')&&DEBUG_STATUSBAR){?>
 <div
 style="display: inline-block; bottom: 0; position: fixed; left: 0; right: 0; z-index: 1000; opacity: 0.75"
 id="notification_debug_div">
@@ -62,7 +62,7 @@ style="border-radius: 5px; display: none"> </span>
 <div id="notification_msg" style="display: inline-block"></div>
 </td>
 <td style="width: 0; text-align: right; white-space: nowrap;"><?php
-if (defined ( 'WPMYBACKUP_LOGOFF' ))
+if (defined ( __NAMESPACE__.'\\WPMYBACKUP_LOGOFF' ))
 echo WPMYBACKUP_LOGOFF;
 ?></td>
 </tr>

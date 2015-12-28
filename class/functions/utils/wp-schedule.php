@@ -24,22 +24,22 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : wp-schedule.php $
  * 
- * @id      : wp-schedule.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-schedule.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 function is_wpcron_disabled() {
-return defined ( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON;
+return defined ( __NAMESPACE__.'\\DISABLE_WP_CRON' ) && DISABLE_WP_CRON;
 }
 function is_wpcron_alternated() {
-return defined ( 'ALTERNATE_WP_CRON' ) && ALTERNATE_WP_CRON;
+return defined ( __NAMESPACE__.'\\ALTERNATE_WP_CRON' ) && ALTERNATE_WP_CRON;
 }
 function check_wpcron() {
 if (is_wpcron_disabled ())
@@ -68,7 +68,7 @@ $params = array (
 'nonce' => wp_create_nonce_wrapper ( 'set_wpcron_schedule' ),
 'schedule' => $job_props ['schedule'] 
 );
-$img_click = 'js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
+$img_click = 'js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
 $img_title = _esc ( 'Click to update the schedule datetime' );
 $img = "<img id='img_$uniq_id' src='" . plugins_url_wrapper ( 'img/save.png', IMG_PATH ) . "' style='display:none;cursor:pointer;' onclick='$img_click' title='$img_title'>";
 $input = "<input type='datetime' id='edt_$uniq_id' value='$timestamp' maxlength='19' size='19' style='display:none'>";

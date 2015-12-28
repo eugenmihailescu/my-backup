@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : notification-functions.php $
  * 
- * @id      : notification-functions.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : notification-functions.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 function echoMessageList($method, $settings = null) {
 $get_scrollbar_row = function ($i, $count, $max_top) {
 $percent = $i * 100 / $count;
@@ -83,7 +83,7 @@ $last_ref_id = null;
 foreach ( $alerts as $msg_id => $msg_item ) {
 if ($i >= $offset) {
 echo '<tr id="' . $msg_id . '">';
-$history_link = defined ( 'APP_JOB_HISTORY' ) ? replaceUrlParam ( $_SERVER ['HTTP_REFERER'], 'tab', 'history&job_id=' . $msg_item->ref_id ) : '';
+$history_link = defined ( __NAMESPACE__.'\\APP_JOB_HISTORY' ) ? replaceUrlParam ( $_SERVER ['HTTP_REFERER'], 'tab', 'history&job_id=' . $msg_item->ref_id ) : '';
 echo ($new_job = ($msg_item->ref_id !== $last_ref_id)) ? ('<th><a href="' . $history_link . '">' . ($last_ref_id = $msg_item->ref_id) . '</a></th>') : '<td></td>';
 echo '<td ' . ($new_job ? 'class="_mlt"' : '') . '><img src="' . plugins_url_wrapper ( $icons [$msg_item->type], IMG_PATH ) . '"></td>';
 $style = array ();
@@ -115,7 +115,7 @@ $bg = ';background-color:#00ADEE';
 $tooltip = _esc ( 'Click the scrollbar to move the slider' );
 } else 
 if ($show_arrow && ! empty ( $arrow ))
-$onclick = "onclick='js55f93aab8f090.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js55f93aab8f090.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js55f93aab8f090.globals.slider_down);'";
+$onclick = "onclick='js56816a36b58dc.messages_scroll(" . ($offset == $i ? '-1' : ($i > $count ? '0' : '1')) . ");' onmousedown='var sender=this;js56816a36b58dc.globals.slider_down=setInterval(sender.onclick,200);' onmouseup='clearInterval(js56816a36b58dc.globals.slider_down);'";
 elseif ($count > $max_top && $i != $offset && ! $draw_slider)
 $style .= 'row_id:' . ($i - $offset);
 $style = "$style$bg";
@@ -168,7 +168,7 @@ $ref_id = $msg_item->ref_id;
 </tr>
 <tr>
 <td><?php echo $msg_item->msg_id;?></td>
-<td><?php echo empty($ref_id)?'<a class="help" onclick='.getHelpCall($help_1).'>[?]</a>':'<a href="'.(defined('APP_JOB_HISTORY')?addUrlParams($_SERVER ['HTTP_REFERER'], array('tab'=>'history', 'job_id'=>$ref_id)):'').'">'.$ref_id.'</a>';?></td>
+<td><?php echo empty($ref_id)?'<a class="help" onclick='.getHelpCall($help_1).'>[?]</a>':'<a href="'.(defined(__NAMESPACE__.'\\APP_JOB_HISTORY')?addUrlParams($_SERVER ['HTTP_REFERER'], array('tab'=>'history', 'job_id'=>$ref_id)):'').'">'.$ref_id.'</a>';?></td>
 <td><?php echo date ( DATETIME_FORMAT, $msg_item->timestamp );?></td>
 <td style="<?php echo $style;?>"><?php echo $types[$msg_item->type]['name'];?></td>
 <td style="text-align: center"><a class="help"

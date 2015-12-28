@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : OAuthTargetEditor.php $
  * 
- * @id      : OAuthTargetEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : OAuthTargetEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class OAuthTargetEditor extends AbstractTargetEditor {
 private $_authInfo;
 protected $_path_id;
@@ -60,7 +60,7 @@ $this->java_scripts [] = "var div=document.getElementById('{$this->target_name}_
 }
 protected function initTarget() {
 parent::initTarget ();
-$this->hasInfoBanner = defined('FILE_EXPLORER');
+$this->hasInfoBanner = defined(__NAMESPACE__.'\\FILE_EXPLORER');
 $this->_direct_dwl = strToBool ( $this->settings [$this->target_name . '_direct_dwl'] );
 $this->_authInfo = null;
 $this->root = addTrailingSlash ( $this->settings [$this->target_name], '/' );
@@ -104,7 +104,7 @@ $this->_session = null;
 $target_auth_file = ROOT_OAUTH_FILE . $this->target_name . '.auth';
 if (isset ( $_GET [$this->target_name . '_unlink'] ) && file_exists ( $target_auth_file )) {
 unlink ( $target_auth_file );
-$this->java_scripts [] = "js55f93aab8f090.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
+$this->java_scripts [] = "js56816a36b58dc.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
 }
 $this->_authInfo = null;
 if (file_exists ( $target_auth_file )) {
@@ -137,8 +137,8 @@ break;
 if (null == $this->_authInfo) {
 require_once OAUTH_PATH . $session_class . '.php';
 echo "<!-- Storage-Cloud auth-box -->" . PHP_EOL;
-echo '<div id="storage_authorize_div"><p class="redcaption">' . sprintf ( _esc ( '%s is not yet configured</p><p>Before using this option you have to authorize %s this application to upload files to your %s account :' ), $this->target_name_name, WPMYBACKUP, $this->target_name_name );
-echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js55f93aab8f090.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
+echo '<div id="storage_authorize_div"><p class="redcaption">' . sprintf ( _esc ( '%s is not yet configured</p><p>Before using this option you have to authorize %s to upload files to your %s account :' ), $this->target_name_name, WPMYBACKUP, $this->target_name_name );
+echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js56816a36b58dc.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
 if ('google' == $this->target_name)
 echo '<br>' . readMoreHere ( 'https://developers.google.com/accounts/docs/OAuth2WebServer#offline', sprintf ( _esc ( 'about %s authorization scope' ), $this->target_name_name ) );
 echo '</div>' . PHP_EOL;
@@ -162,7 +162,7 @@ locationRedirect ( $this->_stripOAuthFromURL () );
 $this->_authInfo = null;
 echo "<div class='hintbox {$this->container_shape}' style='display:inline-block'>" . _esc ( 'An unexpected error occured while tried to authenticate at ' ) . ucwords ( $this->target_name ) . ":<br><p class='redcaption'>" . $e->getMessage () . '</p>';
 echo '<b>' . _esc ( 'Solution:' ) . '</b>';
-printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl,\'' . http_build_query ( array (
+printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl,\'' . http_build_query ( array (
 'action' => 'del_oauth',
 'service' => $this->target_name,
 'nonce' => wp_create_nonce_wrapper ( 'del_oauth' ) 

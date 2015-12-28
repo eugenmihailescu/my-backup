@@ -24,35 +24,38 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : config-fixes.php $
  * 
- * @id      : config-fixes.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-fixes.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-if (! isset ( $_SERVER ['SERVER_SOFTWARE'] ))
-$_SERVER ['SERVER_SOFTWARE'] = PHP_SAPI;
-if (! isset ( $_SERVER ['SERVER_NAME'] ))
-$_SERVER ['SERVER_NAME'] = PHP_BINARY;
-if (! isset ( $_SERVER ['REQUEST_URI'] )) {
-$_SERVER ['REQUEST_URI'] = $_SERVER ['PHP_SELF'];
-if (isset ( $_SERVER ['QUERY_STRING'] )) {
-$_SERVER ['REQUEST_URI'] .= '?' . $_SERVER ['QUERY_STRING'];
+if ( ! isset( $_SERVER['SERVER_SOFTWARE'] ) )
+$_SERVER['SERVER_SOFTWARE'] = PHP_SAPI;
+if ( ! isset( $_SERVER['SERVER_NAME'] ) )
+$_SERVER['SERVER_NAME'] = PHP_BINARY;
+if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+$_SERVER['REQUEST_URI'] = $_SERVER['PHP_SELF'];
+if ( isset( $_SERVER['QUERY_STRING'] ) ) {
+$_SERVER['REQUEST_URI'] .= '?' . $_SERVER['QUERY_STRING'];
 }
 }
-if (! isset ( $_SERVER ['DOCUMENT_ROOT'] )) {
-$script_filename = str_replace ( DIRECTORY_SEPARATOR, '/', realpath($_SERVER ['SCRIPT_FILENAME'] ));
-$doc_root = str_replace ( realpath($_SERVER ['SCRIPT_NAME']), '', $script_filename );
-$_SERVER ['DOCUMENT_ROOT'] = str_replace ( '/', DIRECTORY_SEPARATOR, $doc_root );
-if (defined ( 'ALT_ABSPATH' ))
-$_SERVER ['DOCUMENT_ROOT'] = ALT_ABSPATH;
+if ( ! isset( $_SERVER['DOCUMENT_ROOT'] ) ) {
+$script_filename = str_replace( DIRECTORY_SEPARATOR, '/', realpath( $_SERVER['SCRIPT_FILENAME'] ) );
+$doc_root = str_replace( realpath( $_SERVER['SCRIPT_NAME'] ), '', $script_filename );
+$_SERVER['DOCUMENT_ROOT'] = str_replace( '/', DIRECTORY_SEPARATOR, $doc_root );
+if ( defined( __NAMESPACE__.'\\ALT_ABSPATH' ) )
+$_SERVER['DOCUMENT_ROOT'] = ALT_ABSPATH;
 }
-$tmp_dir = sys_get_temp_dir ();
-! file_exists ( $tmp_dir ) && trigger_error ( sprintf ( _esc ( 'The system temporary directory (%s) does not exist.' ), $tmp_dir ), E_USER_WARNING );
-define ( 'SANDBOX', file_exists ( RULES_PATH . '0-sandbox.php' ) );
+$tmp_dir = sys_get_temp_dir();
+! file_exists( $tmp_dir ) &&
+trigger_error( sprintf( _esc( 'The system temporary directory (%s) does not exist.' ), $tmp_dir ), E_USER_WARNING );
+define( __NAMESPACE__.'\\SANDBOX', file_exists( RULES_PATH . '0-sandbox.php' ) );
+@constant( 'SQLITE3_ASSOC' ) || define( '\SQLITE3_ASSOC', 1 );
+@constant( 'MYSQL_ASSOC' ) || define( '\MYSQL_ASSOC', 1 );
 ?>

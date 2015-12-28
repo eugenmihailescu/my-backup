@@ -24,26 +24,36 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : disksrc-expert.php $
  * 
- * @id      : disksrc-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : disksrc-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-?>
+namespace MyBackup;
+ if(defined(__NAMESPACE__.'\\PCLZIP')){?>
+<tr>
+<td><label for="nocompress"><?php _pesc('Do not compress files by extension (PclZip only)');?></label>
+<a class='help' onclick=<?php echoHelp($help_4); ?>> [?]</a></td>
+</tr>
+<tr>
+<td><textarea name="nocompress" id="nocompress" class="files_excludes"
+form="wpmybackup_admin_form" cols=60 rows=3><?php echo $this->settings['nocompress']; ?></textarea>
+</td>
+</tr>
+<?php }?>
 <tr>
 <td><label for="excludeext"><?php _pesc('Exclude files by extension');?></label>
 <a class='help' onclick=<?php echoHelp($help_1); ?>> [?]</a></td>
 </tr>
 <tr>
 <td>
-<!-- should be text[display:none] and not hidden --> <input
-type="text" name="excludedirs" id="excludedirs" style="display: none">
-<textarea name="excludeext" id="excludeext"
+<!-- should be text[display:none] and not hidden --> <input type="text"
+name="excludedirs" id="excludedirs" style="display: none"> <textarea
+name="excludeext" id="excludeext" class="files_excludes"
 form="wpmybackup_admin_form" cols=60 rows=3><?php echo $this->settings['excludeext']; ?></textarea>
 </td>
 </tr>
@@ -52,7 +62,7 @@ form="wpmybackup_admin_form" cols=60 rows=3><?php echo $this->settings['excludee
 <a class="help" onclick=<?php echoHelp($help_2); ?>> [?]</a></td>
 </tr>
 <tr>
-<td><textarea name="excludefiles" id="excludefiles"
+<td><textarea name="excludefiles" id="excludefiles" class="files_excludes"
 form="wpmybackup_admin_form" cols=60 rows=3><?php echo $this->settings['excludefiles']; ?></textarea>
 </td>
 </tr>
@@ -60,6 +70,6 @@ form="wpmybackup_admin_form" cols=60 rows=3><?php echo $this->settings['excludef
 <td><label for="excludelinks"><?php _pesc('Exclude file links');?></label><input
 type="checkbox" id="excludelinks" name="excludelinks" value="1"
 <?php echo strToBool($this->settings["excludelinks"])?'checked':'';?>><input
-type="hidden" id="excludelinks" name="excludelinks" value="0"><a
-class="help" onclick=<?php echoHelp($help_3); ?>> [?]</a></td>
+type="hidden" id="excludelinks" name="excludelinks" value="0"><a class="help"
+onclick=<?php echoHelp($help_3); ?>> [?]</a></td>
 </tr>

@@ -24,36 +24,36 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : disksrc.php $
  * 
- * @id      : disksrc.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : disksrc.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="dir_show_size"><?php _pesc('Show file size');?></label></td>
-<td><input type='checkbox' name='dir_show_size' id="dir_show_size"
-value='1' onclick="<?php echo $show_file_size_toggle;?>"
+<td><input type='checkbox' name='dir_show_size' id="dir_show_size" value='1'
+onclick="<?php echo $show_file_size_toggle;?>"
 <?php
 echo $this->_dir_show_size ? 'checked="true"' : '';
 ?>><a class='help' onclick=<?php echoHelp($help_1); ?>>[?]</a><input
 type="hidden" name="dir_show_size" value="0"></td>
 <?php
-if ($this->_dir_show_size) {
+if ( $this->_dir_show_size ) {
 ?>
 <td><input type="button" name='btn_disk_cache' class="button"
 value="<?php _pesc('Clear cache');?>"
 onclick="<?php echo $clear_cache_click;?>"
-title="<?php _pesc('Click to read this folder now');?>"><input
-type="hidden" name="clear_disk_cache"></td>
-<td>(<?php
-echo getHumanReadableSize ( getDirCacheSize () );
-?>)</td>
+title="<?php _pesc('Click to read this folder now');?>"><input type="hidden"
+name="clear_disk_cache"></td>
+<td style="color: #bbb;"><?php
+echo getHumanReadableSize( getDirCacheSize() );
+?></td>
 <?php } ?>																																																																																																																													 
 </tr>
 <tr>
@@ -62,7 +62,10 @@ echo getHumanReadableSize ( getDirCacheSize () );
 value=<?php echo "'" . $this->root . "'"; ?> size=40
 <?php echo $this->_readonly;?>><a class='help'
 onclick=<?php
-echo '"js55f93aab8f090.popupWindow(\'' . _esc ( 'Help' ) . '\',\'' . sprintf ( _esc ( 'The root directory to backup. When left empty then<br><b>%s</b>' ), addslashes ( WPMYBACKUP_ROOT ) ) . '\');"';
+echo '"js56816a36b58dc.popupWindow(\'' . _esc( 'Help' ) . '\',\'' .
+sprintf( 
+_esc( 'The root directory to backup. When left empty then<br><b>%s</b>' ), 
+addslashes( WPMYBACKUP_ROOT ) ) . '\');"';
 ?>>[?]</a></td>
 <td><input type="button" style='width: 100%' name='btn_wpmybackup_dir'
 class="button" value="<?php _pesc('Read disk');?>"
@@ -72,7 +75,8 @@ title='<?php _pesc('Click to read this folder now');?>'></td>
 <td><input type="button" name="folder_home"
 id="<?php echo $this->is_wp?'btn_wp_folder':'btn_folder';?>"
 onclick=<?php
-echo '"document.getElementById(\'dir\').value=\'' . addslashes ( WPMYBACKUP_ROOT ) . '\';' . $reload_file_list . '"';
+echo '"document.getElementById(\'dir\').value=\'' . addslashes( WPMYBACKUP_ROOT ) . '\';' . $reload_file_list .
+'"';
 ?>
 class=<?php echo '"button '.($this->is_wp?'btn_wp_folder':'btn_folder').'"';?>
 title=<?php
@@ -81,7 +85,8 @@ echo '\'' . WPMYBACKUP_ROOT . '\'';
 <?php } if($this->is_wp &&$this->_show_dir_buttons){$plugin_dir=ROOT_PATH;;?>
 <td><input type="button" name="folder_plugin" id="btn_plugin"
 onclick=<?php
-echo '"document.getElementsByName(\'dir\')[0].value=\'' . addslashes ( $plugin_dir ) . '\';' . $reload_file_list . '"';
+echo '"document.getElementsByName(\'dir\')[0].value=\'' . addslashes( $plugin_dir ) . '\';' .
+$reload_file_list . '"';
 ?>
 class="button"
 title=<?php

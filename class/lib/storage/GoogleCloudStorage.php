@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : GoogleCloudStorage.php $
  * 
- * @id      : GoogleCloudStorage.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : GoogleCloudStorage.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( 'GOOGLE_SOCKET_TIMEOUT', 30 ); 
-define ( 'GOOGLE_UPLOAD_LIMIT', 5 * (1024 * 1073741824) ); 
-define ( 'GOOGLE_ROOT', 'root' );
+namespace MyBackup;
+define ( __NAMESPACE__.'\\GOOGLE_SOCKET_TIMEOUT', 30 ); 
+define ( __NAMESPACE__.'\\GOOGLE_UPLOAD_LIMIT', 5 * (1024 * 1073741824) ); 
+define ( __NAMESPACE__.'\\GOOGLE_ROOT', 'root' );
 class GoogleCloudStorage extends GenericCloudStorage {
 const EOL = "\r\n";
 private $_SERVICE_API = array (

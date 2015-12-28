@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : notification-expert.php $
  * 
- * @id      : notification-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : notification-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="message_top"><?php _pesc('Show maximum');?></label></td>
@@ -46,7 +46,7 @@ echoHelp ( $help_1 );
 <tr>
 <td><label for="message_age"><?php _pesc('Remove messages');?> &lt;=</label></td>
 <td><input id="message_age" name="message_age" type="number"
-value="<?php echo $message_age;?>"> <?php _pesc('days');?></td>
+value="<?php echo $message_age;?>" min="0"> <?php _pesc('days');?></td>
 <td><a class='help' onclick=<?php
 echoHelp ( $help_2 );
 ?>> [?]</a></td>
@@ -55,7 +55,7 @@ echoHelp ( $help_2 );
 <tr>
 <td colspan="3"><input type="button" class="button"
 value="<?php _pesc('Flush ALL messages');?>"
-onclick="js55f93aab8f090.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js55f93aab8f090.asyncGetContent(js55f93aab8f090.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js55f93aab8f090.read_alerts();js55f93aab8f090.messages_scroll(1);js55f93aab8f090.message_info();});js55f93aab8f090.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
+onclick="js56816a36b58dc.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'js56816a36b58dc.asyncGetContent(js56816a36b58dc.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;js56816a36b58dc.read_alerts();js56816a36b58dc.messages_scroll(1);js56816a36b58dc.message_info();});js56816a36b58dc.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
 class='help' onclick=<?php
 echoHelp ( $help_3 );
 ?>> [?]</a></td>

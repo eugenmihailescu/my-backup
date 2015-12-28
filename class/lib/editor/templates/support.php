@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : support.php $
  * 
- * @id      : support.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : support.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><?php printf(_esc('Whenever you have just a question or you need assistence with the usage of this application the starting point is %s.'),getAnchor(_esc('MyBackup Support Center'), APP_ADDONS_SHOP_URI.'get-support'));?>
@@ -50,7 +50,7 @@ namespace MyNixWorld;
 <tr>
 <td colspan="3" style='text-align: center'><input type="button"
 class="button" value="<?php _pesc('Check PHP setup');?>"
-onclick="js55f93aab8f090.php_setup();"><a style='vertical-align: middle' class='help'
+onclick="js56816a36b58dc.php_setup();"><a style='vertical-align: middle' class='help'
 onclick=<?php echo echoHelp($help_3 );?>> [?]</a></td>
 </tr>
 <tr>
@@ -74,9 +74,13 @@ title="Opera"></td>
 <tr>
 <td><p class="highlight-box hintbox rounded-container"
 style="display: inline-block;"><?php
-printf ( _esc ( 'An introductive guide about how this sofware works can be found %s.' ), getAnchor ( _esc ( 'here' ), getTabLink ( $TARGET_NAMES [APP_WELCOME] ), '_self' ) );
+printf( 
+_esc( 'An introductive guide about how this sofware works can be found %s.' ), 
+getAnchor( _esc( 'here' ), getTabLink( $TARGET_NAMES[APP_WELCOME] ) . '&nocheck', '_self' ) );
 echo '<br>';
-printf ( _esc ( 'For a more comprehensive tuturial visit the %s page.' ), getAnchor ( _esc ( 'Tutorials' ), APP_ADDONS_SHOP_URI . 'tutorials', '_self' ) );
+printf( 
+_esc( 'For a more comprehensive tuturial visit the %s page.' ), 
+getAnchor( _esc( 'Tutorials' ), APP_ADDONS_SHOP_URI . 'tutorials', '_self' ) );
 ?></p></td>
 </tr>
 </table>

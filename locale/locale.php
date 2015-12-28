@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : locale.php $
  * 
- * @id      : locale.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : locale.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 require_once FUNCTIONS_PATH . 'utils.php';
-! defined ( 'LC_MESSAGES' ) && define ( 'LC_MESSAGES', 5 );
-! defined ( 'LANG_PATH' ) && define ( 'LANG_PATH', LOCALE_PATH . 'lang' . DIRECTORY_SEPARATOR );
+! defined ( __NAMESPACE__.'\\LC_MESSAGES' ) && define ( __NAMESPACE__.'\\LC_MESSAGES', 5 );
+! defined ( __NAMESPACE__.'\\LANG_PATH' ) && define ( __NAMESPACE__.'\\LANG_PATH', LOCALE_PATH . 'lang' . DIRECTORY_SEPARATOR );
 function getAvailableLanguages() {
 $lang_codes_file = LOCALE_PATH . 'lang-codes.txt';
 if (file_exists ( $lang_codes_file ) && false != preg_match_all ( '/\s*([\w\d_\.]+)*\s*,\s*(\w+)(,(\d*))*/u', preg_replace ( '/(^\s*#.*|^\s*$)/m', '', file_get_contents ( $lang_codes_file ) ), $matches )) {

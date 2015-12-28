@@ -24,43 +24,41 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : backup2mail.php $
  * 
- * @id      : backup2mail.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backup2mail.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="backup2mail"><?php _pesc('Backup to e-mail');?></label></td>
-<td><input type="checkbox" name="backup2mail" id="backup2mail"
-value="1"
+<td><input type="checkbox" name="backup2mail" id="backup2mail" value="1"
 <?php
-if (strToBool ( $this->settings ['backup2mail'] ))
+if ( strToBool( $this->settings['backup2mail'] ) )
 echo ' checked';
 ?>><a class='help' onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>>[?]</a><input type="hidden" name="backup2mail" value="0"></td>
 </tr>
 <tr>
 <td><label for="backup2mail_address"><?php _pesc('Alternative e-mail');?></label></td>
-<td><input type="email" name="backup2mail_address"
-id="backup2mail_address" size=30
-value="<?php echo $this->settings ['backup2mail_address'];?>"><a
+<td><input type="email" name="backup2mail_address" id="backup2mail_address"
+size=30 value="<?php echo $this->settings ['backup2mail_address'];?>"><a
 class='help' onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="backup2mail_maxsize"><?php _pesc('Attachment size');?></label></td>
-<td><input type="number" name="backup2mail_maxsize"
-id="backup2mail_maxsize"
-value="<?php echo $this->settings ['backup2mail_maxsize'];?>"> <?php echo _esc('bytes');?><a
-class='help' onclick=<?php
-echoHelp ( $help_3 );
+<td><input type="number" name="backup2mail_maxsize" id="backup2mail_maxsize"
+value="<?php echo $this->settings ['backup2mail_maxsize'];?>"
+min="<?php echo MB;?>"> <?php echo _esc('bytes');?><a class='help'
+onclick=<?php
+echoHelp( $help_3 );
 ?>> [?]</a></td>
 </tr>

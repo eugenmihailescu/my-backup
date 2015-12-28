@@ -24,43 +24,44 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : config.php $
  * 
- * @id      : config.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( "JS_NAMESPACE" , "js55f93aab8f090" );
-define('ROOT_PATH',dirname(__FILE__).DIRECTORY_SEPARATOR);
-define('TMP_PATH',ROOT_PATH.'tmp'.DIRECTORY_SEPARATOR);
-define('LOGS_PATH',TMP_PATH.'logs'.DIRECTORY_SEPARATOR);
-define('INC_PATH',ROOT_PATH.'inc'.DIRECTORY_SEPARATOR);
-define('CLASS_PATH',ROOT_PATH.'class'.DIRECTORY_SEPARATOR);
-define('FUNCTIONS_PATH',CLASS_PATH.'functions'.DIRECTORY_SEPARATOR);
-define('ADDONFUNC_PATH',FUNCTIONS_PATH.'addonfunc'.DIRECTORY_SEPARATOR);
-define('UTILS_PATH',FUNCTIONS_PATH.'utils'.DIRECTORY_SEPARATOR);
-define('LIB_PATH',CLASS_PATH.'lib'.DIRECTORY_SEPARATOR);
-define('CURL_PATH',LIB_PATH.'curl'.DIRECTORY_SEPARATOR);
-define('EDITOR_PATH',LIB_PATH.'editor'.DIRECTORY_SEPARATOR);
-define('TEMPLATES_PATH',EDITOR_PATH.'templates'.DIRECTORY_SEPARATOR);
-define('MISC_PATH',LIB_PATH.'misc'.DIRECTORY_SEPARATOR);
-define('OAUTH_PATH',LIB_PATH.'oauth'.DIRECTORY_SEPARATOR);
-define('STORAGE_PATH',LIB_PATH.'storage'.DIRECTORY_SEPARATOR);
-define('VIEWER_PATH',LIB_PATH.'viewer'.DIRECTORY_SEPARATOR);
-define('CONFIG_PATH',ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
-define('ADDONS_PATH',CONFIG_PATH.'addons'.DIRECTORY_SEPARATOR);
-define('RULES_PATH',CONFIG_PATH.'rules'.DIRECTORY_SEPARATOR);
-define('CSS_PATH',ROOT_PATH.'css'.DIRECTORY_SEPARATOR);
-define('IMG_PATH',ROOT_PATH.'img'.DIRECTORY_SEPARATOR);
-define('JS_PATH',ROOT_PATH.'js'.DIRECTORY_SEPARATOR);
-define('LOCALE_PATH',ROOT_PATH.'locale'.DIRECTORY_SEPARATOR);
-define('CUSTOM_PATH',ROOT_PATH.'custom'.DIRECTORY_SEPARATOR);
-define('SAMPLE_PATH',CUSTOM_PATH.'sample'.DIRECTORY_SEPARATOR);
-define('SSL_PATH',ROOT_PATH.'ssl'.DIRECTORY_SEPARATOR);
-defined('CONFIG_PATH') && ($c=CONFIG_PATH.'config-custom.php') && file_exists($c) && (include_once $c) || define ('MYBACKUP_CONFIG_PATH_NOT_FOUND', 'CONFIG_PATH not defined. Your installation seems to be corupted.');
+!defined(__NAMESPACE__."\\JS_NAMESPACE") && define ( __NAMESPACE__."\\JS_NAMESPACE" , "js56816a36b58dc" );
+!defined(__NAMESPACE__.'\\ROOT_PATH') && define(__NAMESPACE__.'\\ROOT_PATH',dirname(__FILE__).DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\TMP_PATH') && define(__NAMESPACE__.'\\TMP_PATH',ROOT_PATH.'tmp'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\LOGS_PATH') && define(__NAMESPACE__.'\\LOGS_PATH',TMP_PATH.'logs'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\INC_PATH') && define(__NAMESPACE__.'\\INC_PATH',ROOT_PATH.'inc'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CLASS_PATH') && define(__NAMESPACE__.'\\CLASS_PATH',ROOT_PATH.'class'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\FUNCTIONS_PATH') && define(__NAMESPACE__.'\\FUNCTIONS_PATH',CLASS_PATH.'functions'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\ADDONFUNC_PATH') && define(__NAMESPACE__.'\\ADDONFUNC_PATH',FUNCTIONS_PATH.'addonfunc'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\UTILS_PATH') && define(__NAMESPACE__.'\\UTILS_PATH',FUNCTIONS_PATH.'utils'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\LIB_PATH') && define(__NAMESPACE__.'\\LIB_PATH',CLASS_PATH.'lib'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CURL_PATH') && define(__NAMESPACE__.'\\CURL_PATH',LIB_PATH.'curl'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\EDITOR_PATH') && define(__NAMESPACE__.'\\EDITOR_PATH',LIB_PATH.'editor'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\TEMPLATES_PATH') && define(__NAMESPACE__.'\\TEMPLATES_PATH',EDITOR_PATH.'templates'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\MISC_PATH') && define(__NAMESPACE__.'\\MISC_PATH',LIB_PATH.'misc'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\OAUTH_PATH') && define(__NAMESPACE__.'\\OAUTH_PATH',LIB_PATH.'oauth'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\STORAGE_PATH') && define(__NAMESPACE__.'\\STORAGE_PATH',LIB_PATH.'storage'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\VIEWER_PATH') && define(__NAMESPACE__.'\\VIEWER_PATH',LIB_PATH.'viewer'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CONFIG_PATH') && define(__NAMESPACE__.'\\CONFIG_PATH',ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\ADDONS_PATH') && define(__NAMESPACE__.'\\ADDONS_PATH',CONFIG_PATH.'addons'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\RULES_PATH') && define(__NAMESPACE__.'\\RULES_PATH',CONFIG_PATH.'rules'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CSS_PATH') && define(__NAMESPACE__.'\\CSS_PATH',ROOT_PATH.'css'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CUSTOM_PATH') && define(__NAMESPACE__.'\\CUSTOM_PATH',ROOT_PATH.'custom'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\SAMPLE_PATH') && define(__NAMESPACE__.'\\SAMPLE_PATH',CUSTOM_PATH.'sample'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\IMG_PATH') && define(__NAMESPACE__.'\\IMG_PATH',ROOT_PATH.'img'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\JS_PATH') && define(__NAMESPACE__.'\\JS_PATH',ROOT_PATH.'js'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\LOCALE_PATH') && define(__NAMESPACE__.'\\LOCALE_PATH',ROOT_PATH.'locale'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\SSL_PATH') && define(__NAMESPACE__.'\\SSL_PATH',ROOT_PATH.'ssl'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\APP_SLUG') && define(__NAMESPACE__.'\\APP_SLUG','mybackup');
+defined(__NAMESPACE__.'\\CONFIG_PATH') && ($c=CONFIG_PATH.'config-custom.php') && file_exists($c) && (include_once $c) || define (__NAMESPACE__.'\\MYBACKUP_CONFIG_PATH_NOT_FOUND', 'CONFIG_PATH not defined. Your installation seems to be corupted.');
 ?>

@@ -24,21 +24,21 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : ssh.php $
  * 
- * @id      : ssh.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ssh.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="ssh_enabled"><?php _pesc('Enabled');?></label></td>
-<td><input type="checkbox" name="ssh_enabled" id="ssh_enabled"
-value="1" onclick='js55f93aab8f090.submitOptions(this,0);'
+<td><input type="checkbox" name="ssh_enabled" id="ssh_enabled" value="1"
+onclick='js56816a36b58dc.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ssh_enabled"></td>
@@ -52,7 +52,7 @@ echo "'" . $this->age . "'";
 <?php echo $this->enabled_tag; ?> min="0"></td>
 <td><?php _pesc('days');?></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
 </tr>
 </table></td>
@@ -66,17 +66,17 @@ value=<?php echo "'" . $this->_sshhost . "'"; ?>
 <tr>
 <td style='text-align: left'><a class='help'
 onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>> [?]</a></td>
 <td style='text-align: right;'><label for="sshport"><?php _pesc('Port');?></label></td>
 </tr>
 </table></td>
 <td><table style="width: 100%">
 <tr>
-<td style="text-align: left"><input style='width: 80px;'
-type="number" name='sshport' id="sshport"
-value=<?php echo "'" . $this->settings['sshport'] . "'"; ?> size=6
-<?php echo $this->enabled_tag; ?>></td>
+<td style="text-align: left"><input style='width: 80px;' type="number"
+name='sshport' id="sshport"
+value=<?php echo "'" . $this->settings['sshport'] . "'"; ?> size="5"
+min="20" max="65535" <?php echo $this->enabled_tag; ?>></td>
 <td style="text-align: right"><label for="sshproto"><?php _pesc('Type');?></label></td>
 <td><select id="sshproto" name="sshproto"><option
 value="<?php echo CURLPROTO_SFTP?>"
@@ -108,8 +108,7 @@ value=<?php echo "'" . $this->settings['sshpwd'] . "'"; ?> size=20 style='width:
 <td colspan="3">
 <table style='width: 100%;'>
 <tr>
-<td width="100%"><input type="text" name='ssh' id="ssh"
-style='width: 100%'
+<td width="100%"><input type="text" name='ssh' id="ssh" style='width: 100%'
 value=<?php echo "'" . stripslashes($this->root) . "'"; echo $this->enabled_tag; ?>></td>
 <td align="right"><input type="button"
 id='update_<?php echo $this->target_name;?>_dir' class="button"
@@ -121,7 +120,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ssh_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote SSH command');?>'
-onclick="<?php printf( "js55f93aab8f090.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js55f93aab8f090.ftpExecCmd(js55f93aab8f090.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
+onclick="<?php printf( "js56816a36b58dc.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js56816a36b58dc.ftpExecCmd(js56816a36b58dc.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
 <?php echo $this->enabled_tag; ?>></td>
 <?php }?>
 </tr>

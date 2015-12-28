@@ -24,17 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : GenericCloudStorage.php $
  * 
- * @id      : GenericCloudStorage.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : GenericCloudStorage.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( 'FILE_BUFFER_SIZE', 8192 );
+namespace MyBackup;
+define ( __NAMESPACE__.'\\FILE_BUFFER_SIZE', 8192 );
 abstract class GenericCloudStorage {
 private $_cached_metadata;
 private $_oauthSession;
@@ -42,10 +42,10 @@ public $onBytesReceived;
 public $onBytesSent;
 public $onAbort;
 private function _getFileMimeType($filename) {
-if (function_exists ( 'fileinfo' )) {
+if (function_exists ( '\\fileinfo' )) {
 $finfo = finfo_open ( FILEINFO_MIME_TYPE );
 return finfo_file ( $finfo, $filename );
-} elseif (function_exists ( 'mime_content_type' ))
+} elseif (function_exists ( '\\mime_content_type' ))
 return mime_content_type ( $filename );
 return 'application/octet-stream'; 
 }

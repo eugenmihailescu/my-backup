@@ -24,17 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : dropbox-expert.php $
  * 
- * @id      : dropbox-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : dropbox-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
- if(defined('FILE_EXPLORER')){?>
+namespace MyBackup;
+ if(defined(__NAMESPACE__.'\\FILE_EXPLORER')){?>
 <tr>
 <td><label for="dropbox_root"><?php _pesc('Dropbox root');?></label></td>
 <td><select name="dropbox_root" id="dropbox_root"
@@ -58,7 +58,7 @@ class='help' onclick=<?php echo echoHelp($help_3);?>> [?]</a></td>
 </tr>
 <?php
 }
-if (defined ( 'BANDWIDTH_THROTTLING' )) {
+if (defined ( __NAMESPACE__.'\\BANDWIDTH_THROTTLING' )) {
 ?>
 <tr>
 <td><label for="dropbox_throttle"><?php _pesc('Upload throttling');?></label></td>

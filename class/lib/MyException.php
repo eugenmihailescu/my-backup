@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : MyException.php $
  * 
- * @id      : MyException.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MyException.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class MyException extends \Exception {
 protected function _trigger_exception($message, $code = null, $previous = null) {
-if (defined ( 'PHP_DEBUG_ON' ) && PHP_DEBUG_ON)
-if (defined ( 'TRACE_DEBUG_LOG' )) {
+if (defined ( __NAMESPACE__.'\\PHP_DEBUG_ON' ) && PHP_DEBUG_ON)
+if (defined ( __NAMESPACE__.'\\TRACE_DEBUG_LOG' )) {
 global $settings;
 $log_file = new LogFile ( TRACE_DEBUG_LOG, $settings );
 $log_file->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );

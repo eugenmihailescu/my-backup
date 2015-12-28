@@ -24,56 +24,62 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : format.php $
  * 
- * @id      : format.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : format.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-function isNull($array, $key, $default = null) {
-if (is_array ( $array ))
-return isset ( $array [$key] ) ? $array [$key] : $default;
-else
-return empty ( $array ) ? $default : $array;
+function timeFormat( $timestamp ) {
+$h = floor($timestamp / 3600);
+$m = floor(( $timestamp - 3600 * $h ) / 60);
+$s = $timestamp - 3600 * $h - 60 * $m;
+return sprintf( '%02d:%02d:%02d', $h, $m, $s );
 }
-function sqlFloor($expr, $is_sqlite) {
+function isNull( $array, $key, $default = null ) {
+if ( is_array( $array ) )
+return isset( $array[$key] ) ? $array[$key] : $default;
+else
+return empty( $array ) ? $default : $array;
+}
+function sqlFloor( $expr, $is_sqlite ) {
 return $is_sqlite ? 'cast(' . $expr . ' AS INTEGER)' : 'floor(' . $expr . ')';
 }
-function strToBool($str) {
-return 1 === preg_match ( '/(true|on|1|yes)/i', $str );
+function strToBool( $str ) {
+return 1 === preg_match( '/(true|on|1|yes)/i', $str );
 }
-function boolToStr($val) {
+function boolToStr( $val ) {
 return $val ? 'true' : 'false';
 }
-function formatRegEx($pattern, $separator, $subject) {
-$subject = str_replace ( $separator, chr ( 92 ) . $separator, $subject );
+function formatRegEx( $pattern, $separator, $subject ) {
+$subject = str_replace( $separator, chr( 92 ) . $separator, $subject );
 foreach ( $pattern as $p )
-$subject = str_replace ( $p, chr ( 92 ) . $p, $subject );
+$subject = str_replace( $p, chr( 92 ) . $p, $subject );
 return $subject;
 }
-function sign($number) {
-return $number > 0 ? 1 : ($number < 0 ? - 1 : 0);
+function sign( $number ) {
+return $number > 0 ? 1 : ( $number < 0 ? - 1 : 0 );
 }
-function strtohex($str) {
+function strtohex( $str ) {
 $result = '';
-for($i = 0; $i < strlen ( $str ); $i ++)
-$result .= sprintf ( "%02X", ord ( $str [$i] ) );
+for ( $i = 0; $i < strlen( $str ); $i++ )
+$result .= sprintf( "%02X", ord( $str[$i] ) );
 return $result;
 }
-function hextostr($str) {
-return pack ( "H*", $str );
+function hextostr( $str ) {
+return pack( "H*", $str );
 }
-if (! function_exists ( '_esc' )) {
-function _esc($string) {
-return _ ( $string );
+if ( ! _function_exists( '_esc' ) ) {
+function _esc( $string ) {
+return _( $string );
 }
-function _pesc($string) {
-echo _esc ( $string );
+function _pesc( $string ) {
+echo _esc( $string );
 }
 }
 ?>

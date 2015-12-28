@@ -24,31 +24,29 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : mysql-remote.php $
  * 
- * @id      : mysql-remote.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql-remote.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="mysql_host"><?php _pesc('MySQL Host');?></label></td>
-<td><input type="url" style='width: 100%' name='mysql_host'
-id="mysql_host"
+<td><input type="url" style='width: 100%' name='mysql_host' id="mysql_host"
 value=<?php echo '"'.$this->_mysql_host.'" '.$this->enabled_tag; ?>></td>
 <td style='text-align: right;'><label for="mysql_port"><?php _pesc('Port');?></label></td>
-<td><input type="number" style='width: 100%' name='mysql_port'
-id="mysql_port"
-value=<?php echo '"'.$this->_mysql_port.'" '.$this->enabled_tag; ?>></td>
+<td><input type="number" style='width: 100%' name='mysql_port' id="mysql_port"
+value=<?php echo '"'.$this->_mysql_port.'" '.$this->enabled_tag; ?> min="20"
+max="65535" size="5"></td>
 </tr>
 <tr>
 <td><label for="mysql_user"><?php _pesc('Username');?></label></td>
-<td><input type="text" style='width: 100%' name='mysql_user'
-id="mysql_user"
+<td><input type="text" style='width: 100%' name='mysql_user' id="mysql_user"
 value=<?php echo '"'.$this->_mysql_user.'" '.$this->enabled_tag; ?>></td>
 <td style='text-align: right;'><label for="mysql_pwd"><?php _pesc('Password');?></label></td>
 <td><input type="password" name='mysql_pwd' id="mysql_pwd"
@@ -59,20 +57,22 @@ value=<?php echo '"'.$this->_mysql_pwd.'" '.$this->enabled_tag; echo " style='".
 <td><label for="mysql_db"><?php _pesc('DB name');?></label></td>
 <td>
 <?php
-$ctrl_type = empty ( $this->_db_list ) ? 'input' : 'select';
-echo "<$ctrl_type style='width: 100%' name='mysql_db' id='mysql_db'" . (empty ( $this->_db_list ) ? ' value="' . $this->_mysql_db . '"' : '') . " $this->enabled_tag onchange='js55f93aab8f090.submitOptions(this,0);'>";
+$ctrl_type = empty( $this->_db_list ) ? 'input' : 'select';
+echo "<$ctrl_type style='width: 100%' name='mysql_db' id='mysql_db'" .
+( empty( $this->_db_list ) ? ' value="' . $this->_mysql_db . '"' : '' ) .
+" $this->enabled_tag onchange='js56816a36b58dc.submitOptions(this,0);'>";
 foreach ( $this->_db_list as $db )
-echo '<option value="' . $db . '" ' . ($db == $this->_mysql_db ? 'selected' : '') . '>' . $db . '</option>';
+echo '<option value="' . $db . '" ' . ( $db == $this->_mysql_db ? 'selected' : '' ) . '>' . $db . '</option>';
 echo "</$ctrl_type>";
 ?>
 </td>
-<?php if(defined('MYSQL_DUMP')){?>
+<?php if(defined(__NAMESPACE__.'\\MYSQL_DUMP')){?>
 <td style='text-align: right;'><label for="mysqldump"><?php _pesc('Use mysqldump');?></label></td>
 <td><input type="checkbox" name="mysqldump" id="mysqldump"
 <?php if($mysqldump)echo ' checked ';echo $this->enabled_tag;?>
-onclick="document.getElementById('tables').disabled=this.checked;js55f93aab8f090.submitOptions(this,0);">
+onclick="document.getElementById('tables').disabled=this.checked;js56816a36b58dc.submitOptions(this,0);">
 <input type="hidden" name="mysqldump" value="0"><a class='help'
 onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>> [?]</a></td><?php }?>
 </tr>

@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : schedule-os_cron-js.php $
  * 
- * @id      : schedule-os_cron-js.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : schedule-os_cron-js.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 global $COMPRESSION_APPS;
 ob_start ();
@@ -76,6 +76,7 @@ $this->_echoParam ( 'disk', false, null, false, 'disk_enabled' );
 $this->_echoParam ( 'disk_age', false, null, false, 'disk_enabled' );
 $this->_echoParam ( 'tables', false, null, false, 'mysql_enabled' );
 $this->_echoParam ( 'excludeext' );
+$this->_echoParam ( 'nocompress' );
 $this->_echoParam ( 'excludefiles' );
 if (! empty ( $this->settings ['ftphost'] ) && ! empty ( $this->settings ['ftpuser'] )) {
 $this->_echoParam ( 'ftphost', false, null, false, 'ftp_enabled' );

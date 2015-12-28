@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : NotificationEditor.php $
  * 
- * @id      : NotificationEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : NotificationEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class NotificationEditor extends AbstractTargetEditor {
 private $_alerts_count;
 private function _getJavaScripts() {
@@ -51,9 +51,9 @@ $this->java_scripts [] = "parent.messages_scroll=function(direction,toggle_sende
 'tab' => $this->target_name,
 'sender' => $this->target_name,
 'nonce' => wp_create_nonce_wrapper ( 'read_folder' ) 
-) ) . "&pos='+pos+'&dir='+direction+'&show='+show+(null!==msg_id?'&msg_id='+msg_id:'')+(null!==parent.isNull(row_id,null)?'&row_id='+row_id:''),'message_list',function(xhtml){var i,els,el=document.getElementById('message_list_tbl');if(!el)return;els=el.getElementsByTagName('IMG');if(els)for(i=0;i<els.length;i+=1){els[i].setAttribute('onclick','js55f93aab8f090.messages_scroll(0,this.parentNode.parentNode);js55f93aab8f090.read_alerts();');els[i].title='Click me to mark this message as '+(1==show?'unread':'read');}els = el.getElementsByTagName('TR');if(els)for (i = 0; i < els.length; i += 1){if(els[i].children.length>1){els[i].children[2].setAttribute('onclick','js55f93aab8f090.message_info(this);');if(els[i].children.length>3 && 0==els[i].lastChild.innerHTML.length)els[i].lastChild.setAttribute('onclick', 'js55f93aab8f090.scroll2page(this)');}}});};";
+) ) . "&pos='+pos+'&dir='+direction+'&show='+show+(null!==msg_id?'&msg_id='+msg_id:'')+(null!==parent.isNull(row_id,null)?'&row_id='+row_id:''),'message_list',function(xhtml){var i,els,el=document.getElementById('message_list_tbl');if(!el)return;els=el.getElementsByTagName('IMG');if(els)for(i=0;i<els.length;i+=1){els[i].setAttribute('onclick','js56816a36b58dc.messages_scroll(0,this.parentNode.parentNode);js56816a36b58dc.read_alerts();');els[i].title='Click me to mark this message as '+(1==show?'unread':'read');}els = el.getElementsByTagName('TR');if(els)for (i = 0; i < els.length; i += 1){if(els[i].children.length>1){els[i].children[2].setAttribute('onclick','js56816a36b58dc.message_info(this);');if(els[i].children.length>3 && 0==els[i].lastChild.innerHTML.length)els[i].lastChild.setAttribute('onclick', 'js56816a36b58dc.scroll2page(this)');}}});};";
 $this->java_scripts [] = 'parent.messages_scroll(0);'; 
-$this->java_scripts [] = 'parent.scroll2page=function(sender){var tmp=parent.getFakeAttrFromStyle(sender,"row_id");if(tmp!==parent.globals.slider_row_id){parent.globals.slider_row_id=tmp;js55f93aab8f090.messages_scroll(1,null,tmp);}};';
+$this->java_scripts [] = 'parent.scroll2page=function(sender){var tmp=parent.getFakeAttrFromStyle(sender,"row_id");if(tmp!==parent.globals.slider_row_id){parent.globals.slider_row_id=tmp;js56816a36b58dc.messages_scroll(1,null,tmp);}};';
 }
 protected function initTarget() {
 parent::initTarget ();

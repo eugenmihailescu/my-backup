@@ -24,78 +24,94 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : functions.php $
  * 
- * @id      : functions.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : functions.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'JS_INJECT_COMMENT', PHP_EOL . '/* inject our local (%s) functions into the global application namespace */' . PHP_EOL );
-! defined ( 'SORT_NATURAL' ) && define ( 'SORT_NATURAL', SORT_STRING );
+define( 
+__NAMESPACE__.'\\JS_INJECT_COMMENT', 
+PHP_EOL . '/* inject our local (%s) functions into the global application namespace */' . PHP_EOL );
+! defined( __NAMESPACE__.'\\SORT_NATURAL' ) && define( __NAMESPACE__.'\\SORT_NATURAL', SORT_STRING );
 function getDashboardTabs() {
 global $dashboard_tabs, $TARGET_NAMES, $registered_targets;
-$result = array ();
+$result = array();
 foreach ( $dashboard_tabs as $target_id )
-$result [$TARGET_NAMES [$target_id]] = isset ( $registered_targets [$target_id] ) ? $registered_targets [$target_id] ['title'] : $TARGET_NAMES [$target_id];
+$result[$TARGET_NAMES[$target_id]] = isset( $registered_targets[$target_id] ) ? $registered_targets[$target_id]['title'] : $TARGET_NAMES[$target_id];
 return $result;
 }
 function getSelectedTab() {
 global $registered_tab_redirects;
-$oauth_tabs = array (
-'dropbox',
-'google' 
-);
+$oauth_tabs = array( 'dropbox', 'google' );
 foreach ( $oauth_tabs as $tab_name )
-if (isset ( $_SESSION ) && isset ( $_SESSION [$tab_name . '_auth'] ) && TRUE === $_SESSION [$tab_name . '_auth'])
+if ( isset( $_SESSION ) && isset( $_SESSION[$tab_name . '_auth'] ) && TRUE === $_SESSION[$tab_name . '_auth'] )
 return $tab_name;
-$tab = ! isset ( $_GET ['tab'] ) ? 'backup' : $_GET ['tab'];
-ksort ( $registered_tab_redirects );
+$tab = ! isset( $_GET['tab'] ) ? getDefaultTab() : $_GET['tab'];
+ksort( $registered_tab_redirects );
 foreach ( $registered_tab_redirects as $callable ) {
-if (is_callable ( $callable )) {
-$redirect_to = call_user_func ( $callable, $tab );
-if (! empty ( $redirect_to ))
+if ( is_callable( $callable ) ) {
+$redirect_to = call_user_func( $callable, $tab );
+if ( ! empty( $redirect_to ) )
 return $redirect_to;
 }
 }
 return $tab;
 }
-function getSelectedTabGrp($default) {
-return isset ( $_GET ['tab'] ) ? (! isset ( $_GET ['gr'] ) ? $default : $_GET ['gr']) : null;
+function getSelectedTabGrp( $default ) {
+return isset( $_GET['tab'] ) ? ( ! isset( $_GET['gr'] ) ? $default : $_GET['gr'] ) : null;
 }
-function getLicenseId(&$license, $license_file) {
+function getLicenseId( &$license, $license_file ) {
 global $java_scripts, $settings, $TARGET_NAMES;
-if (is_array ( $license )) {
-$license_id = array_keys ( $license );
-$license_id = $license_id [0];
-if (WPMYBACKUP_ID != $license_id) {
-if (isset ( $license ['last_error'] ) && is_numeric ( $license ['last_error'] ))
-$last_error = intval ( $license ['last_error'] );
+if ( is_array( $license ) ) {
+$license_id = array_keys( $license );
+$license_id = $license_id[0];
+if ( WPMYBACKUP_ID != $license_id ) {
+if ( isset( $license['last_error'] ) && is_numeric( $license['last_error'] ) )
+$last_error = intval( $license['last_error'] );
 else {
-$last_error = time ();
-$license ['last_error'] = $last_error;
-file_put_contents ( $license_file, json_encode ( $license ) );
+$last_error = time();
+$license['last_error'] = $last_error;
+file_put_contents( $license_file, json_encode( $license ) );
 }
-$remainig_time = INVALID_LICENSE_LIFESPAN * SECDAY + $last_error - time ();
-if ($remainig_time > 0) {
-$title = _esc ( 'Invalid license' );
-$body = empty ( $settings ['email'] ) ? '' : sprintf ( _esc ( 'I have already sent a notification email to %s' ), sprintf ( '<br><a href=\'mailto:%s\'>%s</a>', $settings ['email'], $settings ['email'] ) );
-$body = _esc ( 'Your license is invalid. If you changed/reconfigured recently your<br>system then this is somehow expected.' ) . $body . '<br>';
-$body .= sprintf ( _esc ( 'You have %s days (ie. until %s) to fix this problem.<br>After that the program is automatically deactivated without warning.' ), getSpanE ( INVALID_LICENSE_LIFESPAN, 'red', 'bold' ), date ( 'Y-m-d, H:i:s', time () + $remainig_time ) ) . '<br>';
-$body .= sprintf ( '<p style=\'font-weight:bold\'>%s</p><div class=\'hintbox\' style=\'padding-bottom:0px\'>', _esc ( 'How to fix it?' ) );
-$unlink_str = '<ol><li><b>' . _esc ( 'unlink' ) . '</b>';
-$auth_str = '</li><li><b>' . _esc ( 'authorize' ) . '</b>';
-$thanks_str = '<br><p style=\'font-weight:bold\'>' . _esc ( 'Thank you for using our product!' ) . '</p>';
-$body .= sprintf ( _esc ( 'All you have to do (now or then) is to reactivate your %s, ie.%s the license%s it again%sWe are sorry for this inconvenient and I hope we haven\' created<br>to much trouble for you.%s' ), getTabAnchor ( APP_LICENSE ), $unlink_str, $auth_str, '</li></ol></div><br>', $thanks_str );
-$java_scripts [] = sprintf ( 'parent.popupError("%s","%s");', $title, $body );
+$remainig_time = INVALID_LICENSE_LIFESPAN * SECDAY + $last_error - time();
+if ( $remainig_time > 0 ) {
+$title = _esc( 'Invalid license' );
+$body = empty( $settings['email'] ) ? '' : sprintf( 
+_esc( 'I have already sent a notification email to %s' ), 
+sprintf( '<br><a href=\'mailto:%s\'>%s</a>', $settings['email'], $settings['email'] ) );
+$body = _esc( 
+'Your license is invalid. If you changed/reconfigured recently your<br>system then this is somehow expected.' ) .
+$body . '<br>';
+$body .= sprintf( 
+_esc( 
+'You have %s days (ie. until %s) to fix this problem.<br>After that the program is automatically deactivated without warning.' ), 
+getSpanE( INVALID_LICENSE_LIFESPAN, 'red', 'bold' ), 
+date( 'Y-m-d, H:i:s', time() + $remainig_time ) ) . '<br>';
+$body .= sprintf( 
+'<p style=\'font-weight:bold\'>%s</p><div class=\'hintbox\' style=\'padding-bottom:0px\'>', 
+_esc( 'How to fix it?' ) );
+$unlink_str = '<ol><li><b>' . _esc( 'unlink' ) . '</b>';
+$auth_str = '</li><li><b>' . _esc( 'authorize' ) . '</b>';
+$thanks_str = '<br><p style=\'font-weight:bold\'>' . _esc( 'Thank you for using our product!' ) . '</p>';
+$body .= sprintf( 
+_esc( 
+'All you have to do (now or then) is to reactivate your %s, ie.%s the license%s it again%sWe are sorry for this inconvenient and I hope we haven\' created<br>to much trouble for you.%s' ), 
+getTabAnchor( APP_LICENSE ), 
+$unlink_str, 
+$auth_str, 
+'</li></ol></div><br>', 
+$thanks_str );
+$java_scripts[] = sprintf( 'parent.popupError("%s","%s");', $title, $body );
 } else {
-if (file_exists ( $license_file ))
-unlink ( $license_file );
-del_session_var ( 'license_activated' );
+if ( file_exists( $license_file ) )
+unlink( $license_file );
+del_session_var( 'license_activated' );
 }
 }
 } else
@@ -104,61 +120,79 @@ return $license_id;
 }
 function sanitizeYAYUI() {
 global $java_scripts, $java_scripts_load, $java_scripts_beforeunload, $java_scripts_unload, $chart_script;
-ksort ( $java_scripts, SORT_NATURAL );
-ksort ( $java_scripts_load, SORT_NATURAL );
-ksort ( $java_scripts_beforeunload, SORT_NATURAL );
-ksort ( $java_scripts_unload, SORT_NATURAL );
-ksort ( $chart_script, SORT_NATURAL );
-$java_scripts = array_unique ( $java_scripts );
-$java_scripts_load = array_unique ( $java_scripts_load );
-$java_scripts_beforeunload = array_unique ( $java_scripts_beforeunload );
-$java_scripts_unload = array_unique ( $java_scripts_unload );
-$chart_script = array_unique ( $chart_script );
-$yayui = new YayuiCompressor ();
-if (! (empty ( $java_scripts ) && empty ( $java_scripts_load ) && empty ( $java_scripts_beforeunload ) && empty ( $java_scripts_unload ) && empty ( $chart_script ))) {
-$js = PHP_EOL . sprintf ( 'parent.ajaxurl=%s;', ! is_wp () ? '"' . getAsyncRunURL () . '"' : 'window.ajaxurl' ) . PHP_EOL;
-if (! empty ( $chart_script )) {
-$js .= implode ( PHP_EOL, array_values ( $chart_script ) ) . PHP_EOL;
+ksort( $java_scripts, SORT_NATURAL );
+ksort( $java_scripts_load, SORT_NATURAL );
+ksort( $java_scripts_beforeunload, SORT_NATURAL );
+ksort( $java_scripts_unload, SORT_NATURAL );
+ksort( $chart_script, SORT_NATURAL );
+$java_scripts = array_unique( $java_scripts );
+$java_scripts_load = array_unique( $java_scripts_load );
+$java_scripts_beforeunload = array_unique( $java_scripts_beforeunload );
+$java_scripts_unload = array_unique( $java_scripts_unload );
+$chart_script = array_unique( $chart_script );
+$yayui = new YayuiCompressor();
+if ( ! ( empty( $java_scripts ) && empty( $java_scripts_load ) && empty( $java_scripts_beforeunload ) &&
+empty( $java_scripts_unload ) && empty( $chart_script ) ) ) {
+$js = '("undefined"==typeof parent)&&window.location.reload(true);';
+$js .= sprintf( 
+PHP_EOL . 'parent.ajaxurl=%s;' . PHP_EOL, 
+! is_wp() ? '"' . getAsyncRunURL() . '"' : 'window.ajaxurl' );
+if ( ! empty( $chart_script ) ) {
+$js .= implode( PHP_EOL, array_values( $chart_script ) ) . PHP_EOL;
 }
-if (! empty ( $java_scripts ))
-$js .= implode ( PHP_EOL, $java_scripts ) . PHP_EOL;
-if (! empty ( $java_scripts_load ))
-$js .= 'parent._addEventListener(window,(parent.ie<9?"on":"")+"load",function(){' . implode ( '', $java_scripts_load ) . '});' . PHP_EOL;
-if (! empty ( $java_scripts_beforeunload ))
-$js .= 'parent._addEventListener(window,parent.ie<9?"on":"")+"beforeunload",function(){' . implode ( '', $java_scripts_beforeunload ) . '});' . PHP_EOL;
-if (! empty ( $java_scripts_unload ))
-$js .= 'parent._addEventListener(window,parent.ie<9?"on":"")+"unload",function(){' . implode ( '', $java_scripts_unload ) . '});' . PHP_EOL;
-$js = '<script>' . sprintf ( JS_INJECT_COMMENT, 'page' ) . 'window.js55f93aab8f090.local=(function(window,parent,undefined){' . $js . '})(this,window.js55f93aab8f090);' . PHP_EOL . '</script>' . PHP_EOL;
-$js = (! empty ( $chart_script ) ? "<script src=\"https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart','gauge']}]}\"></script>" . PHP_EOL : '') . $js;
-if (! defined ( "YAYUI_HANDLER" ) && YAYUI_COMPRESS && ("YAYUI_HANDLER") && (empty ( $_GET ) || empty ( $_GET ['noyayui'] ))) {
-$js = $yayui->streamCompress ( $js );
+if ( ! empty( $java_scripts ) )
+$js .= implode( PHP_EOL, $java_scripts ) . PHP_EOL;
+if ( ! empty( $java_scripts_load ) )
+$js .= 'parent._addEventListener(window,(parent.ie<9?"on":"")+"load",function(){' .
+implode( '', $java_scripts_load ) . '});' . PHP_EOL;
+if ( ! empty( $java_scripts_beforeunload ) )
+$js .= 'parent._addEventListener(window,parent.ie<9?"on":"")+"beforeunload",function(){' .
+implode( '', $java_scripts_beforeunload ) . '});' . PHP_EOL;
+if ( ! empty( $java_scripts_unload ) )
+$js .= 'parent._addEventListener(window,parent.ie<9?"on":"")+"unload",function(){' .
+implode( '', $java_scripts_unload ) . '});' . PHP_EOL;
+$js = '<script>' . sprintf( JS_INJECT_COMMENT, 'page' ) .
+'window.js56816a36b58dc.local=(function(window,parent,undefined){' . $js . '})(this,window.js56816a36b58dc);' . PHP_EOL .
+'window.jsnspace=window.js56816a36b58dc;' . PHP_EOL . '</script>' . PHP_EOL;
+$js = ( ! empty( $chart_script ) ? "<script src=\"https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart','gauge']}]}\"></script>" .
+PHP_EOL : '' ) . $js;
+if ( ! defined( __NAMESPACE__."\\YAYUI_HANDLER" ) && YAYUI_COMPRESS && ( "YAYUI_HANDLER" ) &&
+( empty( $_GET ) || empty( $_GET['noyayui'] ) ) ) {
+$js = $yayui->streamCompress( $js );
 }
 $section_name = 'page JavaScript';
-insertHTMLSection ( $section_name );
+insertHTMLSection( $section_name );
 echo $js;
-insertHTMLSection ( $section_name, true );
+insertHTMLSection( $section_name, true );
 }
 return $yayui;
 }
-function insertDebugScript($enclosed_script = false) {
-if (! (defined ( 'DEBUG_STATUSBAR' ) && DEBUG_STATUSBAR))
+function insertDebugScript( $enclosed_script = false ) {
+if ( ! ( defined( __NAMESPACE__.'\\DEBUG_STATUSBAR' ) && DEBUG_STATUSBAR ) )
 return '';
 global $java_scripts;
 $section_name = 'Debug Statusbar JavaScript';
-$script = insertHTMLSection ( $section_name, false, false, ! $enclosed_script );
-$signature = sprintf ( JS_INJECT_COMMENT, 'debug' );
-$script .= $enclosed_script ? '<script type="text/javascript">' . $signature . 'window.js55f93aab8f090.local=(function(window,parent,undefined){' . PHP_EOL : $signature;
+$script = insertHTMLSection( $section_name, false, false, ! $enclosed_script );
+$signature = sprintf( JS_INJECT_COMMENT, 'debug' );
+$script .= $enclosed_script ? '<script type="text/javascript">' . $signature .
+'window.js56816a36b58dc.local=(function(window,parent,undefined){' . PHP_EOL : $signature;
+$script .= '("undefined"==typeof parent)&&window.location.reload(true);';
 $script .= 'Date.now = Date.now || function() { return +new Date; };';
-$script .= "(function(){var el=document.getElementById('notification_debug'),doc=document.documentElement.innerHTML,doc_len=doc.length,dom_ready_time=(Date.now()-window.page_start_loading)/1000,i,yayui='';if(document.children)for(i=0;i<document.children.length;i+=1)if(document.childNodes[i].textContent){var cmt=document.childNodes[i].textContent.match(/.*minified by YAYUI[^\d]+([\d\.]+%)\((\d+).*/);if(cmt){yayui='YAYUI: '+cmt[1]+'(ie. '+cmt[2]+' bytes); ';break;}}if(el)el.innerHTML='PHP debug:" . (defined ( 'PHP_DEBUG_ON' ) && PHP_DEBUG_ON ? 'on' : 'off') . "; Curl debug:" . (defined ( 'CURL_DEBUG' ) && CURL_DEBUG ? 'on' : 'off') . "; Charts debug:" . (defined ( 'STATISTICS_DEBUG' ) && STATISTICS_DEBUG ? 'on' : 'off') . "'+el.innerHTML.replace(/\((.*)\)/g,'($1; DOMlength: '+doc_len+' bytes; '+yayui+'DOMready: '+dom_ready_time.toFixed(3)+'s => '+(doc_len/dom_ready_time/1024).toFixed(1)+'KiB/s)');})();parent._addEventListener(window,'load',function(){var el=document.getElementById('notification_debug');if(el && el.innerHTML){var m=el.innerHTML.match(/\([\w\s]+:([\d\.]+)s/i); m=m?m[1]:'0';var server_load_time=parseFloat(m),window_load_time=(Date.now()-window.page_start_loading)/1000,total_time=server_load_time+window_load_time;el.innerHTML=el.innerHTML.replace(/\((.*)\)/,'($1; page loaded: '+window_load_time.toFixed(3)+'s => <b> total time:'+total_time.toFixed(3)+'s</b>)');el.style.display='';}},false);";
-$enclosed_script && $script .= '})(this,window.js55f93aab8f090);' . PHP_EOL . '</script>';
-$script .= insertHTMLSection ( $section_name, true, false, ! $enclosed_script );
-$java_scripts [] = $script;
+$script .= "(function(){var el=document.getElementById('notification_debug'),doc=document.documentElement.innerHTML,doc_len=doc.length,dom_ready_time=(Date.now()-window.page_start_loading)/1000,i,yayui='';if(document.children)for(i=0;i<document.children.length;i+=1)if(document.childNodes[i].textContent){var cmt=document.childNodes[i].textContent.match(/.*minified by YAYUI[^\d]+([\d\.]+%)\((\d+).*/);if(cmt){yayui='YAYUI: '+cmt[1]+'(ie. '+cmt[2]+' bytes); ';break;}}if(el)el.innerHTML='PHP debug:" .
+( defined( __NAMESPACE__.'\\PHP_DEBUG_ON' ) && PHP_DEBUG_ON ? 'on' : 'off' ) . "; Curl debug:" .
+( defined( __NAMESPACE__.'\\CURL_DEBUG' ) && CURL_DEBUG ? 'on' : 'off' ) . "; Charts debug:" .
+( defined( __NAMESPACE__.'\\STATISTICS_DEBUG' ) && STATISTICS_DEBUG ? 'on' : 'off' ) .
+"'+el.innerHTML.replace(/\((.*)\)/g,'($1; DOMlength: '+doc_len+' bytes; '+yayui+'DOMready: '+dom_ready_time.toFixed(3)+'s => '+(doc_len/dom_ready_time/1024).toFixed(1)+'KiB/s)');})();parent._addEventListener(window,'load',function(){var el=document.getElementById('notification_debug');if(el && el.innerHTML){var m=el.innerHTML.match(/\([\w\s]+:([\d\.]+)s/i); m=m?m[1]:'0';var server_load_time=parseFloat(m),window_load_time=(Date.now()-window.page_start_loading)/1000,total_time=server_load_time+window_load_time;el.innerHTML=el.innerHTML.replace(/\((.*)\)/,'($1; page loaded: '+window_load_time.toFixed(3)+'s => <b> total time:'+total_time.toFixed(3)+'s</b>)');el.style.display='';}},false);";
+$enclosed_script &&
+$script .= '})(this,window.js56816a36b58dc);' . PHP_EOL . 'window.jsnspace=window.js56816a36b58dc;' . PHP_EOL . '</script>';
+$script .= insertHTMLSection( $section_name, true, false, ! $enclosed_script );
+$java_scripts[] = $script;
 return $script;
 }
 function insertPostboxJS() {
 global $java_scripts;
-$img_path = plugins_url_wrapper ( 'img/', IMG_PATH );
-$java_scripts [] = "var items = document.querySelectorAll('div.postbox'),
+$img_path = plugins_url_wrapper( 'img/', IMG_PATH );
+$java_scripts[] = "var items = document.querySelectorAll('div.postbox'),
 i, j, div;
 for (i = 0; i < items.length; i += 1) {
 var h3s = items[i].getElementsByTagName('h3'),
@@ -166,13 +200,13 @@ h4s = items[i].getElementsByTagName('h4');
 parent.addHeaderToggle(h3s, false,'$img_path');
 parent.addHeaderToggle(h4s, true,'$img_path');}";
 }
-function insertWarningBox($cookie_name, $title, $message, $icon, $buttons, $force = false) {
-if (isset ( $_COOKIE [$cookie_name] ) && ! $force)
+function insertWarningBox( $cookie_name, $title, $message, $icon, $buttons, $force = false ) {
+if ( isset( $_COOKIE[$cookie_name] ) && ! $force )
 return;
-$format = "js55f93aab8f090.setCookie('$cookie_name','%s',%d); var el=document.getElementById('{$cookie_name}_box');el.style.position='relative';el.style.top=-100+'px';setTimeout(function(){el.style.display='none';},750);";
-$accept [false] = sprintf ( $format, 'false', COOKIE_NOACCEPT_MAXAGE );
-$accept [true] = sprintf ( $format, 'true', COOKIE_ACCEPT_MAXAGE );
-ob_start ();
+$format = "js56816a36b58dc.setCookie('$cookie_name','%s',%d); var el=document.getElementById('{$cookie_name}_box');el.style.position='relative';el.style.top=-100+'px';setTimeout(function(){el.style.display='none';},750);";
+$accept[false] = sprintf( $format, 'false', COOKIE_NOACCEPT_MAXAGE );
+$accept[true] = sprintf( $format, 'true', COOKIE_ACCEPT_MAXAGE );
+ob_start();
 ?>
 <!-- Cookie warning (see http://ec.europa.eu/ipg/basics/legal/cookies/index_en.htm#section_2) -->
 <div id="<?php echo $cookie_name;?>_box"
@@ -191,66 +225,72 @@ onclick="<?php echo $accept [false];?>"></td>
 </table>
 </div>
 <?php
-return ob_get_clean ();
+return ob_get_clean();
 }
-function insertTabContent($min_container_height) {
+function insertTabContent( $min_container_height ) {
 global $registered_targets, $license, $license_id, $settings, $alert_message_obj, $has_postbox;
 global $container_shape, $tab_orientation, $container_shape;
 global $java_scripts, $java_scripts_load, $java_scripts_beforeunload, $java_scripts_unload, $chart_script;
 global $PROGRESS_PROVIDER, $TARGET_NAMES, $REGISTERED_BACKUP_TABS;
-echo "<div id='content-container' class='content-container $tab_orientation $container_shape' style='min-height:" . ($min_container_height) . "px;'>";
+echo "<div id='content-container' class='content-container $tab_orientation $container_shape' style='min-height:" .
+( $min_container_height ) . "px;'>";
 $outer_section_name = 'active menu content';
-insertHTMLSection ( $outer_section_name );
-echo '<form method="POST" enctype="multipart/form-data" id="wpmybackup_admin_form" action="' . $_SERVER ['REQUEST_URI'] . '">' . PHP_EOL;
-$active_tab = getSelectedTab ();
-if (! in_array ( $active_tab, $TARGET_NAMES )) {
-$include_tab_file = chkIncludeTab ( getDashboardTabs (), $active_tab, 'custom' );
-if (false !== $include_tab_file)
+insertHTMLSection( $outer_section_name );
+echo '<form method="POST" enctype="multipart/form-data" id="wpmybackup_admin_form" action="' .
+$_SERVER['REQUEST_URI'] . '">' . PHP_EOL;
+$active_tab = getSelectedTab();
+if ( ! in_array( $active_tab, $TARGET_NAMES ) ) {
+$include_tab_file = chkIncludeTab( getDashboardTabs(), $active_tab, 'custom' );
+if ( false !== $include_tab_file )
 include_once $include_tab_file;
 } else
-echoTargetEditor ( $active_tab );
+echoTargetEditor( $active_tab );
 echo PHP_EOL;
 echo '<input type="hidden" name="action" value="submit_options">' . PHP_EOL;
-echo '<input type="hidden" name="nonce" value="' . wp_create_nonce_wrapper ( 'submit_options' ) . '">' . PHP_EOL;
-echo '<input type="hidden" name="locked_settings" id="locked_settings" value="' . (strToBool ( $settings ['locked_settings'] ) ? 1 : 0) . '">' . PHP_EOL;
+echo '<input type="hidden" name="nonce" value="' . wp_create_nonce_wrapper( 'submit_options' ) . '">' . PHP_EOL;
+echo '<input type="hidden" name="locked_settings" id="locked_settings" value="' .
+( strToBool( $settings['locked_settings'] ) ? 1 : 0 ) . '">' . PHP_EOL;
 echo '</form></div>';
-insertHTMLSection ( $outer_section_name, true );
+insertHTMLSection( $outer_section_name, true );
 }
-function insertTabMenus($banner = '') {
+function insertTabMenus( $banner = '' ) {
 global $tab_orientation, $tab_position, $menu_shape, $settings;
 echo "<div id='tab-container' class='tab-container $tab_orientation $tab_position $menu_shape'>";
 echo '<ul id="navlist">';
-$sel_tab = getSelectedTab ();
+$sel_tab = getSelectedTab();
 $visible_tabs = 0;
-foreach ( getDashboardTabs () as $tab => $name ) {
-$class = ($tab == $sel_tab) ? ' active' : '';
-$href = stripUrlParams ( getTabLink ( $tab ), array (
-'gr',
-'paypal_cancel',
-'paypal_thanks',
-'wire_thanks',
-'card_thanks',
-'card_cancel',
-'access_token',
-'token_type',
-'expires_in',
-'refresh_token',
-'oauth_token_created',
-'state',
-'api_key',
-'error_message',
-'error_code',
-'dropbox_unlink',
-'google_unlink',
-'oautherror',
-'decrypt_status',
-'job_id' 
-) );
-if ($tab == 'stats' && ! $settings ['history_enabled'])
+foreach ( getDashboardTabs() as $tab => $name ) {
+$class = ( $tab == $sel_tab ) ? ' active' : '';
+$href = stripUrlParams( 
+getTabLink( $tab ), 
+array( 
+'gr', 
+'paypal_cancel', 
+'paypal_thanks', 
+'wire_thanks', 
+'card_thanks', 
+'card_cancel', 
+'access_token', 
+'token_type', 
+'expires_in', 
+'refresh_token', 
+'oauth_token_created', 
+'state', 
+'api_key', 
+'error_message', 
+'error_code', 
+'dropbox_unlink', 
+'google_unlink', 
+'oautherror', 
+'decrypt_status', 
+'job_id' ) );
+if ( $tab == 'stats' && ! $settings['history_enabled'] )
 continue;
-echo "<li" . (empty ( $class ) ? '' : " class='$class'") . ('notification' == $tab ? ' style="' . ('vertical' == $tab_orientation ? 'border-left-color' : 'border-top-color') . ': red;"' : '') . "><a href='" . $href . "'>$name</a>";
-strlen ( $name ) > 16 && $visible_tabs += 16 / 38; 
-$visible_tabs ++;
+echo "<li" . ( empty( $class ) ? '' : " class='$class'" ) . ( 'notification' == $tab ? ' style="' .
+( 'vertical' == $tab_orientation ? 'border-left-color' : 'border-top-color' ) . ': red;"' : '' ) .
+"><a href='" . $href . "'>$name</a>";
+strlen( $name ) > 16 && $visible_tabs += 16 / 38; 
+$visible_tabs++;
 }
 echo $banner;
 echo '</ul></div>';
@@ -258,10 +298,11 @@ return $visible_tabs;
 }
 function insertFooterBar() {
 global $tab_orientation, $settings;
-$export = "js55f93aab8f090.post(js55f93aab8f090.ajaxurl,{action:\\'export_settings\\',format:\\'%s\\',nonce:\\'" . wp_create_nonce_wrapper ( 'export_settings' ) . "\\'});";
+$export = "js56816a36b58dc.post(js56816a36b58dc.ajaxurl,{action:\\'export_settings\\',format:\\'%s\\',nonce:\\'" .
+wp_create_nonce_wrapper( 'export_settings' ) . "\\'});";
 $section_name = 'Update/Reset buttons';
-insertHTMLSection ( $section_name );
-$locked = strToBool ( $settings ['locked_settings'] );
+insertHTMLSection( $section_name );
+$locked = strToBool( $settings['locked_settings'] );
 $disabled = $locked ? ' disabled ' : '';
 ?>
 <table class=<?php echo "'btn-container $tab_orientation' ";?>
@@ -270,20 +311,20 @@ id='btn-container'>
 <td><input type="button" name='update_wpmybackup_option'
 <?php echo $disabled;?> class="button-primary"
 value="<?php _pesc('Save settings');?>"
-onclick="js55f93aab8f090.submitOptions(this,0);"
+onclick="js56816a36b58dc.submitOptions(this,0);"
 title='<?php _pesc('Click to save these options now. It saves also when you click the Run Backup, Read or Download buttons');?>'></td>
 <td><input type="button" name='reset_wpmybackup_option'
 <?php echo $disabled;?> class="button-primary"
 value="<?php _pesc('Reset defaults');?>"
-onclick="<?php echo "js55f93aab8f090.popupConfirm('"._esc('Settings removal confirm')."','"._esc('Are you really,really sure you want to reset &lt;b&gt;ALL options from ALL TABS&lt;/b&gt; to their factory defaults?')."','#ff2c00',{'"._esc('Yes, reset them!')."':'window.onbeforeunload=null;js55f93aab8f090.post(js55f93aab8f090.this_url,{action:\'reset_defaults\',nonce:\'".wp_create_nonce_wrapper('reset_defaults')."\'});js55f93aab8f090.removePopupLast();','"._esc('Cancel')."':null});";?>"
+onclick="<?php echo "js56816a36b58dc.popupConfirm('"._esc('Settings removal confirm')."','"._esc('Are you really,really sure you want to reset &lt;b&gt;ALL options from ALL TABS&lt;/b&gt; to their factory defaults?')."','#ff2c00',{'"._esc('Yes, reset them!')."':'window.onbeforeunload=null;js56816a36b58dc.post(js56816a36b58dc.this_url,{action:\'reset_defaults\',nonce:\'".wp_create_nonce_wrapper('reset_defaults')."\'});js56816a36b58dc.removePopupLast();','"._esc('Cancel')."':null});";?>"
 title='<?php _pesc('Click to reset these options to factory defaults.');?>'></td>
 <td><input type="button" name='dwl_wpmybackup_option' <?php echo $disabled;?>
 class="button-primary" value="<?php _pesc('Export settings');?>"
-onclick="<?php echo "js55f93aab8f090.popupPrompt('"._('Export settings')."','"._esc('Choose the format to export the current settings to a file on your local system.')."',null,{'"._esc('XML format')."':'".sprintf($export,'xml')."','"._esc('JSON format')."':'".sprintf($export,'json')."','"._esc('.ini format')."':'".sprintf($export,'ini')."','"._esc('Cancel')."':null});";?>"></td>
+onclick="<?php echo "js56816a36b58dc.popupPrompt('"._('Export settings')."','"._esc('Choose the format to export the current settings to a file on your local system.')."',null,{'"._esc('XML format')."':'".sprintf($export,'xml')."','"._esc('JSON format')."':'".sprintf($export,'json')."','"._esc('.ini format')."':'".sprintf($export,'ini')."','"._esc('Cancel')."':null});";?>"></td>
 <td><input type="submit" class="button-primary"
 title="<?php _pesc('Allow/disallow changes of settings');?>"
 id="<?php echo $locked?'btn_unlock_settings':'btn_lock_settings';?>"
-onclick="document.getElementById('locked_settings').value='<?php echo !$locked?1:0;?>';js55f93aab8f090.submitOptions(this,0);"
+onclick="document.getElementById('locked_settings').value='<?php echo !$locked?1:0;?>';js56816a36b58dc.submitOptions(this,0);"
 value="<?php echo '&nbsp;&nbsp;&nbsp;'.($locked?_esc('Unlock'):_esc('Lock'));?>"></td>
 <td>
 <div class="spin" id="spin_save"></div>
@@ -293,11 +334,11 @@ value="<?php echo '&nbsp;&nbsp;&nbsp;'.($locked?_esc('Unlock'):_esc('Lock'));?>"
 </table>
 </div>
 <?php
-insertHTMLSection ( $section_name, true );
+insertHTMLSection( $section_name, true );
 }
-function insertHeaderBar($title, $title_desc) {
+function insertHeaderBar( $title, $title_desc ) {
 global $java_scripts;
-$title_desc = str_replace ( "'", "\'", $title_desc );
+$title_desc = str_replace( "'", "\'", $title_desc );
 include_once INC_PATH . 'header-bar.php';
 }
 ?>

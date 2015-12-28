@@ -24,21 +24,21 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : webdav.php $
  * 
- * @id      : webdav.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : webdav.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="webdav_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="webdav_enabled" id="webdav_enabled"
-value="1" onclick='js55f93aab8f090.submitOptions(this,0);'
+value="1" onclick='js56816a36b58dc.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="webdav_enabled" value="0"></td>

@@ -24,18 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : WebDAVWebStorage.php $
  * 
- * @id      : WebDAVWebStorage.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WebDAVWebStorage.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( "WEBDAV_UPLOAD_LIMIT", PHP_INT_MAX );
-define ( 'WEBDAV_ROOT', '/' );
+namespace MyBackup;
+define ( __NAMESPACE__."\\WEBDAV_UPLOAD_LIMIT", PHP_INT_MAX );
+define ( __NAMESPACE__.'\\WEBDAV_ROOT', '/' );
 class WebDAVWebStorage extends GenericCloudStorage {
 private $_root;
 private $_curl_wrapper;

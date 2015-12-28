@@ -24,65 +24,86 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : TarArchive.php $
  * 
- * @id      : TarArchive.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : TarArchive.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'TAR_MAGIC', 'ustar ' );
-define ( 'TAR_VERSION', '00' );
-define ( 'TAR_VERSION_EX', " \0" );
-define ( 'TAR_MAGIC_OFFSET', 257 );
-define ( 'TAR_EXTHEADER_LEN', 512 );
-define ( 'TAR_BUFFER_LENGTH', 8192 );
-define ( 'TAR_LONGLINK', '././@LongLink' );
-define ( 'BZ_OK', 0 );
+define( __NAMESPACE__.'\\TAR_MAGIC', 'ustar ' );
+define( __NAMESPACE__.'\\TAR_VERSION', '00' );
+define( __NAMESPACE__.'\\TAR_VERSION_EX', " \0" );
+define( __NAMESPACE__.'\\TAR_MAGIC_OFFSET', 257 );
+define( __NAMESPACE__.'\\TAR_EXTHEADER_LEN', 512 );
+define( __NAMESPACE__.'\\TAR_BUFFER_LENGTH', 8192 );
+define( __NAMESPACE__.'\\TAR_LONGLINK', '././@LongLink' );
+define( __NAMESPACE__.'\\BZ_OK', 0 );
 class TarArchive extends GenericArchive {
-function __construct($filename, $provider = null) {
-parent::__construct ( $filename . '.tar', $provider );
+function __construct( $filename, $provider = null ) {
+parent::__construct( $filename . '.tar', $provider );
+$this->setDefaultComment();
 }
-private function _isValidHeader($header) {
-$tar_maginc_len = strlen ( TAR_MAGIC );
-$ext_header = TAR_LONGLINK == substr ( $header, 0, strlen ( TAR_LONGLINK ) );
+private function _isValidHeader( $header ) {
+$tar_maginc_len = strlen( TAR_MAGIC );
+$ext_header = TAR_LONGLINK == substr( $header, 0, strlen( TAR_LONGLINK ) );
 $offset = $ext_header ? 2 * TAR_EXTHEADER_LEN : 0;
-$tar_magic_ok = TAR_MAGIC == substr ( $header, $offset + TAR_MAGIC_OFFSET, $tar_maginc_len );
-$tar_version_ok = TAR_VERSION == substr ( $header, $offset + TAR_MAGIC_OFFSET + $tar_maginc_len, strlen ( TAR_VERSION ) );
-$tar_version_ext_ok = TAR_VERSION_EX == substr ( $header, $offset + TAR_MAGIC_OFFSET + $tar_maginc_len, strlen ( TAR_VERSION_EX ) );
-return $tar_magic_ok && ($tar_version_ok || $tar_version_ext_ok);
+$tar_magic_ok = TAR_MAGIC == substr( $header, $offset + TAR_MAGIC_OFFSET, $tar_maginc_len );
+$tar_version_ok = TAR_VERSION ==
+substr( $header, $offset + TAR_MAGIC_OFFSET + $tar_maginc_len, strlen( TAR_VERSION ) );
+$tar_version_ext_ok = TAR_VERSION_EX ==
+substr( $header, $offset + TAR_MAGIC_OFFSET + $tar_maginc_len, strlen( TAR_VERSION_EX ) );
+return $tar_magic_ok && ( $tar_version_ok || $tar_version_ext_ok );
 }
-private function _getFileHeader($filename, $name = null) {
-$finfo = stat ( $filename );
+private function _getFileHeader( $filename, $name = null ) {
+$finfo = stat( $filename );
 $falias = null == $name ? $filename : $name;
-if (strlen ( $falias ) > 0 && DIRECTORY_SEPARATOR == substr ( $falias, 0, 1 ))
-$falias = substr ( $falias, 1 );
-if (strlen ( $falias ) > 512)
+if ( strlen( $falias ) > 0 && DIRECTORY_SEPARATOR == substr( $falias, 0, 1 ) )
+$falias = substr( $falias, 1 );
+if ( strlen( $falias ) > 512 )
 return false;
-$falias = str_replace ( '\\', '/', $falias ); 
+preg_match( '/^(\w:)?\\' . DIRECTORY_SEPARATOR . '(.*)/', $falias, $matches ) && $falias = $matches[2];
+$falias = str_replace( '\\', '/', $falias ); 
 $bigheader = $header = '';
-if (function_exists ( 'posix_getpwuid' )) {
-$posix_getpwuid = posix_getpwuid ( $finfo ['uid'] );
-$posix_getpwuid = posix_getpwuid ( $finfo ['gid'] );
-$user_name = $posix_getpwuid ["name"];
-$group_name = $posix_getpwuid ["name"];
+if ( function_exists( '\\posix_getpwuid' ) ) {
+$posix_getpwuid = posix_getpwuid( $finfo['uid'] );
+$posix_getpwuid = posix_getpwuid( $finfo['gid'] );
+$user_name = $posix_getpwuid["name"];
+$group_name = $posix_getpwuid["name"];
 } else {
-$user_name = getenv ( 'USERNAME' );
+$user_name = getenv( 'USERNAME' );
 $group_name = $user_name;
 }
-if (strlen ( $falias ) > 100) {
-$bigheader = pack ( "a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", TAR_LONGLINK, sprintf ( '%08o', $finfo ['mode'] ), '0000000', '0000000', sprintf ( "%011o", strlen ( $falias ) ), '00000000000', str_repeat ( ' ', 8 ), 'L', '', TAR_MAGIC, TAR_VERSION, $user_name, $group_name, '', '', '', '' );
-$bigheader .= pack ( "a512", $falias );
+if ( strlen( $falias ) > 100 ) {
+$bigheader = pack( 
+"a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", 
+TAR_LONGLINK, 
+sprintf( '%08o', $finfo['mode'] ), 
+'0000000', 
+'0000000', 
+sprintf( "%011o", strlen( $falias ) ), 
+'00000000000', 
+str_repeat( ' ', 8 ), 'L', 
+'', 
+TAR_MAGIC, 
+TAR_VERSION, 
+$user_name, 
+$group_name, 
+'', 
+'', 
+'', 
+'' );
+$bigheader .= pack( "a512", $falias );
 $checksum = 0;
-for($i = 0; $i < TAR_EXTHEADER_LEN; $i ++)
-$checksum += ord ( substr ( $bigheader, $i, 1 ) );
-$bigheader = substr_replace ( $bigheader, sprintf ( "%06o", $checksum ) . "\0 ", 148, 8 );
+for ( $i = 0; $i < TAR_EXTHEADER_LEN; $i++ )
+$checksum += ord( substr( $bigheader, $i, 1 ) );
+$bigheader = substr_replace( $bigheader, sprintf( "%06o", $checksum ) . "\0 ", 148, 8 );
 }
-switch (filetype ( $filename )) {
+switch ( filetype( $filename ) ) {
 case 'dir' :
 $typeflag = 5;
 break;
@@ -102,319 +123,386 @@ default :
 $typeflag = 0; 
 break;
 }
-$header = pack ( "a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", 		
-substr ( $falias, 0, 100 ), 		
-sprintf ( '%08o', $finfo ['mode'] ), 		
-sprintf ( "%08o", $finfo ['uid'] ), 		
-sprintf ( "%08o", $finfo ['gid'] ), 		
-sprintf ( "%012o", $finfo ['size'] ), 		
-sprintf ( "%012o", $finfo ['mtime'] ), 		
-str_repeat ( ' ', 8 ), 		
+$header = pack( "a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12", 		
+substr( $falias, 0, 100 ), 		
+sprintf( '%08o', $finfo['mode'] ), 		
+sprintf( "%08o", $finfo['uid'] ), 		
+sprintf( "%08o", $finfo['gid'] ), 		
+sprintf( "%012o", $finfo['size'] ), 		
+sprintf( "%012o", $finfo['mtime'] ), 		
+str_repeat( ' ', 8 ), 		
 $typeflag, 		
-is_link ( $filename ) ? readlink ( $filename ) : '', 		
+is_link( $filename ) ? readlink( $filename ) : '', 		
 TAR_MAGIC, 		
 TAR_VERSION, 		
 $user_name, 		
 $group_name, 		
 '', 		
 '', 		
-substr ( $falias, 100, 155 ), 		
+substr( $falias, 100, 155 ), 		
 '' );
 $checksum = 0;
-for($i = 0; $i < TAR_EXTHEADER_LEN; $i ++)
-$checksum += ord ( substr ( $header, $i, 1 ) );
-$header = substr_replace ( $header, sprintf ( "%06o", $checksum ) . "\0 ", 148, 8 );
+for ( $i = 0; $i < TAR_EXTHEADER_LEN; $i++ )
+$checksum += ord( substr( $header, $i, 1 ) );
+$header = substr_replace( $header, sprintf( "%06o", $checksum ) . "\0 ", 148, 8 );
 return $bigheader . $header; 
 }
-private function _extractHeader($buffer) {
-$blen = strlen ( $buffer );
-if ($blen < TAR_EXTHEADER_LEN)
+private function _extractHeader( $buffer ) {
+$blen = strlen( $buffer );
+if ( $blen < TAR_EXTHEADER_LEN )
 return false;
-$trim = function ($var) {
-return rtrim ( ltrim ( str_replace ( "\0", '', $var ) ) );
+$trim = function ( $var ) {
+return rtrim( ltrim( str_replace( "\0", '', $var ) ) );
 };
-if (! $this->_isValidHeader ( $buffer ))
+if ( ! $this->_isValidHeader( $buffer ) )
 return false;
-if ($ext_header = TAR_LONGLINK == substr ( $buffer, 0, strlen ( TAR_LONGLINK ) )) {
-$fname = substr ( $buffer, TAR_EXTHEADER_LEN, TAR_EXTHEADER_LEN );
-$buffer = substr ( $buffer, 2 * TAR_EXTHEADER_LEN );
+if ( $ext_header = TAR_LONGLINK == substr( $buffer, 0, strlen( TAR_LONGLINK ) ) ) {
+$fname = substr( $buffer, TAR_EXTHEADER_LEN, TAR_EXTHEADER_LEN );
+$buffer = substr( $buffer, 2 * TAR_EXTHEADER_LEN );
 } else
-$fname = substr ( $buffer, 0, 100 );
-$fmode = substr ( $buffer, 100, 8 );
-$uid = substr ( $buffer, 108, 8 );
-$gid = substr ( $buffer, 116, 8 );
-$fsize = substr ( $buffer, 124, 12 );
-$mtime = substr ( $buffer, 136, 12 );
-$chksum = substr ( $buffer, 148, 8 );
-$is_link = substr ( $buffer, 156, 1 );
-$linkname = substr ( $buffer, 157, 100 );
-$result = array (
-'mode' => octdec ( $fmode ),
-'uid' => octdec ( $uid ),
-'gid' => octdec ( $gid ),
-'size' => octdec ( $fsize ),
-'time' => octdec ( $mtime ),
-'chksum' => octdec ( $chksum ),
-'link' => $is_link,
-'linkname' => $trim ( $linkname ) 
-);
+$fname = substr( $buffer, 0, 100 );
+$fmode = substr( $buffer, 100, 8 );
+$uid = substr( $buffer, 108, 8 );
+$gid = substr( $buffer, 116, 8 );
+$fsize = substr( $buffer, 124, 12 );
+$mtime = substr( $buffer, 136, 12 );
+$chksum = substr( $buffer, 148, 8 );
+$is_link = substr( $buffer, 156, 1 );
+$linkname = substr( $buffer, 157, 100 );
+$result = array( 
+'mode' => octdec( $fmode ), 
+'uid' => octdec( $uid ), 
+'gid' => octdec( $gid ), 
+'size' => octdec( $fsize ), 
+'time' => octdec( $mtime ), 
+'chksum' => octdec( $chksum ), 
+'link' => $is_link, 
+'linkname' => $trim( $linkname ) );
 $prefix = '';
-if ($ext_header) {
-$uname = substr ( $buffer, 265, 32 );
-$gname = substr ( $buffer, 297, 32 );
-$dev_major = substr ( $buffer, 329, 8 );
-$dev_minor = substr ( $buffer, 337, 8 );
-$result += array (
-'uname' => $trim ( $uname ),
-'gname' => $trim ( $gname ),
-'major' => $trim ( $dev_major ),
-'minor' => $trim ( $dev_minor ) 
-);
+if ( $ext_header ) {
+$uname = substr( $buffer, 265, 32 );
+$gname = substr( $buffer, 297, 32 );
+$dev_major = substr( $buffer, 329, 8 );
+$dev_minor = substr( $buffer, 337, 8 );
+$result += array( 
+'uname' => $trim( $uname ), 
+'gname' => $trim( $gname ), 
+'major' => $trim( $dev_major ), 
+'minor' => $trim( $dev_minor ) );
 }
-$result ['name'] = $trim ( $fname );
+$result['name'] = $trim( $fname );
 return $result;
 }
-public function addFile($filename, $name = null) {
-if ($abort_signal_received = ! parent::addFile ( $filename, $name ))
+public function addFile( $filename, $name = null, $compress = true ) {
+if ( $abort_signal_received = ! parent::addFile( $filename, $name, $compress ) )
 return false;
-$fsize = filesize ( $filename );
+$fsize = filesize( $filename );
 $err = false;
-if (false === ($header = $this->_getFileHeader ( $filename, $name )))
+if ( false === ( $header = $this->_getFileHeader( $filename, $name ) ) )
 return false;
-$fw = fopen ( $this->getFileName (), 'ab' );
-if (false !== $fw)
-fwrite ( $fw, $header );
+$fw = fopen( $this->getFileName(), 'ab' );
+if ( false !== $fw )
+fwrite( $fw, $header );
 else
-throw new MyException ( sprintf ( _esc ( 'Cannot open file %s in write-mode' ), $this->getFileName () ) );
+throw new MyException( sprintf( _esc( 'Cannot open file %s in write-mode' ), $this->getFileName() ) );
 try {
 $chunksize = MB; 
-if ($fsize > $chunksize) {
+if ( $fsize > $chunksize ) {
 $bw = 0;
-$fr = fopen ( $filename, 'rb' );
-if (flock ( $fr, LOCK_EX )) {
-while ( ! feof ( $fr ) && false === $abort_signal_received ) {
-if (_is_callable ( $this->onAbortCallback ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $this->onAbortCallback )))
+$fr = fopen( $filename, 'rb' );
+if ( flock( $fr, LOCK_EX ) ) {
+while ( ! feof( $fr ) && false === $abort_signal_received ) {
+if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $this->onAbortCallback ) ) )
 break;
-$bw += fwrite ( $fw, fread ( $fr, $chunksize ) );
-$this->onProgress ( $filename, $bw, $fsize, $this );
+$bw += fwrite( $fw, fread( $fr, $chunksize ) );
+$this->onProgress( $filename, $bw, $fsize, $this );
 }
-flock ( $fr, LOCK_UN );
+flock( $fr, LOCK_UN );
 } else {
-$this->_stdOutput ( _esc ( 'Could not gain exclusive access for ' ) . $filename );
-fseek ( $fw, - strlen ( $header ), SEEK_END ); 
+$this->_stdOutput( _esc( 'Could not gain exclusive access for ' ) . $filename );
+fseek( $fw, - strlen( $header ), SEEK_END ); 
 }
-fclose ( $fr );
+fclose( $fr );
 } else {
-fwrite ( $fw, file_get_contents ( $filename ) );
-$this->onProgress ( $filename, $fsize, $fsize, $this );
+fwrite( $fw, file_get_contents( $filename ) );
+$this->onProgress( $filename, $fsize, $fsize, $this );
 }
-$pad_len = ceil ( ($fsize) / TAR_EXTHEADER_LEN ) * TAR_EXTHEADER_LEN - $fsize;
-$pad_len > 0 && fwrite ( $fw, str_repeat ( chr ( 0 ), $pad_len ) );
+$pad_len = ceil( ( $fsize ) / TAR_EXTHEADER_LEN ) * TAR_EXTHEADER_LEN - $fsize;
+$pad_len > 0 && fwrite( $fw, str_repeat( chr( 0 ), $pad_len ) );
 } catch ( Exception $err ) {
 }
-fclose ( $fw );
-if (false !== $err)
-throw new MyException ( $err->getMessage (), $err->getCode (), $err->getPrevious () );
+fclose( $fw );
+if ( false !== $err )
+throw new MyException( $err->getMessage(), $err->getCode(), $err->getPrevious() );
 return false === $abort_signal_received;
 }
-public function compress($method, $level) {
-if (NONE == $method)
-return $this->getFileName ();
+public function compress( $method, $level ) {
+if ( NONE == $method )
+return $this->getFileName();
 global $COMPRESSION_NAMES;
 $abort_signal_received = false;
-$ext = '.' . $COMPRESSION_NAMES [$method];
+$ext = '.' . $COMPRESSION_NAMES[$method];
 $filter = '';
-list ( $filter, $mode ) = $this->_getFilterMode ( $method, $level, false );
-if (! _function_exists ( $filter . 'open' ))
-throw new MyException ( sprintf ( _esc ( '%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), strtoupper ( $filter ) ) );
-$output_file = $this->getFileName () . $ext;
-file_exists ( $output_file ) && @unlink ( $output_file ); 
-if (! file_exists ( $this->getFileName () ))
-throw new MyException ( sprintf ( _esc ( "Cannot compress the file %s due to it does not exist" ), $this->getFileName () ) );
-if ('' != $filter) {
-$fsize = filesize ( $this->getFileName () );
-$fw = _call_user_func ( $filter . 'open', $output_file, $mode );
-$fr = fopen ( $this->getFileName (), 'rb' );
-if (false !== $fr) {
+list( $filter, $mode ) = $this->_getFilterMode( $method, $level, false );
+if ( ! _function_exists( $filter . 'open' ) )
+throw new MyException( 
+sprintf( 
+_esc( 
+'%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), 
+strtoupper( $filter ) ) );
+$output_file = $this->getFileName() . $ext;
+file_exists( $output_file ) && @unlink( $output_file ); 
+if ( ! file_exists( $this->getFileName() ) )
+throw new MyException( 
+sprintf( _esc( "Cannot compress the file %s due to it does not exist" ), $this->getFileName() ) );
+if ( '' != $filter ) {
+$fsize = filesize( $this->getFileName() );
+$fw = _call_user_func( $filter . 'open', $output_file, $mode );
+$fr = fopen( $this->getFileName(), 'rb' );
+if ( false !== $fr ) {
 $bw = 0;
-while ( ! feof ( $fr ) && false === $abort_signal_received ) {
-if (_is_callable ( $this->onAbortCallback ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $this->onAbortCallback)))
+while ( ! feof( $fr ) && false === $abort_signal_received ) {
+if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $this->onAbortCallback) ) )
 break;
-$bw += _call_user_func ( $filter . 'write', $fw, fread ( $fr, MB ) );
-if (_is_callable ( $this->onProgressCallback ))
-_call_user_func ( $this->onProgressCallback, $this->getProvider (), $this->getFileName (), $bw, $fsize, 3 );
-$this->getCPUSleep () > 0 && _usleep ( 1000 * $this->getCPUSleep () );
+$bw += _call_user_func( $filter . 'write', $fw, fread( $fr, MB ) );
+if ( _is_callable( $this->onProgressCallback ) )
+_call_user_func( 
+$this->onProgressCallback, 
+$this->getProvider(), 
+$this->getFileName(), 
+$bw, 
+$fsize, 
+3 );
+$this->getCPUSleep() > 0 && _usleep( 1000 * $this->getCPUSleep() );
 }
-fclose ( $fr );
+fclose( $fr );
 }
-_call_user_func ( $filter . 'close', $fw );
+_call_user_func( $filter . 'close', $fw );
 }
-return false === $abort_signal_received ? $this->getFileName () . $ext : false;
+return false === $abort_signal_received ? $this->getFileName() . $ext : false;
 }
-public function decompress($method = null, $uncompress_size = 0) {
+public function decompress( $method = null, $uncompress_size = 0, $new_name = null ) {
 global $COMPRESSION_NAMES;
-$gz_uncompressed = function ($filename) {
+$gz_uncompressed = function ( $filename ) {
 $result = 0;
-$fr = fopen ( $filename, 'rb' );
-if (false !== $fr) {
-fseek ( $fr, - 4, SEEK_END );
-$buff = fread ( $fr, 4 );
-$array = unpack ( 'V', $buff );
-$result = end ( $array );
-fclose ( $fr );
+$fr = fopen( $filename, 'rb' );
+if ( false !== $fr ) {
+fseek( $fr, - 4, SEEK_END );
+$buff = fread( $fr, 4 );
+$array = unpack( 'V', $buff );
+$result = end( $array );
+fclose( $fr );
 }
 return $result;
 };
 $result = false;
 $abort_signal_received = false;
-if (null === $method && preg_match ( '/\.((' . implode ( '|', $COMPRESSION_NAMES ) . ')$)/i', $this->getFileName (), $matches )) {
-($filter = $matches [2]) && $method = array_search ( $filter, $COMPRESSION_NAMES );
+if ( null === $method &&
+preg_match( '/\.((' . implode( '|', $COMPRESSION_NAMES ) . ')$)/i', $this->getFileName(), $matches ) ) {
+( $filter = $matches[2] ) && $method = array_search( $filter, $COMPRESSION_NAMES );
 $mode = 'r';
 }
-(null !== $method) && list ( $filter, $mode ) = $this->_getFilterMode ( $method );
-if (empty ( $filter ) || ! _function_exists ( $filter . 'open' ))
-throw new MyException ( sprintf ( _esc ( '%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), strtoupper ( $filter ) ) );
-if (! empty ( $filter )) {
-if (! $this->fixArchiveCRLF ( $this->getFileName (), $method )) 
-throw new MyException ( sprintf ( _esc ( 'Archive %s has a bad signature. Unsupported format.' ), $this->getFileName () ) );
-0 == $uncompress_size && GZ == $method && $uncompress_size = $gz_uncompressed ( $this->getFileName () );
-$result = preg_replace ( '/(\.(' . implode ( '|', $COMPRESSION_NAMES ) . '))$/i', '', $this->getFileName () );
-$fr = _call_user_func ( $filter . 'open', $this->getFileName (), $mode );
-$eof_func = (GZ == $method ? 'gz' : 'f') . 'eof';
-$fw = fopen ( $result, 'wb' );
+( null !== $method ) && list( $filter, $mode ) = $this->_getFilterMode( $method );
+if ( empty( $filter ) || ! _function_exists( $filter . 'open' ) )
+throw new MyException( 
+sprintf( 
+_esc( 
+'%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), 
+strtoupper( $filter ) ) );
+if ( ! empty( $filter ) ) {
+if ( ! $this->fixArchiveCRLF( $this->getFileName(), $method ) ) 
+throw new MyException( 
+sprintf( _esc( 'Archive %s has a bad signature. Unsupported format.' ), $this->getFileName() ) );
+0 == $uncompress_size && GZ == $method && $uncompress_size = $gz_uncompressed( $this->getFileName() );
+if ( ! empty( $new_name ) )
+$result = $new_name;
+else
+$result = preg_replace( 
+'/(\.(' . implode( '|', $COMPRESSION_NAMES ) . '))$/i', 
+'', 
+$this->getFileName() );
+$fr = _call_user_func( $filter . 'open', $this->getFileName(), $mode );
+$eof_func = ( GZ == $method ? 'gz' : 'f' ) . 'eof';
+$fw = fopen( $result, 'wb' );
 $error = false;
 $bw = 0;
-if (false !== $fr) {
+if ( false !== $fr ) {
 $uncompress_size = 0; 
-while ( ! _call_user_func ( $eof_func, $fr ) && false === $abort_signal_received ) {
-if (_is_callable ( $this->onAbortCallback ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $this->onAbortCallback)))
+while ( ! _call_user_func( $eof_func, $fr ) && false === $abort_signal_received ) {
+if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $this->onAbortCallback) ) )
 break;
-$str = _call_user_func ( $filter . 'read', $fr, TAR_BUFFER_LENGTH );
-$bw += strlen ( $str );
+$str = _call_user_func( $filter . 'read', $fr, TAR_BUFFER_LENGTH );
+$bw += strlen( $str );
 $uncompress_size < 0 && $bw > $uncompress_size && $bw = $uncompress_size; 
-if (false === $str)
-$error = sprintf ( _esc ( '%s problem' ), $filter );
-elseif (BZ2 == $method && BZ_OK !== bzerrno ( $fr ))
-$error = bzerrstr ( $fr );
-if (false !== $error)
+if ( false === $str )
+$error = sprintf( _esc( '%s problem' ), $filter );
+elseif ( BZ2 == $method && BZ_OK !== bzerrno( $fr ) )
+$error = bzerrstr( $fr );
+if ( false !== $error )
 break;
-fwrite ( $fw, $str );
-_is_callable ( $this->onProgressCallback ) && _call_user_func ( $this->onProgressCallback, $this->getProvider (), $this->getFileName (), $bw, $uncompress_size, 8 );
-$this->getCPUSleep () > 0 && _usleep ( 1000 * $this->getCPUSleep () );
+fwrite( $fw, $str );
+_is_callable( $this->onProgressCallback ) && _call_user_func( 
+$this->onProgressCallback, 
+$this->getProvider(), 
+$this->getFileName(), 
+$bw, 
+$uncompress_size, 
+8 );
+$this->getCPUSleep() > 0 && _usleep( 1000 * $this->getCPUSleep() );
 }
-_is_callable ( $this->onProgressCallback ) && _call_user_func ( $this->onProgressCallback, $this->getProvider (), $this->getFileName (), $uncompress_size, $uncompress_size, 8 ); 
+_is_callable( $this->onProgressCallback ) && _call_user_func( 
+$this->onProgressCallback, 
+$this->getProvider(), 
+$this->getFileName(), 
+$uncompress_size, 
+$uncompress_size, 
+8 );
 }
-fclose ( $fw );
-_call_user_func ( $filter . 'close', $fr );
-if ($error)
-throw new MyException ( $error );
-$bw < $uncompress_size && $this->_stdOutput ( sprintf ( _esc ( '[!] Expected %d bytes to decompress but I got only %d' ), $uncompress_size, $bw ) );
+fclose( $fw );
+_call_user_func( $filter . 'close', $fr );
+if ( $error )
+throw new MyException( $error );
+$bw < $uncompress_size && $this->_stdOutput( 
+sprintf( _esc( '[!] Expected %d bytes to decompress but I got only %d' ), $uncompress_size, $bw ) );
 }
 return $result;
 }
-public function getArchiveFiles($filename = null) {
-$filename = empty ( $filename ) ? $this->getFileName () : $filename;
-$max_offset = filesize ( $filename );
-if (! ($result = file_exists ( $filename ) && $this->isValidTar ( $filename )))
+public function getArchiveFiles( $filename = null ) {
+$filename = empty( $filename ) ? $this->getFileName() : $filename;
+$max_offset = filesize( $filename );
+if ( ! ( $result = file_exists( $filename ) && $this->isValidTar( $filename ) ) )
 return false;
-$result = array ();
-if (! ($fr = fopen ( $filename, 'rb' )))
+$result = array();
+if ( ! ( $fr = fopen( $filename, 'rb' ) ) )
 return false;
 $offset = 0;
-while ( $offset < $max_offset && - 1 != fseek ( $fr, $offset, SEEK_SET ) ) {
-$buffer = fread ( $fr, TAR_BUFFER_LENGTH );
-if (false === $buffer)
+while ( $offset < $max_offset && - 1 != fseek( $fr, $offset, SEEK_SET ) ) {
+$buffer = fread( $fr, TAR_BUFFER_LENGTH );
+if ( false === $buffer )
 continue;
-if (false === ($array = $this->_extractHeader ( $buffer ))) {
+if ( false === ( $array = $this->_extractHeader( $buffer ) ) ) {
 $found = false;
-$this->_stdOutput ( sprintf ( _esc ( '[!] Invalid TAR header at offset %d %sSkipping to the next header...' ), $offset, count ( $result ) > 0 ? sprintf ( _esc ( 'Probably the file %s has a truncated content.' ), $result [count ( $result ) - 1] ['name'] ) . PHP_EOL : '.' ) );
+$this->_stdOutput( 
+sprintf( 
+_esc( '[!] Invalid TAR header at offset %d %sSkipping to the next header...' ), 
+$offset, 
+count( $result ) > 0 ? sprintf( 
+_esc( 'Probably the file %s has a truncated content.' ), 
+$result[count( $result ) - 1]['name'] ) . PHP_EOL : '.' ) );
 $old_offset = $offset;
-if (false !== ($p = strpos ( $buffer, TAR_MAGIC . TAR_VERSION ))) {
+if ( false !== ( $p = strpos( $buffer, TAR_MAGIC . TAR_VERSION ) ) ) {
 $offset += $p - TAR_MAGIC_OFFSET;
 $found = true;
 } else
-while ( $offset < $max_offset && ! feof ( $fr ) ) {
-if (false !== ($buffer = fread ( $fr, TAR_BUFFER_LENGTH )) && false !== ($p = strpos ( $buffer, TAR_MAGIC . TAR_VERSION ))) {
-$offset = ftell ( $fr ) - strlen ( $buffer );
+while ( $offset < $max_offset && ! feof( $fr ) ) {
+if ( false !== ( $buffer = fread( $fr, TAR_BUFFER_LENGTH ) ) &&
+false !== ( $p = strpos( $buffer, TAR_MAGIC . TAR_VERSION ) ) ) {
+$offset = ftell( $fr ) - strlen( $buffer );
 $found = true;
 break; 
 }
 }
-$this->_stdOutput ( $found ? sprintf ( _esc ( 'Found the next header at offset %d (%d bytes away)' ), $offset, $offset - $old_offset ) : _esc ( 'No other header found. I give up....' ) );
-if ($found)
+$this->_stdOutput( 
+$found ? sprintf( 
+_esc( 'Found the next header at offset %d (%d bytes away)' ), 
+$offset, 
+$offset - $old_offset ) : _esc( 'No other header found. I give up....' ) );
+if ( $found )
 continue;
 else
 break;
 }
-$fsize = ceil ( $array ['size'] / TAR_EXTHEADER_LEN ) * TAR_EXTHEADER_LEN;
-$pos = (count ( $array ) > 9 ? 3 : 1) * TAR_EXTHEADER_LEN;
-$array ['offset'] = $offset + $pos;
-$result [] = $array;
+$fsize = ceil( $array['size'] / TAR_EXTHEADER_LEN ) * TAR_EXTHEADER_LEN;
+$pos = ( count( $array ) > 9 ? 3 : 1 ) * TAR_EXTHEADER_LEN;
+$array['offset'] = $offset + $pos;
+$result[] = $array;
 $offset += $pos + $fsize; 
 }
-fclose ( $fr );
+fclose( $fr );
 return $result;
 }
-public function extract($filename = null, $dst_path = null, $force_extrct = true) {
-$filename = empty ( $filename ) ? $this->getFileName () : $filename;
-if ($result = false !== ($tar_files = $this->getArchiveFiles ( $filename )))
-! (empty ( $dst_path ) || file_exists ( $dst_path )) && $result = mkdir ( $dst_path, 0770, true );
-if (! $result)
+public function extract( $filename = null, $dst_path = null, $force_extrct = true ) {
+$filename = empty( $filename ) ? $this->getFileName() : $filename;
+if ( $result = false !== ( $tar_files = $this->getArchiveFiles( $filename ) ) )
+! ( empty( $dst_path ) || file_exists( $dst_path ) ) && $result = mkdir( $dst_path, 0770, true );
+if ( ! $result )
 return false;
-if (! ($fr = fopen ( $filename, 'rb' )))
+if ( ! ( $fr = fopen( $filename, 'rb' ) ) )
 return false;
-$result = array ();
+$result = array();
 $abort_signal_received = false;
-$max = count ( $tar_files );
+$max = count( $tar_files );
 $i = 1;
-$is_win = preg_match ( '/^win/i', PHP_OS );
+$is_win = preg_match( '/^win/i', PHP_OS );
 foreach ( $tar_files as $file_header ) {
-if (_is_callable ( $this->onAbortCallback ) && ($abort_signal_received = $abort_signal_received || false !== _call_user_func ( $this->onAbortCallback)))
+if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort_signal_received ||
+false !== _call_user_func( $this->onAbortCallback) ) )
 break;
-if (! empty ( $dst_path ) || ! $is_win)
-$output_file = $this->_addTrailingSlash ( $dst_path );
-$orig_filename = $file_header ['name'];
-! empty ( $dst_path ) && $is_win && $orig_filename = preg_replace ( '@\w*:[\\\/]@', '', $orig_filename ); 
-$output_file .= str_replace ( array (
-'\\',
-'/' 
-), DIRECTORY_SEPARATOR, $orig_filename );
-if (($file_header ['mode'] & 16384) && ! empty ( $file_header ['name'] )) {
-$this->_mk_dir ( $output_file );
-$this->onProgress ( $filename, $i ++, $max, $this, 0 );
+if ( ! empty( $dst_path ) || ! $is_win )
+$output_file = $this->_addTrailingSlash( $dst_path );
+$orig_filename = $file_header['name'];
+! empty( $dst_path ) && $is_win && $orig_filename = preg_replace( '@\w*:[\\\/]@', '', $orig_filename ); 
+$output_file .= str_replace( array( '\\', '/' ), DIRECTORY_SEPARATOR, $orig_filename );
+if ( ( $file_header['mode'] & 16384 ) && ! empty( $file_header['name'] ) ) {
+$this->_mk_dir( $output_file );
+$this->onProgress( $filename, $i++, $max, $this, 0 );
 continue;
 } else {
-$this->_mk_dir ( dirname ( $output_file ) );
+$this->_mk_dir( dirname( $output_file ) );
 }
 $error = false;
-$fw = fopen ( $output_file, 'wb' );
-if (false !== $fw) {
-if ($error = ($file_header ['size'] != ($bw = $this->_pipeStreams ( $fr, $fw, $file_header ['size'], $file_header ['offset'] )))) {
-$this->_stdOutput ( sprintf ( _esc ( '[!] Wrote only %d of %d bytes to %s' ), $bw, $file_header ['size'], $output_file ) );
-$fsize = filesize ( $filename ) / (1000 * 100); 
-$fsize > 0 && $fsize < 10 && $this->_stdOutput ( sprintf ( _esc ( 'The TAR archive has odd filesize of %d*100k. Was it initially compressed with PBzip2 with -%d flag?\nIf that is the case then the %s is probably truncated thus unreliable.' ), $fsize, $fsize, basename ( $filename ) ) );
+$fw = fopen( $output_file, 'wb' );
+if ( false !== $fw ) {
+if ( $error = ( $file_header['size'] !=
+( $bw = $this->_pipeStreams( $fr, $fw, $file_header['size'], $file_header['offset'] ) ) ) ) {
+$this->_stdOutput( 
+sprintf( 
+_esc( '[!] Wrote only %d of %d bytes to %s' ), 
+$bw, 
+$file_header['size'], 
+$output_file ) );
+$fsize = filesize( $filename ) / ( 1000 * 100 ); 
+$fsize > 0 && $fsize < 10 && $this->_stdOutput( 
+sprintf( 
+_esc( 
+'The TAR archive has odd filesize of %d*100k. Was it initially compressed with PBzip2 with -%d flag?\nIf that is the case then the %s is probably truncated thus unreliable.' ), 
+$fsize, 
+$fsize, 
+basename( $filename ) ) );
 }
-fclose ( $fw );
+fclose( $fw );
 }
-$this->onProgress ( $filename, $i ++, $max, $this, 0 );
-if ($error && $force_extrct)
-$this->_stdOutput ( sprintf ( _esc ( '[!] Extracting the file %s forcebly (its content may be truncated)' ), $output_file ) );
-(! $error || $force_extrct) && $result [$file_header ['name']] = $output_file; 
+$this->onProgress( $filename, $i++, $max, $this, 0 );
+if ( $error && $force_extrct )
+$this->_stdOutput( 
+sprintf( 
+_esc( '[!] Extracting the file %s forcebly (its content may be truncated)' ), 
+$output_file ) );
+( ! $error || $force_extrct ) && $result[$file_header['name']] = $output_file; 
 }
-fclose ( $fr );
+fclose( $fr );
 return $result;
 }
-public function isValidTar($filename) {
-if (! file_exists ( $filename ))
+public function isValidTar( $filename ) {
+if ( ! file_exists( $filename ) )
 return false;
 $result = false;
-$fr = fopen ( $filename, 'rb' );
-if (false !== $fr) {
-$header = fread ( $fr, 3 * TAR_EXTHEADER_LEN );
-$result = $this->_isValidHeader ( $header );
-fclose ( $fr );
+$fr = fopen( $filename, 'rb' );
+if ( false !== $fr ) {
+$header = fread( $fr, 3 * TAR_EXTHEADER_LEN );
+$result = $this->_isValidHeader( $header );
+fclose( $fr );
 }
 return $result;
+}
+public function isValidArchive( $filename, $method = null ) {
+if ( NONE == $method )
+return $this->isValidTar( $filename );
+else
+return parent::isValidArchive( $filename, $method );
 }
 }
 ?>

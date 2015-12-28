@@ -24,23 +24,23 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : FacebookOAuth2Client.php $
  * 
- * @id      : FacebookOAuth2Client.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : FacebookOAuth2Client.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( 'FACEBOOK_SERVICE_ID', 'facebook' );
-define ( 'FACEBOOK_OAUTH_URL', 'www.facebook.com' );
-define ( 'FACEBOOK_GRAPH_URL', 'graph.facebook.com' );
-define ( 'FACEBOOK_PROTOCOL', 'https' ); 
-define ( 'FACEBOOK_OAUTH_VERSION', '2' );
-define ( 'FACEBOOK_ACCESS_TYPE', 'offline' ); 
-define ( 'FACEBOOK_APPROVAL_PROMPT', 'reauthenticate' ); 
+namespace MyBackup;
+define ( __NAMESPACE__.'\\FACEBOOK_SERVICE_ID', 'facebook' );
+define ( __NAMESPACE__.'\\FACEBOOK_OAUTH_URL', 'www.facebook.com' );
+define ( __NAMESPACE__.'\\FACEBOOK_GRAPH_URL', 'graph.facebook.com' );
+define ( __NAMESPACE__.'\\FACEBOOK_PROTOCOL', 'https' ); 
+define ( __NAMESPACE__.'\\FACEBOOK_OAUTH_VERSION', '2' );
+define ( __NAMESPACE__.'\\FACEBOOK_ACCESS_TYPE', 'offline' ); 
+define ( __NAMESPACE__.'\\FACEBOOK_APPROVAL_PROMPT', 'reauthenticate' ); 
 class FacebookOAuth2Client extends GenericOAuth2Client {
 private $_SESSION_API = array (
 'auth' => 'oauth',

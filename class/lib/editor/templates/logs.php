@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : logs.php $
  * 
- * @id      : logs.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : logs.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="check_status"><?php _pesc('Status');?></label></td>
@@ -43,5 +43,5 @@ namespace MyNixWorld;
 id="check_status" value="<?php _pesc('Check');?>" class="button"
 onclick=<?php echo '"'.$this->_fct_chk_status.'"';?>
 title='<?php _pesc('Click to check the status now');?>'></td>
-<td colspan="2"><a class='help' onclick=<?php echo echoHelp($help_1);?>>[?]</a></td>
+<td colspan="3"><a class='help' onclick=<?php echo echoHelp($help_1);?>>[?]</a></td>
 </tr>

@@ -24,40 +24,40 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : schedule-os_cron.php $
  * 
- * @id      : schedule-os_cron.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : schedule-os_cron.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td style="width: 0px"></td>
 <td colspan="2" style="white-space: nowrap;"><input type="radio"
 id="schedule_grp_os_cron" name="schedule_grp" value="os_cron"
-onclick="js55f93aab8f090.toggle_wp_cron(false);"
+onclick="js56816a36b58dc.toggle_wp_cron(false);"
 <?php
 if ('os_cron' == $this->settings ['schedule_grp'])
 echo 'checked';
 ?>><label for="schedule_grp_os_cron"><?php _pesc('Schedule by OS-Cron');?></label>
 <a class='help'
 title="<?php _pesc('You should define a schedule/cron task in your OS with a command like the one shown by this option');?>"
-onclick="js55f93aab8f090.popupWindow('<?php _pesc('CLI usage');?>',js55f93aab8f090.globals.help,700,null,null,null,true);">[?]</a></td>
+onclick="js56816a36b58dc.popupWindow('<?php _pesc('CLI usage');?>',js56816a36b58dc.globals.help,700,null,null,null,true);">[?]</a></td>
 </tr>
 <tr id="schedule_cron_row3">
 <td colspan="3"><div
 class='hintbox <?php echo $this->container_shape;?>'
 id="os_cron_hint" style='display: none; background-color: #f0f0f0'
-onmouseover="js55f93aab8f090.showClipboardBtn(this,'visible','os_cron_clpb');"
-onmouseout="js55f93aab8f090.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
+onmouseover="js56816a36b58dc.showClipboardBtn(this,'visible','os_cron_clpb');"
+onmouseout="js56816a36b58dc.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
 <img id="os_cron_clpb"
 src="<?php echo $this->getImgURL ( 'edit-copy-32.png' ) ;?>"
 style="position: relative; float: right; right: 5px; visibility: hidden; cursor: pointer;"
 onmouseover="this.style.visibility='visible'"
-onclick="<?php echo sprintf("js55f93aab8f090.popupPrompt('%s','%s', null,{'%s':null},js55f93aab8f090.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
+onclick="<?php echo sprintf("js56816a36b58dc.popupPrompt('%s','%s', null,{'%s':null},js56816a36b58dc.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
 title='<?php _pesc('Click to copy to clipboard');?>'></td>
 </tr>

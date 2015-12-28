@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : autoloader.php $
  * 
- * @id      : autoloader.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : autoloader.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
 
-global $classes_path;
-$classes_path = array (
+namespace MyBackup;
+global $classes_path_668264596;
+$classes_path_668264596 = array (
 'AbstractJob' => CLASS_PATH . 'AbstractJob.php',
 'AbstractOAuthClient' => OAUTH_PATH . 'AbstractOAuthClient.php',
 'AbstractTarget' => CLASS_PATH . 'AbstractTarget.php',
@@ -56,6 +56,7 @@ $classes_path = array (
 'CurlSSHWrapper' => CURL_PATH . 'CurlSSHWrapper.php',
 'CurlWrapper' => CURL_PATH . 'CurlWrapper.php',
 'Dashboard' => CLASS_PATH . 'Dashboard.php',
+'DashboardEditor' => EDITOR_PATH . 'DashboardEditor.php',
 'DiskSourceEditor' => EDITOR_PATH . 'DiskSourceEditor.php',
 'DiskTargetEditor' => EDITOR_PATH . 'DiskTargetEditor.php',
 'DropboxCloudStorage' => STORAGE_PATH . 'DropboxCloudStorage.php',
@@ -89,6 +90,7 @@ $classes_path = array (
 'OAuthTargetEditor' => EDITOR_PATH . 'OAuthTargetEditor.php',
 'OSScheduleEditor' => EDITOR_PATH . 'OSScheduleEditor.php',
 'ProgressManager' => MISC_PATH . 'ProgressManager.php',
+'RegExBuilder' => MISC_PATH . 'RegExBuilder.php',
 'SSHTargetEditor' => EDITOR_PATH . 'SSHTargetEditor.php',
 'ScheduleEditor' => EDITOR_PATH . 'ScheduleEditor.php',
 'SimpleLogin' => MISC_PATH . 'SimpleLogin.php',
@@ -111,7 +113,7 @@ $classes_path = array (
 'YayuiCompressor' => MISC_PATH . 'YayuiCompressor.php'
 );
 spl_autoload_register ( function ($class_name) {
-global $classes_path;
+global $classes_path_668264596;
 $class_name = preg_replace ( "/" . __NAMESPACE__ . "\\\\/", "", $class_name );
-isset ( $classes_path [$class_name] ) && include_once $classes_path [$class_name];});
+isset ( $classes_path_668264596 [$class_name] ) && include_once $classes_path_668264596 [$class_name];});
 ?>

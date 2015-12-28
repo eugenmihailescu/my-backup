@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : BackupSettingsEditor.php $
  * 
- * @id      : BackupSettingsEditor.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupSettingsEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class BackupSettingsEditor extends AbstractTargetEditor {
 protected function getEditorTemplate() {
 $help_1 = "'" . sprintf ( _esc ( 'Specify the full path of the file holding one or more CA root certificates to verify the peer with (a .pem file). So your private certificate and the server (you are going to connect) certificate is supposed to be signed by an Certificate Authority (CA) that exists in that .pem file. If it`s happening that your CA certificate is not in the .pem format (but instead is in - for instance - .crt format) you can %s. Remember: independent of their format (.pem,.crt,whatever) they all will contain the same info : a list of one/more CA root certificates that are used to validate the server SSL certificate you are going to use.<br>Btw: you can enter here either the .pem file or the folder name where I will search for a &amp;lt;any-name-is-good&amp;gt;.pem file. In that case make sure the %s.' ), getAnchorE(_esc ( 'easily convert the .crt to .pem format' ), 'http://lmgtfy.com/?q=.crt+to+.pem'), getAnchorE(_esc ( 'certificate directory is prepared using the openssl c_rehash utility' ), 'http://curl.haxx.se/libcurl/c/CURLOPT_CAPATH.html'));

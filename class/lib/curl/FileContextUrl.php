@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : FileContextUrl.php $
  * 
- * @id      : FileContextUrl.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : FileContextUrl.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 include_once UTILS_PATH . 'url.php';
 class FileContextUrl {
 private $_is_dwl;
@@ -47,7 +47,7 @@ protected $_dwl_throttle;
 protected $_upl_throttle;
 protected $_debug_buffer;
 function __construct() {
-$this->_logfile = new LogFile ( defined ( 'CURL_DEBUG_LOG' ) ? CURL_DEBUG_LOG : null );
+$this->_logfile = new LogFile ( defined ( __NAMESPACE__.'\\CURL_DEBUG_LOG' ) ? CURL_DEBUG_LOG : null );
 $this->_options = array ();
 $this->_ok_status_codes = array ();
 $this->_redirect_codes = array ();
@@ -199,8 +199,8 @@ $response_meta = $this->_parse_response_meta ( $meta );
 }
 } catch ( MyException $e ) {
 }
-if (defined ( 'CURL_DEBUG' ) && CURL_DEBUG)
-if (defined ( 'CURL_DEBUG_LOG' )) {
+if (defined ( __NAMESPACE__.'\\CURL_DEBUG' ) && CURL_DEBUG)
+if (defined ( __NAMESPACE__.'\\CURL_DEBUG_LOG' )) {
 $error = error_get_last ();
 $this->_logfile->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );
 $this->_logfile->writeLog ( sprintf ( '[%s] %s' . PHP_EOL, date ( DATETIME_FORMAT ), sprintf ( _esc ( 'Curl not available; running via %s wrapper' ), get_class () ) ) );

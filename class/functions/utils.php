@@ -24,116 +24,108 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : utils.php $
  * 
- * @id      : utils.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : utils.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-date_default_timezone_set ( "UTC" );
-define ( "WPMYBACKUP_AUTHOR", '@author:		Eugen Mihailescu <eugenmihailescux@gmail.com> $' );
-$utils_includes = array (
-'wp-schedule.php',
-'cli-options.php',
-'options.php',
-'wp-wrappers.php',
-'files.php',
-'random.php',
-'url.php',
-'mail.php',
-'nonce.php',
-'signals.php',
-'session.php',
-'sys.php',
-'php.php',
-'sys-tools.php',
-'help.php',
-'ui.php',
-'history.php',
-'ftp.php',
-'format.php',
-'vat.php' 
-);
+date_default_timezone_set( "UTC" );
+define( __NAMESPACE__."\\WPMYBACKUP_AUTHOR", '@author:		Eugen Mihailescu <eugenmihailescux@gmail.com> $' );
+$utils_includes = array( 
+'php.php', 
+'wp-schedule.php', 
+'cli-options.php', 
+'options.php', 
+'wp-wrappers.php', 
+'files.php', 
+'random.php', 
+'url.php', 
+'mail.php', 
+'nonce.php', 
+'signals.php', 
+'session.php', 
+'sys.php', 
+'sys-tools.php', 
+'help.php', 
+'ui.php', 
+'history.php', 
+'ftp.php', 
+'format.php', 
+'vat.php', 
+'mysql.php' );
 foreach ( $utils_includes as $include_file )
-file_exists ( UTILS_PATH . $include_file ) && include_once UTILS_PATH . $include_file;
-function getDatesByAge($dates, $days, $filter_by) {
-$compare = strtotime ( "-$days days", time () );
-$result = array ();
+file_exists( UTILS_PATH . $include_file ) && include_once UTILS_PATH . $include_file;
+function getDatesByAge( $dates, $days, $filter_by ) {
+$compare = strtotime( "-$days days", time() );
+$result = array();
 foreach ( $dates as $d )
-if (array_search ( $filter_by, array (
-0,
-sign ( $d - $compare ) 
-) ))
-$result [] = $d;
+if ( array_search( $filter_by, array( 0, sign( $d - $compare ) ) ) )
+$result[] = $d;
 return $result;
 }
-function getHumanReadableSize($size, $precision = 2, $return_what = 0) {
-$units = array (
-'B',
-'KiB',
-'MiB',
-'GiB',
-'TiB',
-'PiB' 
-);
-for($i = 0; abs ( $size ) >= 1024; $i ++)
+function getHumanReadableSize( $size, $precision = 2, $return_what = 0 ) {
+$units = array( 'B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB' );
+for ( $i = 0; abs( $size ) >= 1024; $i++ )
 $size /= 1024;
-$i = $i + 1 > count ( $units ) ? count ( $units ) - 1 : $i;
-if ($return_what == 1)
+$i = $i + 1 > count( $units ) ? count( $units ) - 1 : $i;
+if ( $return_what == 1 )
 return $i;
-elseif ($return_what == 2)
-return $units [$i];
+elseif ( $return_what == 2 )
+return $units[$i];
 else
-return sprintf ( '%.' . $precision . 'f %s', $size, $units [$i] );
+return sprintf( '%.' . $precision . 'f %s', $size, $units[$i] );
 }
-function getTransferSpeed($start, $end) {
-$sec = $start->diff ( $end )->format ( '%s' );
-if ($sec > 0 && file_exists ( $part ))
-$rate = filesize ( $part ) / $sec;
+function getTransferSpeed( $start, $end ) {
+$sec = $start->diff( $end )->format( '%s' );
+if ( $sec > 0 && file_exists( $part ) )
+$rate = filesize( $part ) / $sec;
 else
 $rate = - 1;
-return sprintf ( '%s/s', getHumanReadableSize ( $rate ) );
+return sprintf( '%s/s', getHumanReadableSize( $rate ) );
 }
 function getPluginAuthorEmail() {
-$result = preg_match ( '/^@author:\s*[\w\s]*\s*\<([\w\@\.]*)\>\s*\$$/', WPMYBACKUP_AUTHOR, $author_email_matches ) ? $author_email_matches [1] : '';
-return trim ( $result );
+$result = preg_match( '/^@author:\s*[\w\s]*\s*\<([\w\@\.]*)\>\s*\$$/', WPMYBACKUP_AUTHOR, $author_email_matches ) ? $author_email_matches[1] : '';
+return trim( $result );
 }
 function getPluginAuthorName() {
-$result = preg_match ( '/^@author:\s*([\w\s]*)\s*/', WPMYBACKUP_AUTHOR, $author_matches ) ? $author_matches [1] : '';
-return trim ( $result );
+$result = preg_match( '/^@author:\s*([\w\s]*)\s*/', WPMYBACKUP_AUTHOR, $author_matches ) ? $author_matches[1] : '';
+return trim( $result );
 }
-function getPluginVersion($full_version = true) {
-return sprintf ( '%s%s', APP_VERSION_ID, $full_version ? ', ' . APP_VERSION_DATE : '' );
+function getPluginVersion( $full_version = true ) {
+return sprintf( '%s%s', APP_VERSION_ID, $full_version ? ', ' . APP_VERSION_DATE : '' );
 }
-function isJobRunning($settings = null) {
+function isJobRunning( $settings = null ) {
 global $_branch_id;
 $lock_file = JOBS_LOCK_FILE;
 $last_job_id = false;
 $is_running = false;
-$f = fopen ( $lock_file, 'wb' );
-if (! $f || ! flock ( $f, LOCK_EX | LOCK_NB )) {
+$f = fopen( $lock_file, 'wb' );
+if ( ! $f || ! flock( $f, LOCK_EX | LOCK_NB ) ) {
 $is_running = true;
-if (null != $settings) {
-$jobs_log = new LogFile ( JOBS_LOGFILE, $settings );
-$last_job_id = $jobs_log->getLastJobId ();
+if ( null != $settings ) {
+$jobs_log = new LogFile( JOBS_LOGFILE, $settings );
+$last_job_id = $jobs_log->getLastJobId();
 }
 }
-if (! $is_running)
-flock ( $f, LOCK_UN );
-fclose ( $f );
-return array (
-$is_running,
-getSpanE ( sprintf ( _esc ( 'Backup seems to be %s now' ), $is_running ? "RUNNING" : "IDLE" ), $is_running ? 'red' : '#2ea2cc', $is_running ? 'bold' : 'normal' ),
-$last_job_id 
-);
+if ( ! $is_running )
+flock( $f, LOCK_UN );
+fclose( $f );
+return array( 
+$is_running, 
+getSpanE( 
+sprintf( _esc( 'Backup seems to be %s now' ), $is_running ? "RUNNING" : "IDLE" ), 
+$is_running ? 'red' : '#2ea2cc', 
+$is_running ? 'bold' : 'normal' ), 
+$last_job_id );
 }
-function getLogfileByType($log_type) {
-switch ($log_type) {
+function getLogfileByType( $log_type ) {
+switch ( $log_type ) {
 case 'jobs' :
 $log = JOBS_LOGFILE;
 break;
@@ -164,20 +156,17 @@ break;
 }
 return $log;
 }
-function std_dev($array) {
-$n = count ( $array );
-if (0 == $n)
+function std_dev( $array ) {
+$n = count( $array );
+if ( 0 == $n )
 return 0;
-$mean = array_sum ( $array ) / $n;
+$mean = array_sum( $array ) / $n;
 $carry = 0.0;
 foreach ( $array as $val )
-$carry += ($d = (( double ) $val) - $mean) * $d;
-return array (
-sqrt ( $carry / $n ),
-$mean 
-);
+$carry += ( $d = ( (double) $val ) - $mean ) * $d;
+return array( sqrt( $carry / $n ), $mean );
 }
-function swap_items(&$item1, &$item2) {
+function swap_items( &$item1, &$item2 ) {
 $tmp = $item1;
 $item1 = $item2;
 $item2 = $tmp;

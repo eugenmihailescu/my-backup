@@ -24,23 +24,23 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : GoogleOAuth2Client.php $
  * 
- * @id      : GoogleOAuth2Client.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : GoogleOAuth2Client.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
-define ( 'GOOGLE_SERVICE_ID', 'google' );
-define ( 'GOOGLE_APIS_URL', 'www.googleapis.com' );
-define ( 'GOOGLE_OAUTH_URL', 'accounts.google.com' );
-define ( 'GOOGLE_PROTOCOL', 'https' ); 
-define ( 'GOOGLE_OAUTH_VERSION', '2' );
-define ( 'GOOGLE_ACCESS_TYPE', 'offline' ); 
-define ( 'GOOGLE_APPROVAL_PROMPT', 'force' ); 
+namespace MyBackup;
+define ( __NAMESPACE__.'\\GOOGLE_SERVICE_ID', 'google' );
+define ( __NAMESPACE__.'\\GOOGLE_APIS_URL', 'www.googleapis.com' );
+define ( __NAMESPACE__.'\\GOOGLE_OAUTH_URL', 'accounts.google.com' );
+define ( __NAMESPACE__.'\\GOOGLE_PROTOCOL', 'https' ); 
+define ( __NAMESPACE__.'\\GOOGLE_OAUTH_VERSION', '2' );
+define ( __NAMESPACE__.'\\GOOGLE_ACCESS_TYPE', 'offline' ); 
+define ( __NAMESPACE__.'\\GOOGLE_APPROVAL_PROMPT', 'force' ); 
 class GoogleOAuth2Client extends GenericOAuth2Client {
 private $_SESSION_API = array (
 'auth' => 'auth',

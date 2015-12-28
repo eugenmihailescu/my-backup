@@ -24,113 +24,122 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : wp-wrappers.php $
  * 
- * @id      : wp-wrappers.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-wrappers.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-function plugins_url_wrapper($path, $plugin) {
-$plugin_root = str_replace ( DIRECTORY_SEPARATOR, '/', getFileRelativePath ( $plugin ) );
-'/' != substr ( $path, 0, 1 ) && '/' != substr ( $plugin_root, - 1 ) && ($plugin_root .= '/') || ('/' == substr ( $plugin_root, - 1 ) && ($plugin_root = substr ( $plugin_root, 0, - 1 )));
-$result = function_exists ( 'plugins_url' ) ? plugins_url ( $path, $plugin ) : ($plugin_root . $path);
+function plugins_url_wrapper( $path, $plugin ) {
+$plugin_root = str_replace( DIRECTORY_SEPARATOR, '/', getFileRelativePath( $plugin ) );
+'/' != substr( $path, 0, 1 ) && '/' != substr( $plugin_root, - 1 ) && ( $plugin_root .= '/' ) ||
+( '/' == substr( $plugin_root, - 1 ) && ( $plugin_root = substr( $plugin_root, 0, - 1 ) ) );
+$result = function_exists( '\\plugins_url' ) ? plugins_url( $path, $plugin ) : ( $plugin_root . $path );
 return $result;
 }
-function plugin_dir_path_wrapper($file) {
-return function_exists ( 'plugin_dir_path' ) ? plugin_dir_path ( $file ) : dirname ( $file );
+function plugin_dir_path_wrapper( $file ) {
+return function_exists( '\\plugin_dir_path' ) ? plugin_dir_path( $file ) : dirname( $file );
 }
-function get_option_wrapper($option, $default) {
-return function_exists ( 'get_option' ) ? get_option ( $option, $default ) : get_option_local_db ( $option, $default );
+function get_option_wrapper( $option, $default ) {
+return function_exists( '\\get_option' ) ? get_option( $option, $default ) : get_option_local_db( 
+$option, 
+$default );
 }
 function get_ABSPATH_wrapper() {
-return defined ( 'ALT_ABSPATH' ) ? '/' : DIRECTORY_SEPARATOR == substr ( __DIR__, - 1 ) ? substr ( __DIR__, 0, strlen ( __DIR__ ) ) : __DIR__;
+return defined( __NAMESPACE__.'\\ALT_ABSPATH' ) ? '/' : DIRECTORY_SEPARATOR == substr( __DIR__, - 1 ) ? substr( 
+__DIR__, 
+0, 
+strlen( __DIR__ ) ) : __DIR__;
 }
-function get_home_url_wrapper($blog_id = null, $path = null, $scheme = null) {
-if (function_exists ( 'get_home_url' ))
-return get_home_url ( $blog_id, $path, $scheme );
+function get_home_url_wrapper( $blog_id = null, $path = null, $scheme = null ) {
+if ( function_exists( '\\get_home_url' ) )
+return get_home_url( $blog_id, $path, $scheme );
 else {
-$url = selfURL ( true );
-if ('/' == substr ( $url, - 1 ))
-return substr ( $url, 0, strlen ( $url ) - 1 );
+$url = selfURL( true );
+if ( '/' == substr( $url, - 1 ) )
+return substr( $url, 0, strlen( $url ) - 1 );
 else
 return $url;
 }
 }
-function update_option_wrapper($option, $new_value) {
-return function_exists ( 'update_option' ) ? update_option ( $option, $new_value ) : update_option_local_db ( $option, $new_value );
+function update_option_wrapper( $option, $new_value ) {
+return function_exists( '\\update_option' ) ? update_option( $option, $new_value ) : update_option_local_db( 
+$option, 
+$new_value );
 }
-function delete_option_wrapper($option) {
-return function_exists ( 'delete_option' ) ? delete_option ( $option ) : delete_option_local_db ( $option );
+function delete_option_wrapper( $option ) {
+return function_exists( '\\delete_option' ) ? delete_option( $option ) : delete_option_local_db( $option );
 }
 function wp_get_schedules_wrapper() {
-return function_exists ( 'wp_get_schedules' ) ? wp_get_schedules () : array ();
+return function_exists( '\\wp_get_schedules' ) ? wp_get_schedules() : array();
 }
-function wp_create_nonce_wrapper($action) {
-return function_exists ( 'wp_create_nonce' ) ? wp_create_nonce ( $action ) : create_nonce ( $action );
+function wp_create_nonce_wrapper( $action ) {
+return function_exists( '\\wp_create_nonce' ) ? wp_create_nonce( $action ) : create_nonce( $action );
 }
-function wp_verify_nonce_wrapper($nonce, $action) {
-return function_exists ( 'wp_verify_nonce' ) ? wp_verify_nonce ( $nonce, $action ) : verify_nonce ( $nonce, $action );
+function wp_verify_nonce_wrapper( $nonce, $action ) {
+return function_exists( '\\wp_verify_nonce' ) ? wp_verify_nonce( $nonce, $action ) : verify_nonce( $nonce, $action );
 }
 function auth_redirect_wrapper() {
-if ($_SESSION ['login_redirect'])
+if ( isset( $_SESSION ) && $_SESSION['login_redirect'] )
 return;
-$wp_pluggable = wp_get_pluggable_path ();
-if (is_wp () && file_exists ( $wp_pluggable ) && function_exists ( 'is_user_logged_in' ) && ! is_user_logged_in ()) {
-add_session_var ( 'login_redirect', true );
+$wp_pluggable = @constant( 'ABSPATH' ) && @constant( 'WPINC' ) ? ABSPATH . WPINC . DIRECTORY_SEPARATOR .
+'pluggable.php' : false;
+if ( $wp_pluggable && is_wp() && file_exists( $wp_pluggable ) && function_exists( '\\is_user_logged_in' ) &&
+! is_user_logged_in() ) {
+add_session_var( 'login_redirect', true );
 include_once $wp_pluggable;
-auth_redirect (); 
+auth_redirect(); 
 } else {
-locationRedirect ( selfURL ( false ) ); 
+locationRedirect( selfURL( false ) ); 
 }
-}
-function wp_get_pluggable_path() {
-return dirname ( dirname ( dirname ( ROOT_PATH ) ) ) . '/wp-includes/pluggable.php';
 }
 function is_multisite_wrapper() {
-if (function_exists ( 'is_multisite' ))
-return is_multisite ();
+if ( function_exists( '\\is_multisite' ) )
+return \is_multisite();
 else
 return false;
 }
 function get_current_user_id_wrapper() {
-if (is_wp ()) {
-if (function_exists ( 'get_current_user_id' ))
-return get_current_user_id ();
+if ( is_wp() ) {
+if ( function_exists( '\\get_current_user_id' ) )
+return get_current_user_id();
 } else {
-if (isset ( $_SESSION ) && isset ( $_SESSION ['simple_login_username'] ))
-return $_SESSION ['simple_login_username'];
+if ( isset( $_SESSION ) && isset( $_SESSION['simple_login_username'] ) )
+return $_SESSION['simple_login_username'];
 }
 return false;
 }
 function is_wp() {
-return function_exists ( 'add_management_page' );
+return @constant( 'ABSPATH' ) && $GLOBALS['wp_version'] &&
+file_exists( ABSPATH . DIRECTORY_SEPARATOR . 'wp-includes' . DIRECTORY_SEPARATOR . 'version.php' ) &&
+function_exists( '\\add_management_page' );
 }
 function wp_get_timezone_string() {
-if (function_exists ( 'get_option' ) && $timezone = get_option ( 'timezone_string' ))
+if ( function_exists( '\\get_option' ) && $timezone = get_option( 'timezone_string' ) )
 return $timezone;
-if (0 === (function_exists ( 'get_option' ) && $utc_offset = get_option ( 'gmt_offset', 0 )))
+if ( 0 === ( function_exists( '\\get_option' ) && $utc_offset = get_option( 'gmt_offset', 0 ) ) )
 return 'UTC';
 else
 $utc_offset = 0;
 $utc_offset *= 3600;
-$timezone = timezone_name_from_abbr ( '', $utc_offset );
-if (false === $timezone) {
-$is_dst = date ( 'I' );
+$timezone = timezone_name_from_abbr( '', $utc_offset );
+if ( false === $timezone ) {
+$is_dst = date( 'I' );
 $timezone = null;
-foreach ( timezone_abbreviations_list () as $abbr ) {
+foreach ( timezone_abbreviations_list() as $abbr ) {
 foreach ( $abbr as $city ) {
-if ($city ['dst'] == $is_dst && $city ['offset'] == $utc_offset) {
-$timezone = $city ['timezone_id'];
+if ( $city['dst'] == $is_dst && $city['offset'] == $utc_offset ) {
+$timezone = $city['timezone_id'];
 break;
 }
 }
 }
-if (! empty ( $timezone ))
+if ( ! empty( $timezone ) )
 return $timezone;
 }
 return 'UTC';
@@ -138,29 +147,130 @@ return 'UTC';
 function get_wp_config_path() {
 return ABSPATH . 'wp-config.php';
 }
-function update_wp_config($array) {
+function update_wp_config( $array ) {
 global $container_shape;
-if (! empty ( $array )) {
-$filename = get_wp_config_path ();
-$backup = $filename . '.' . time ();
-$buffer = file_get_contents ( $filename );
-$comment = ' by ' . WPMYBACKUP . ' @ ' . date ( 'Y-m-d H:i:s e' );
-$summary = array ();
+if ( ! empty( $array ) ) {
+$filename = get_wp_config_path();
+$backup = $filename . '.' . time();
+$buffer = file_get_contents( $filename );
+$comment = ' by ' . WPMYBACKUP . ' @ ' . date( 'Y-m-d H:i:s e' );
+$summary = array();
 foreach ( $array as $key => $value ) {
 $pattern = '/((define\s*\(\s*[\'"]' . $key . '[\'"]\s*,\s*)([\w]+)([^;]+;)).*/';
-if (preg_match ( $pattern, $buffer ))
-$buffer = preg_replace ( $pattern, '$2' . $value . '$4 // changed' . $comment . ' << $1', $buffer );
+if ( preg_match( $pattern, $buffer ) )
+$buffer = preg_replace( $pattern, '$2' . $value . '$4 // changed' . $comment . ' << $1', $buffer );
 else
 $buffer .= PHP_EOL . "define('$key' , $value); // added" . $comment . PHP_EOL;
-$summary [] = "<b>$key</b> = <i>$value</i>";
+$summary[] = "<b>$key</b> = <i>$value</i>";
 }
-if (copy ( $filename, $backup ) && file_put_contents ( $filename, $buffer )) {
-$summary = ! empty ( $summary ) ? "<ul style=\'list-style: square inside none;\'><li>" . implode ( '</li><li>', $summary ) . '</li></ul>' : '';
-return sprintf ( "parent.popupWindow('%s','%s');", _esc ( 'Confirmation' ), sprintf ( _esc ( 'The file %s has been updated successfully.%s: the old file has been copied at %s' ), addslashes ( $filename ), '<br><br><b>' . _esc ( 'What was changed' ) . "</b><blockquote class=\'hintbox $container_shape\'>$summary</blockquote><b>" . _esc ( 'Note' ) . '</b>', addslashes ( $backup ) ) );
+if ( copy( $filename, $backup ) && file_put_contents( $filename, $buffer ) ) {
+$summary = ! empty( $summary ) ? "<ul style=\'list-style: square inside none;\'><li>" .
+implode( '</li><li>', $summary ) . '</li></ul>' : '';
+return sprintf( 
+"parent.popupWindow('%s','%s');", 
+_esc( 'Confirmation' ), 
+sprintf( 
+_esc( 'The file %s has been updated successfully.%s: the old file has been copied at %s' ), 
+addslashes( $filename ), 
+'<br><br><b>' . _esc( 'What was changed' ) .
+"</b><blockquote class=\'hintbox $container_shape\'>$summary</blockquote><b>" . _esc( 'Note' ) .
+'</b>', 
+addslashes( $backup ) ) );
 }
 }
-$err = error_get_last ();
-$err_str = sprintf ( _esc ( 'Could not update the %s.%s' ), addslashes ( $filename ), '<br>' . $err ['message'] );
-return sprintf ( "parent.popupError('%s','%s');", _esc ( 'Error' ), $err_str );
+$err = error_get_last();
+$err_str = sprintf( _esc( 'Could not update the %s.%s' ), addslashes( $filename ), '<br>' . $err['message'] );
+return sprintf( "parent.popupError('%s','%s');", _esc( 'Error' ), $err_str );
+}
+function wp_get_admin_email() {
+return wp_exec_in_blog( function () {
+return\get_bloginfo( 'admin_email' );
+} );
+}
+function wp_get_upload_dir() {
+return wp_exec_in_blog( function () {
+return\wp_upload_dir();
+} );
+}
+function wp_get_db_prefix() {
+return wp_exec_in_blog( function () {
+global $wpdb;
+return isset( $wpdb ) ? $wpdb->prefix : '';
+} );
+}
+function wp_get_current_blog_id() {
+global $blog_id;
+$result = function_exists( '\\get_current_blog_id' ) ? \get_current_blog_id() : $blog_id;
+return ! empty( $result ) ? $result : null;
+}
+function wp_get_site_id() {
+$site_id = isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
+if ( is_wp() ) {
+$site_id = wp_get_current_blog_id();
+}
+return $site_id;
+}
+function wp_get_plugins( $status = 'all' ) {
+$plugins = array( 'all' => array(), 'active' => array(), 'inactive' => array() );
+if ( is_wp() ) {
+if ( ! function_exists( '\\get_plugins' ) )
+require_once \ABSPATH . 'wp-admin/includes/plugin.php';
+$plugins['all'] =\apply_filters( 'all_plugins',\get_plugins() );
+foreach ( (array) $plugins['all'] as $plugin_file => $plugin_data ) {
+if ( \is_multisite() && \is_network_only_plugin( $plugin_file ) && ! \is_plugin_active( $plugin_file ) ) {
+unset( $plugins['all'][$plugin_file] );
+} elseif ( \is_plugin_active_for_network( $plugin_file ) ) {
+unset( $plugins['all'][$plugin_file] );
+} elseif ( ( \is_plugin_active( $plugin_file ) ) || ( \is_plugin_active_for_network( $plugin_file ) ) ) {
+$plugins['active'][$plugin_file] = $plugin_data;
+} else {
+$plugins['inactive'][$plugin_file] = $plugin_data;
+}
+}
+}
+return $plugins[$status];
+}
+function wp_exec_in_blog( $callback, $args = array(), $blog_id = -1, $default = '', $default_single = true ) {
+is_array( $args ) || $args = array();
+$result = $default;
+if ( function_exists( '\\switch_to_blog' ) ) {
+( - 1 == $blog_id ) && $blog_id = wp_get_current_blog_id();
+switch_to_blog( $blog_id );
+is_callable( $callback ) && $result = call_user_func_array( $callback, $args );
+restore_current_blog();
+} elseif ( $default_single && is_callable( $callback ) )
+$result = call_user_func_array( $callback, $args );
+return $result;
+}
+function is_administrator() {
+return function_exists( '\\current_user_can' ) && \current_user_can( 'manage_options' );
+}
+function is_wpmu_admin() {
+return function_exists( '\\is_network_admin' ) && \is_network_admin() && is_wpmu_superadmin();
+}
+function is_wpmu_superadmin() {
+return \current_user_can( 'manage_network_options' );
+}
+function wp_get_user_blogs_prefixes( $all = false ) {
+$result = array();
+if ( function_exists( '\\get_blogs_of_user' ) ) {
+foreach ( \get_blogs_of_user( \get_current_user_id(), $all ) as $blog_id => $blog_info ) {
+$result[$blog_id] = wp_exec_in_blog( 
+function () {
+global $wpdb;
+return isset( $wpdb ) ? $wpdb->prefix : '';
+}, 
+null, 
+$blog_id );
+}
+ksort( $result );
+} else {
+$blog_id = wp_get_current_blog_id();
+$result[isset( $blog_id ) ? $blog_id : 1] = wp_get_db_prefix();
+}
+return $result;
+}
+function wp_get_all_blogs_prefixes() {
+return wp_get_user_blogs_prefixes( true );
 }
 ?>

@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : LogFile.php $
  * 
- * @id      : LogFile.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogFile.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 class LogFile {
 private $_logrotate;
 private $_logsize;
@@ -45,25 +45,25 @@ private $_branch_id;
 private $_rw_filter;
 private $_rw_mode;
 private function _getLogfile() {
-if (empty ( $this->_log_filename ) )
+if ( empty( $this->_log_filename ) )
 return false;
 return $this->_log_filename;
 }
-private function _validateFilename($logfile) {
-if (false === $logfile)
-throw new MyException ( 'The log filename is empty' );
-$path = dirname ( $logfile );
-! file_exists ( $path ) && mkdir ( $path, 0770, true );
+private function _validateFilename( $logfile ) {
+if ( false === $logfile )
+throw new MyException( 'The log filename is empty' );
+$path = dirname( $logfile );
+! file_exists( $path ) && mkdir( $path, 0770, true );
 }
-function __construct($log_file = null, $settings = null) {
+function __construct( $log_file = null, $settings = null ) {
 global $_branch_id_;
 $this->_logrotate = false;
 $this->_logsize = 1;
-$this->_logdir = ! empty ( $log_file ) ? dirname ( $log_file ) : sys_get_temp_dir ();
-$this->_log_filename = ! empty ( $log_file ) ? $log_file : null;
-is_array ( $settings ) && $this->initFromArray ( $settings );
-if (defined ( 'BRANCHED_LOGS' ) && BRANCHED_LOGS && ! empty ( $_branch_id_ )) {
-$this->_setBranched ();
+$this->_logdir = ! empty( $log_file ) ? dirname( $log_file ) : ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() );
+$this->_log_filename = ! empty( $log_file ) ? $log_file : null;
+is_array( $settings ) && $this->initFromArray( $settings );
+if ( defined( __NAMESPACE__.'\\BRANCHED_LOGS' ) && BRANCHED_LOGS && ! empty( $_branch_id_ ) ) {
+$this->_setBranched();
 } else {
 $this->_branched = false;
 $this->_branch_id = null;
@@ -74,120 +74,127 @@ $this->_rw_mode = null;
 private function _setBranched() {
 global $COMPRESSION_FILTERS;
 $this->_branched = true;
-$this->_rw_filter = $COMPRESSION_FILTERS [GZ] [0];
-$this->_rw_mode = sprintf ( $COMPRESSION_FILTERS [GZ] [1], 9 );
-$this->_setBranchId (); 
+$this->_rw_filter = $COMPRESSION_FILTERS[GZ][0];
+$this->_rw_mode = sprintf( $COMPRESSION_FILTERS[GZ][1], 9 );
+$this->_setBranchId(); 
 }
 private function _setBranchId() {
 global $_branch_id_;
-$log_file = $this->_getLogfile ();
+$log_file = $this->_getLogfile();
 $this->_branch_id = $_branch_id_;
-$fname = basename ( $log_file );
-if (! $this->_branched)
-$this->_log_filename = preg_replace ( "@{$this->_branch_id}" . normalize_path ( DIRECTORY_SEPARATOR ) . "$fname$@", $fname, $log_file ); 
+$fname = basename( $log_file );
+if ( ! $this->_branched )
+$this->_log_filename = preg_replace( 
+"@{$this->_branch_id}" . normalize_path( DIRECTORY_SEPARATOR ) . "$fname$@", 
+$fname, 
+$log_file ); 
 else
-$this->_log_filename = getBranchedFileName ( $log_file ); 
-! empty ( $this->_rw_filter ) && $this->_log_filename .= '.' . $this->_rw_filter;
+$this->_log_filename = getBranchedFileName( $log_file ); 
+! empty( $this->_rw_filter ) && $this->_log_filename .= '.' . $this->_rw_filter;
 }
-private function _rotateLog($log_file) {
-if (! $this->_logrotate)
+private function _rotateLog( $log_file ) {
+if ( ! $this->_logrotate )
 return false;
-if (NONE == $this->_filter) {
-$new_name = sprintf ( '%s.%s', $log_file, date ( 'Ymd-His' ) );
-$success = move_file ( $log_file, $new_name );
-if (! $success)
+if ( NONE == $this->_filter ) {
+$new_name = sprintf( '%s.%s', $log_file, date( 'Ymd-His' ) );
+$success = move_file( $log_file, $new_name );
+if ( ! $success )
 return false;
 else
 return $new_name;
 }
 global $COMPRESSION_NAMES, $COMPRESSION_FILTERS;
 $filter = '';
-$ext = '.' . $COMPRESSION_NAMES [$this->_filter];
-$filter = $COMPRESSION_FILTERS [$this->_filter] [0];
-$mode = sprintf ( $COMPRESSION_FILTERS [$this->_filter] [1], 9 ); 
-if (! _function_exists ( $filter . 'open' ))
-throw new MyException ( sprintf ( _esc ( '%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), strtoupper ( $filter ) ) );
+$ext = '.' . $COMPRESSION_NAMES[$this->_filter];
+$filter = $COMPRESSION_FILTERS[$this->_filter][0];
+$mode = sprintf( $COMPRESSION_FILTERS[$this->_filter][1], 9 ); 
+if ( ! _function_exists( $filter . 'open' ) )
+throw new MyException( 
+sprintf( 
+_esc( 
+'%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), 
+strtoupper( $filter ) ) );
 $output_file = $log_file . $ext;
 $i = 0;
-while ( file_exists ( $output_file ) )
-$output_file = sprintf ( '%s-%d', $log_file . $ext, $i ++ );
-if (! file_exists ( $log_file ))
-throw new MyException ( sprintf ( _esc ( "Cannot rotate log file %s due to it doesn't exist" ), $log_file ) );
-if ('' != $filter) {
-$fw = _call_user_func ( $filter . 'open', $output_file, $mode );
-$fr = fopen ( $log_file, 'rb' );
-if (false !== $fr) {
-while ( ! feof ( $fr ) )
-_call_user_func ( $filter . 'write', $fw, fread ( $fr, MB ) );
-fclose ( $fr );
+while ( file_exists( $output_file ) )
+$output_file = sprintf( '%s-%d', $log_file . $ext, $i++ );
+if ( ! file_exists( $log_file ) )
+throw new MyException( sprintf( _esc( "Cannot rotate log file %s due to it doesn't exist" ), $log_file ) );
+if ( '' != $filter ) {
+$fw = _call_user_func( $filter . 'open', $output_file, $mode );
+$fr = fopen( $log_file, 'rb' );
+if ( false !== $fr ) {
+while ( ! feof( $fr ) )
+_call_user_func( $filter . 'write', $fw, fread( $fr, MB ) );
+fclose( $fr );
 }
-_call_user_func ( $filter . 'close', $fw );
+_call_user_func( $filter . 'close', $fw );
 }
 return $output_file;
 }
-public function initFromArray($array) {
-$options = array (
-'logdir' => '_logdir',
-'logrotate' => '_logrotate',
-'logsize' => '_logsize',
-'method' => '_filter',
-'current_user_id' => '_current_user_id' 
-);
+public function initFromArray( $array ) {
+$options = array( 
+'logdir' => '_logdir', 
+'logrotate' => '_logrotate', 
+'logsize' => '_logsize', 
+'method' => '_filter', 
+'current_user_id' => '_current_user_id' );
 foreach ( $options as $key => $prop )
-isset ( $array [$key] ) && $this->$prop = $array [$key];
+isset( $array[$key] ) && $this->$prop = $array[$key];
 }
-public function writeLog($str) {
-$logfile = $this->_getLogfile ();
-$this->_validateFilename ( $logfile );
-if ($this->_logrotate && file_exists ( $logfile ) && filesize ( $logfile ) + strlen ( $str ) > $this->_logsize * MB)
-if (false !== $this->_rotateLog ( $logfile ))
-@unlink ( $logfile );
-$line = is_string ( $str ) ? $str : obsafe_print_r ( $str, true );
-if (null == $this->_rw_filter) {
-if (false === file_put_contents ( $logfile, $line, FILE_APPEND ))
-trigger_error ( _esc ( 'Cannot write to the log file' ) . ' "' . $logfile . '"', E_USER_WARNING );
+public function writeLog( $str ) {
+$logfile = $this->_getLogfile();
+$this->_validateFilename( $logfile );
+if ( $this->_logrotate && file_exists( $logfile ) &&
+filesize( $logfile ) + strlen( $str ) > $this->_logsize * MB )
+if ( false !== $this->_rotateLog( $logfile ) )
+@unlink( $logfile );
+$line = is_string( $str ) ? $str : obsafe_print_r( $str, true );
+if ( null == $this->_rw_filter ) {
+if ( false === file_put_contents( $logfile, $line, FILE_APPEND ) )
+trigger_error( _esc( 'Cannot write to the log file' ) . ' "' . $logfile . '"', E_USER_WARNING );
 } else {
-if (file_exists ( $logfile )) {
-$log_data = gzfile ( $logfile );
-$log_data [] = $line;
-$log_data = implode ( $log_data );
+if ( file_exists( $logfile ) ) {
+$log_data = gzfile( $logfile );
+$log_data[] = $line;
+$log_data = implode( $log_data );
 } else
 $log_data = $line;
-$fw = _call_user_func ( $this->_rw_filter . 'open', $logfile, $this->_rw_mode );
-if (flock ( $fw, LOCK_EX )) {
-_call_user_func ( $this->_rw_filter . 'write', $fw, $log_data, strlen ( $log_data ) );
-flock ( $fw, LOCK_UN );
-_call_user_func ( $this->_rw_filter . 'close', $fw );
+$fw = _call_user_func( $this->_rw_filter . 'open', $logfile, $this->_rw_mode );
+if ( flock( $fw, LOCK_EX ) ) {
+_call_user_func( $this->_rw_filter . 'write', $fw, $log_data, strlen( $log_data ) );
+flock( $fw, LOCK_UN );
+_call_user_func( $this->_rw_filter . 'close', $fw );
 } else
-throw new MyException ( sprintf ( _esc ( 'Cannot aquire exclusive lock for writting to %s' ), $logfile ) );
+throw new MyException( sprintf( _esc( 'Cannot aquire exclusive lock for writting to %s' ), $logfile ) );
 }
 }
 public function readLog() {
-$logfile = $this->_getLogfile ();
-if (null == $this->_rw_filter)
-return file_get_contents ( $logfile );
+$logfile = $this->_getLogfile();
+if ( null == $this->_rw_filter )
+return file_get_contents( $logfile );
 else {
 $log_data = '';
-$fw = _call_user_func ( $this->_rw_filter . 'open', $logfile, $this->_rw_mode );
-while ( ! feof ( $fw ) )
-$log_data .= _call_user_func ( $this->_rw_filter . 'read', $fw, 4096 );
-_call_user_func ( $this->_rw_filter . 'close', $fw );
+$fw = _call_user_func( $this->_rw_filter . 'open', $logfile, $this->_rw_mode );
+while ( ! feof( $fw ) )
+$log_data .= _call_user_func( $this->_rw_filter . 'read', $fw, 4096 );
+_call_user_func( $this->_rw_filter . 'close', $fw );
 return $log_data;
 }
 }
 public function getLastJobId() {
 $result = false;
-if (false !== ($fr = fopen ( $this->_log_filename, 'r' ))) {
-$buff_len = min ( 4096, filesize ( $this->_log_filename ) );
-if (0 == fseek ( $fr, - $buff_len, SEEK_END ) && false !== ($buff = fread ( $fr, $buff_len ))) {
+if ( false !== ( $fr = fopen( $this->_log_filename, 'r' ) ) ) {
+$buff_len = min( 4096, filesize( $this->_log_filename ) );
+if ( 0 == fseek( $fr, - $buff_len, SEEK_END ) && false !== ( $buff = fread( $fr, $buff_len ) ) ) {
 $key = 'job_id:';
-$p = strrpos ( $buff, $key );
-false !== $p && ($p = strrpos ( substr ( $buff, 0, $p ), PHP_EOL ));
-$buff = substr ( $buff, $p ); 
-if (preg_match ( '/\[([\d\-\s\:]+)\][^\(]+\(' . $key . '\s*([\-\d]+)\)/', $buff, $matches ))
+$p = strrpos( $buff, $key );
+false !== $p && ( $p = strrpos( substr( $buff, 0, $p ), PHP_EOL ) );
+$buff = substr( $buff, $p ); 
+if ( preg_match( '/\[([\d\-\s\:]+)\][^\(]+\(' . $key . '\s*([\-\d]+)\)/', $buff, $matches ) )
 $result = $matches;
 }
-fclose ( $fr );
+fclose( $fr );
 }
 return $result;
 }

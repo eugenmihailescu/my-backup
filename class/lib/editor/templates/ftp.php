@@ -24,21 +24,21 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : ftp.php $
  * 
- * @id      : ftp.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ftp.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="ftp_enabled"><?php _pesc('Enabled');?></label></td>
-<td><input type="checkbox" name="ftp_enabled" id="ftp_enabled"
-value="1" onclick='js55f93aab8f090.submitOptions(this,0);'
+<td><input type="checkbox" name="ftp_enabled" id="ftp_enabled" value="1"
+onclick='js56816a36b58dc.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ftp_enabled"></td>
@@ -67,25 +67,23 @@ value=<?php echo "'" . $this->_ftphost . "'"; ?>
 <tr>
 <td style='text-align: left'><a class='help'
 onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
 <td style='text-align: right;'><label for="ftpport"><?php _pesc('Port');?></label></td>
 </tr>
 </table></td>
-<td><input style='width: 80px;' type="number" name='ftpport'
-id="ftpport"
-value=<?php echo "'" . $this->settings ['ftpport'] . "'"; ?> size=6
-<?php echo $this->enabled_tag; ?>> <input type="checkbox"
+<td><input style='width: 80px;' type="number" name='ftpport' id="ftpport"
+value=<?php echo "'" . $this->settings ['ftpport'] . "'"; ?> size="5"
+<?php echo $this->enabled_tag; ?> min="20" max="65535"> <input type="checkbox"
 name="ftppasv" id="ftppasv"
 <?php
 echo $this->_ftppasv ? 'checked' : '';
 echo $this->enabled_tag;
-if ($is_curl_ftp)
+if ( $is_curl_ftp )
 echo ' onclick="toggle_passive(this);"';
 ?>><input type="hidden" name="ftppasv" value="0"><label for="ftppasv"><?php _pesc('Passive mode');?></label><a
-id="passive_ftp_help" class='help'
-onclick=<?php
-echoHelp ( $help_2 );
+id="passive_ftp_help" class='help' onclick=<?php
+echoHelp( $help_2 );
 ?>> [?]</a></td>
 <?php if ($is_curl_ftp){?>
 <td>
@@ -93,10 +91,9 @@ echoHelp ( $help_2 );
 <tr>
 <td><label for="ftp_active_port"></label></td>
 <td><input type="text" name="ftp_active_port" id="ftp_active_port"
-value="<?php echo $this->settings ['ftp_active_port'];?>"><a
-id="passive_ftp_help" class='help'
+value="<?php echo $this->settings ['ftp_active_port'];?>" size="5"><a id="passive_ftp_help" class='help'
 onclick=<?php
-echoHelp ( $help_4 );
+echoHelp( $help_4 );
 ?>> [?]</a></td>
 </tr>
 </table>
@@ -124,8 +121,7 @@ id="ftppwd" value="<?php echo $this->settings ['ftppwd'] ; ?>" size=20 style='wi
 <td colspan="3">
 <table style='width: 100%;'>
 <tr>
-<td width="100%"><input type="text" name='ftp' id="ftp"
-style='width: 100%'
+<td width="100%"><input type="text" name='ftp' id="ftp" style='width: 100%'
 value=<?php echo "'" . stripslashes($this->root) . "'"; echo $this->enabled_tag; ?>></td>
 <td align="right"><input type="button"
 id='update_<?php echo $this->target_name;?>_dir' class="button"
@@ -135,7 +131,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ftp_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote FTP command');?>'
-onclick="<?php echo "js55f93aab8f090.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'js55f93aab8f090.ftpExecCmd(js55f93aab8f090.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
+onclick="<?php echo "js56816a36b58dc.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'js56816a36b58dc.ftpExecCmd(js56816a36b58dc.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
 <?php echo $this->enabled_tag; ?>></td>
 </tr>
 </table>

@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : logs-expert.php $
  * 
- * @id      : logs-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : logs-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td><label for="logdir"><?php _pesc('Log directory');?></label></td>
@@ -41,35 +41,36 @@ namespace MyNixWorld;
 value=<?php
 echo "'" . $log_dir . "'";
 ?>><a class='help' onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
 </tr>
 <tr>
 <td><label for="logrotate"><?php _pesc('Rotate logs');?></label></td>
 <td><input type="checkbox" name="logrotate" id="logrotate"
 <?php
-echo strToBool ( $this->settings ['logrotate'] ) ? 'checked' : '';
+echo strToBool( $this->settings['logrotate'] ) ? 'checked' : '';
 ?>><input type="hidden" name="logrotate" value="0"><a class='help'
 onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>> [?]</a></td>
 <td><label for="logsize"><?php _pesc('Max log size');?></label></td>
-<td><input type='number' size="4" name='logsize' id="logsize"
+<td><input type='number' size="4" min="1" max="2048" name='logsize'
+id="logsize"
 value=<?php
-echo $this->settings ['logsize'];
-echo ! $this->settings ['logrotate'] ? ' disabled' : '';
+echo $this->settings['logsize'];
+echo ! $this->settings['logrotate'] ? ' disabled' : '';
 ?>> MiB <a class='help' onclick=<?php
-echoHelp ( $help_3 );
+echoHelp( $help_3 );
 ?>> [?]</a></td>
 </tr>
-<?php if(defined ( 'APP_LISTVIEW_TARGETS' ) ){?>
+<?php if(defined ( __NAMESPACE__.'\\APP_LISTVIEW_TARGETS' ) ){?>
 <tr>
 <td><label for="logbranched"><?php _pesc('Logs per job');?></label></td>
-<td colspan="3"><input type="checkbox" name="logbranched"
-id="logbranched" <?php echo $logbranched?'checked':'';?> value="1"><input
-type="hidden" name="logbranched" value="0"><a class='help'
+<td colspan="3"><input type="checkbox" name="logbranched" id="logbranched"
+<?php echo $logbranched?'checked':'';?> value="1"><input type="hidden"
+name="logbranched" value="0"><a class='help'
 onclick=<?php
-echoHelp ( $help_4 );
+echoHelp( $help_4 );
 ?>> [?]</a></td>
 </tr>
 <?php }?>

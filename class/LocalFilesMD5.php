@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : LocalFilesMD5.php $
  * 
- * @id      : LocalFilesMD5.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LocalFilesMD5.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
 require_once LIB_PATH . 'MyException.php';
 require_once UTILS_PATH . 'files.php';
@@ -45,117 +45,124 @@ private $_log_records;
 public $onAbortCallback;
 public $onProgressCallback;
 public $onOutputCallback;
-function __construct($log_filename, $ref_log_filename = null) {
-if (empty ( $log_filename ))
-throw new MyException ( _ ( 'An empty log filename is not acceptable.' ) );
-empty ( $ref_log_filename ) && $ref_log_filename = $log_filename;
+function __construct( $log_filename, $ref_log_filename = null ) {
+if ( empty( $log_filename ) )
+throw new MyException( _( 'An empty log filename is not acceptable.' ) );
+empty( $ref_log_filename ) && $ref_log_filename = $log_filename;
 $this->_changed = false;
 $this->_log_filename = $log_filename;
 $this->_ref_log_filename = $ref_log_filename;
-$this->read ();
+$this->read();
 }
 function __destruct() {
-$this->_changed && $this->write ();
+$this->_changed && $this->write();
 }
-private function _checkFHandle($fhandle) {
-if (false === $fhandle) {
-$e = error_get_last ();
-throw new MyException ( $e ['message'], $e ['type'] );
+private function _checkFHandle( $fhandle ) {
+if ( false === $fhandle ) {
+$e = error_get_last();
+throw new MyException( $e['message'], $e['type'] );
 }
 }
 public function read() {
-$this->_log_records = array ();
-if (! file_exists ( $this->_ref_log_filename ))
+$this->_log_records = array();
+if ( ! file_exists( $this->_ref_log_filename ) )
 return false;
-$fr = fopen ( $this->_ref_log_filename, 'r' );
-$this->_checkFHandle ( $fr );
-while ( false !== ($line = fgets ( $fr )) ) {
-$cols = explode ( ',', $line );
-if (count ( $cols ) < 3)
+$fr = fopen( $this->_ref_log_filename, 'r' );
+$this->_checkFHandle( $fr );
+while ( false !== ( $line = fgets( $fr ) ) ) {
+$cols = explode( ',', $line );
+if ( count( $cols ) < 3 )
 continue;
-$this->_log_records [$cols [0]] = array (
-$cols [1], 
-$cols [2]  
-);
+$this->_log_records[$cols[0]] = array( $cols[1], 			
+$cols[2] );			
 }
-return fclose ( $fr );
+return fclose( $fr );
 }
 public function write() {
-$fw = fopen ( $this->_log_filename, 'w' );
-$this->_checkFHandle ( $fw );
+$fw = fopen( $this->_log_filename, 'w' );
+$this->_checkFHandle( $fw );
 foreach ( $this->_log_records as $filename => $cols )
-fwrite ( $fw, sprintf ( '%s,%s,%d', $filename, $cols [0], $cols [1] ) . PHP_EOL );
+fwrite( $fw, sprintf( '%s,%s,%d', $filename, $cols[0], $cols[1] ) . PHP_EOL );
 $this->_changed = false;
-return fclose ( $fw );
+return fclose( $fw );
 }
-public function sync($dir, $pattern, $recursively = true, $add_empty_dir = true) {
+public function sync( $dir, $pattern, $recursively = true, $add_empty_dir = true ) {
 $abort_signal_received = false;
-$array = getFileListByPattern ( $dir, $pattern, $recursively, $add_empty_dir, false );
+$array = getFileListByPattern( $dir, $pattern, $recursively, $add_empty_dir, false );
 $i = 1;
-$max = count ( $array );
-$timestamp = time ();
+$max = count( $array );
+$timestamp = time();
 foreach ( $array as $filename ) {
-if (_is_callable ( $this->onAbortCallback ) && false !== ($abort_signal_received = _call_user_func ( $this->onAbortCallback )))
+if ( _is_callable( $this->onAbortCallback ) &&
+false !== ( $abort_signal_received = _call_user_func( $this->onAbortCallback ) ) )
 break;
-$this->file_sync ( $filename );
-_is_callable ( $this->onProgressCallback ) && _call_user_func ( $this->onProgressCallback, - 3, $dir, $i ++, $max, 6 );
+$this->file_sync( $filename );
+_is_callable( $this->onProgressCallback ) &&
+_call_user_func( $this->onProgressCallback, - 3, $dir, $i++, $max, 6 );
 }
 return $abort_signal_received ? false : $timestamp;
 }
-public function file_sync($filename, $comp_timestamp) {
+public function file_sync( $filename, $comp_timestamp ) {
 $changed = false;
-$current_md5 = file_exists ( $filename ) && is_file ( $filename ) ? md5_file ( $filename ) : null;
-if (isset ( $this->_log_records [$filename] )) {
-$md5 = $this->_log_records [$filename] [0];
-$timestamp = $this->_log_records [$filename] [1];
+$current_md5 = file_exists( $filename ) && is_file( $filename ) ? md5_file( $filename ) : null;
+if ( isset( $this->_log_records[$filename] ) ) {
+$md5 = $this->_log_records[$filename][0];
+$timestamp = $this->_log_records[$filename][1];
 } else {
 $md5 = false;
 $timestamp = $comp_timestamp;
 }
-if (! $md5 || $md5 != $current_md5) {
+if ( ! $md5 || $md5 != $current_md5 ) {
 $changed = true;
-$timestamp = $timestamp <= $comp_timestamp ? time () : $timestamp;
-$this->_log_records [$filename] = array (
-$current_md5,
-$timestamp 
-);
+$timestamp = $timestamp <= $comp_timestamp ? time() : $timestamp;
+$this->_log_records[$filename] = array( $current_md5, $timestamp );
 }
 $this->_changed = $this->_changed || $changed;
 return $timestamp;
 }
-public function filter($timestamp) {
-return array_filter ( $this->_log_records, function ($value) use(&$timestamp) {
-return $timestamp == $value [1];
+public function filter( $timestamp ) {
+return array_filter( 
+$this->_log_records, 
+function ( $value ) use(&$timestamp ) {
+return $timestamp == $value[1];
 } );
 }
-public function diff($filename, $comp_timestamp) {
-$tmp_file = tempnam ( sys_get_temp_dir (), uniqid () );
-if (false === $tmp_file || false === ($fr = fopen ( $filename, 'r' )))
+public function diff( $filename, $comp_timestamp ) {
+$tmp_file = tempnam( dirname( $this->_log_filename ), uniqid() );
+if ( false === $tmp_file || false === ( $fr = fopen( $filename, 'r' ) ) )
 return false;
-if (! file_exists ( $filename ))
-throw new MyException ( sprintf ( _esc ( 'Cannot compute the difference. File %s does not exist.' ), $filename ) );
-$ftmp_file = fopen ( $tmp_file, 'w' );
+if ( ! file_exists( $filename ) )
+throw new MyException( 
+sprintf( _esc( 'Cannot compute the difference. File %s does not exist.' ), $filename ) );
+$ftmp_file = fopen( $tmp_file, 'w' );
 $i = 0;
-$max = getFileLinesCount ( $filename );
+$max = getFileLinesCount( $filename );
 $files_added = 0;
-while ( false !== ($fname = fgets ( $fr )) ) {
-if (_is_callable ( $this->onAbortCallback ) && false !== ($abort_signal_received = _call_user_func ( $this->onAbortCallback )))
+while ( false !== ( $fname = fgets( $fr ) ) ) {
+if ( _is_callable( $this->onAbortCallback ) &&
+false !== ( $abort_signal_received = _call_user_func( $this->onAbortCallback ) ) )
 break;
-$fname = str_replace ( PHP_EOL, '', $fname );
-if (empty ( $fname ))
+$fname = str_replace( PHP_EOL, '', $fname );
+if ( empty( $fname ) )
 continue;
-if (false !== ($timestamp = $this->file_sync ( $fname, $comp_timestamp )) && $timestamp > $comp_timestamp) {
-_is_callable ( $this->onOutputCallback ) && _call_user_func ( $this->onOutputCallback, sprintf ( _esc ( 'file %s changed' ), $fname, date ( DATETIME_FORMAT, $comp_timestamp ) ), BULLET, 2 );
-fwrite ( $ftmp_file, $fname . PHP_EOL );
-$files_added ++;
+if ( false !== ( $timestamp = $this->file_sync( $fname, $comp_timestamp ) ) && $timestamp > $comp_timestamp ) {
+_is_callable( $this->onOutputCallback ) && _call_user_func( 
+$this->onOutputCallback, 
+sprintf( _esc( 'file %s changed' ), $fname, date( DATETIME_FORMAT, $comp_timestamp ) ), 
+BULLET, 
+2 );
+fwrite( $ftmp_file, $fname . PHP_EOL );
+$files_added++;
 }
-_is_callable ( $this->onProgressCallback ) && _call_user_func ( $this->onProgressCallback, - 2, $filename, $i ++, $max, 2, 1 );
+_is_callable( $this->onProgressCallback ) &&
+_call_user_func( $this->onProgressCallback, - 2, $filename, $i++, $max, 2, 1 );
 }
-_is_callable ( $this->onProgressCallback ) && _call_user_func ( $this->onProgressCallback, - 2, $filename, $max, $max, 2, 1 );
-fclose ( $ftmp_file );
-fclose ( $fr );
-$result = copy ( $tmp_file, $filename );
-unlink ( $tmp_file );
+_is_callable( $this->onProgressCallback ) &&
+_call_user_func( $this->onProgressCallback, - 2, $filename, $max, $max, 2, 1 );
+fclose( $ftmp_file );
+fclose( $fr );
+$result = copy( $tmp_file, $filename );
+unlink( $tmp_file );
 return $result ? $files_added : false;
 }
 public function changed() {

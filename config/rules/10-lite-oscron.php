@@ -24,18 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : 10-lite-oscron.php $
  * 
- * @id      : 10-lite-oscron.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 10-lite-oscron.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 
-define ( 'APP_OS_SCHEDULE', 22 );
+define ( __NAMESPACE__.'\\APP_OS_SCHEDULE', 22 );
 $REGISTERED_SCHEDULE_TABS ['os_schedule'] = PHP_OS;
 registerTab ( APP_OS_SCHEDULE, 'OSScheduleEditor', PHP_OS . '-Cron' );
 $TARGET_NAMES [APP_OS_SCHEDULE] = 'os_schedule';

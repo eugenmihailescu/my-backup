@@ -24,16 +24,16 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2 $
- * @commit  : 23a9968c44669fbb2b60bddf4a472d16c006c33c $
+ * @version : 0.2.2-10 $
+ * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Sep 16 11:33:37 2015 +0200 $
+ * @date    : Mon Dec 28 17:57:55 2015 +0100 $
  * @file    : mysql-expert.php $
  * 
- * @id      : mysql-expert.php | Wed Sep 16 11:33:37 2015 +0200 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
-namespace MyNixWorld;
+namespace MyBackup;
 ?>
 <tr>
 <td colspan="2"><input type="checkbox" name="mysql_maint"
@@ -42,7 +42,7 @@ id="mysql_maint"
 if ($enabled)
 echo 'checked';
 if ($this->enabled)
-echo " onclick='toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
+echo " onclick='js56816a36b58dc.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
 echo $this->enabled ? '' : ' disabled';
 ?>><input type="hidden" name="mysql_maint" value="0"></td>
 <td><label for="mysql_maint"><?php _pesc('MySQL Table maintenance');?></label><a
@@ -53,14 +53,14 @@ echoHelp ( $help_1 );
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
 title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="js55f93aab8f090.run_mysql_maint();"
+name="mysql_maint_run" onclick="js56816a36b58dc.run_mysql_maint();"
 id="btn_mysql_maint" <?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>
 <tr>
 <td colspan="4">&nbsp;</td>
 </tr>
-<?php if(defined('MYSQL_DUMP')){?>
+<?php if(defined(__NAMESPACE__.'\\MYSQL_DUMP')){?>
 <tr>
 <td colspan="4"><label for="mysqldump_opts"><?php _pesc('mysqldump options');?></label><a
 class='help' onclick=<?php
