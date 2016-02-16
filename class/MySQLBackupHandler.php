@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : MySQLBackupHandler.php $
  * 
- * @id      : MySQLBackupHandler.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MySQLBackupHandler.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
 
 require_once FUNCTIONS_PATH . 'utils.php';
-is_wp() && require_once \ABSPATH . 'wp-config.php';
+is_wp() && require_once\ABSPATH . 'wp-config.php';
 class MySQLBackupHandler {
 private $_options;
 private $_link;
@@ -47,6 +47,8 @@ private $_abort_clbk;
 private $_newarc_clbk;
 private $_compress_clbk;
 private $_nocompress;
+private $_db_collation;
+private $_db_charset;
 function __construct( $options = null ) {
 global $settings;
 $this->_options = empty( $options ) ? $settings : $options;
@@ -57,7 +59,19 @@ $this->_progress_clbk = null;
 $this->_abort_clbk = null;
 $this->_newarc_clbk = null;
 $this->_compress_clbk = null;
-$this->_link = $this->_getDbConnection();
+if ( FALSE !== ( $this->_link = $this->_getDbConnection() ) ) {
+$rst = \mysql_query( 
+'SELECT @@character_set_database as charset, @@collation_database as collation;', 
+$this->_link );
+if ( $row =\mysql_fetch_row( $rst ) ) {
+$this->_db_collation = $row[1];
+$this->_db_charset = $row[0];
+} else {
+$this->_db_collation = $this->_getDBConnectionParam( 'mysql_collate' );
+$this->_db_charset = $this->_getDBConnectionParam( 'mysql_charset' );
+}
+mysql_free_result( $rst );
+}
 }
 function __destruct() {
 FALSE !== $this->_link && closeMySQLConnection( $this->_link );
@@ -143,8 +157,8 @@ return $result == 0;
 private function _formatTableToXML( $statement, $db_name, $table ) {
 $result = '<!-- ' . $table . ' schema -->' . PHP_EOL;
 $result .= '<pma:structure_schemas>' . PHP_EOL;
-$result .= '<pma:database name="' . $db_name . '" collation="' . $this->_getDBConnectionParam( 'mysql_collate' ) .
-'" charset="' . $this->_getDBConnectionParam( 'mysql_charset' ) . '">' . PHP_EOL;
+$result .= '<pma:database name="' . $db_name . '" collation="' . $this->_db_collation . '" charset="' .
+$this->_db_charset . '">' . PHP_EOL;
 $result .= sprintf( '<pma:table name="%s">', $table );
 $result .= htmlspecialchars( $statement );
 $result .= sprintf( '</pma:table>' . PHP_EOL . '</pma:database>' . PHP_EOL . '</pma:structure_schemas>' ) .
@@ -153,17 +167,31 @@ $result .= '<!-- table\'s data -->' . PHP_EOL;
 return $result;
 }
 private function _formatRowToXML( $row, $db_name, $table ) {
+$bin2hex = function ( $str ) {
+$result = '';
+$has_bin = false;
+for ( $i = 0; $i < strlen( $str ); $i++ ) {
+$o = ord( $str[$i] );
+$is_bin = $o < 32 || $o > 127;
+$has_bin |= $is_bin;
+$result .= $is_bin ? '\\' . $o : $str[$i];
+}
+return $has_bin ? $result : $str;
+};
 $result = sprintf( '<table name="%s">', $table ) . PHP_EOL;
 foreach ( $row as $colname => $value ) {
-$result .= sprintf( '<column name="%s">%s</column>', $colname, htmlspecialchars( $value ) ) . PHP_EOL;
+$result .= sprintf( 
+'<column name="%s">%s</column>', 
+$colname, 
+$bin2hex( mysql_real_escape_string( $value, $this->_link ) ) ) . PHP_EOL;
 }
 $result .= '</table>' . PHP_EOL;
 return $result;
 }
 private function _getTableDefinition( $table_name ) {
-$rst =\mysql_query( 'DESCRIBE ' . $table_name, $this->_link );
+$rst = \mysql_query( 'DESCRIBE ' . $table_name, $this->_link );
 $defs = array();
-while ( $row = \mysql_fetch_row( $rst ) ) {
+while ( $row =\mysql_fetch_row( $rst ) ) {
 $defs[$row[0]] = array( 
 'type' => preg_replace( '/([^\(]+).*/', '$1', $row[1] ), 
 'allow_null' => strToBool( $row[2] ), 
@@ -217,11 +245,11 @@ $this->_runTableMaintenance( $tables, $pattern );
 is_dir( dirname( $fname ) ) || mkdir( dirname( $fname ), 0770, true );
 if ( false !== ( $fw = fopen( $fname, 'w' ) ) ) {
 if ( 'xml' == $format ) {
-$result = '<?xml version="1.0"?>';
+$result = '<?xml version="1.0"?>' . PHP_EOL;
 $result .= '<!--' . PHP_EOL;
 $result .= '- ' . WPMYBACKUP . ' XML Dump' . PHP_EOL;
 $result .= '- version ' . APP_VERSION_ID . PHP_EOL;
-$result .= '- ' . APP_ADDONS_SHOP_URI . PHP_EOL;
+$result .= '- ' . APP_PLUGIN_URI . PHP_EOL;
 $result .= '- ' . PHP_EOL;
 $result .= '- host: ' . gethostname() . PHP_EOL;
 $result .= '- created: ' . date( 'r' ) . PHP_EOL;
@@ -229,33 +257,35 @@ $info = $this->getServerInfo();
 $result .= '- MySQL version: ' . $info['version'] . PHP_EOL;
 $result .= '- PHP version: ' . PHP_VERSION . PHP_EOL;
 $result .= '-->' . PHP_EOL . PHP_EOL;
-$result .= '<pma_xml_export version="1.0" xmlns:pma="' . $_SERVER['HTTP_REFERER'] .
-$_SERVER['REQUEST_URI'] . '">' . PHP_EOL;
+$result .= '<pma_xml_export version="1.0" xmlns:pma="' . htmlspecialchars( 
+$_SERVER['HTTP_REFERER'] ) . '">' . PHP_EOL;
 fwrite( $fw, $result );
 }
 foreach ( $tables as $table ) {
 $table_defs = $this->_getTableDefinition( $table );
 $tables_cols = array_keys( $table_defs );
-$rst =\mysql_query( 'SELECT * FROM ' . $table, $this->_link );
+$rst = \mysql_query( 'SELECT * FROM ' . $table, $this->_link );
 if ( FALSE !== $rst )
-$num_fields =\mysql_num_fields( $rst );
+$num_fields = \mysql_num_fields( $rst );
 else
 $num_fields = 0;
 if ( 'sql' == $format ) {
 $result = 'DROP TABLE IF EXISTS ' . $table . ';';
 fwrite( $fw, $result );
 }
-$rst1 =\mysql_query( 'SHOW CREATE TABLE ' . $table, $this->_link );
+$rst1 = \mysql_query( 'SHOW CREATE TABLE ' . $table, $this->_link );
 if ( FALSE !== $rst1 ) {
-$row2 =\mysql_fetch_row( $rst1 );
+$row2 = \mysql_fetch_row( $rst1 );
 $result = PHP_EOL . PHP_EOL . $row2[1] . ";" . PHP_EOL . PHP_EOL;
 'xml' == $format && $result = $this->_formatTableToXML( $result, $db_name, $table );
 fwrite( $fw, $result );
+$rec_count = 0;
 for ( $i = 0; $i < $num_fields; $i++ )
 while ( $row = mysql_fetch_array( $rst, MYSQL_BOTH ) ) {
 $this->_fix_data( $row, $table_defs );
 if ( 'xml' == $format ) {
 $result = $this->_formatRowToXML( $row, $db_name, $table );
+$rec_count++;
 } else {
 $result = 'INSERT INTO ' . $table . ' VALUES(';
 for ( $j = 0; $j < $num_fields; $j++ ) {
@@ -274,6 +304,9 @@ fwrite( $fw, $result );
 unset( $result );
 unset( $row );
 }
+( 'xml' == $format ) && fwrite( 
+$fw, 
+sprintf( '<!-- ' . _esc( '%s record(s) exported' ) . ' -->', $rec_count ) );
 }
 fwrite( $fw, PHP_EOL . PHP_EOL . PHP_EOL );
 $ok = true;
@@ -319,8 +352,8 @@ return getMySQLTableNamesFromPattern( $pattern, $close_link, $this->_options, fa
 }
 public function getServerInfo() {
 $info = array();
-if ( $this->_link && $rst =\mysql_query( 'SHOW VARIABLES LIKE "version%";', $this->_link ) )
-while ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) )
+if ( $this->_link && $rst = \mysql_query( 'SHOW VARIABLES LIKE "version%";', $this->_link ) )
+while ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) )
 $info[$row[0]] = $row[1];
 else {
 $unknown = _esc( 'unknown' );
@@ -334,10 +367,10 @@ return $info;
 }
 public function getDbSize() {
 $dbsize = array();
-if ( $this->_link && $rst =\mysql_query( 
+if ( $this->_link && $rst = \mysql_query( 
 "select (SELECT SUM(data_length + index_length) as dbsize FROM information_schema.TABLES where table_schema=database() group by table_schema) as dbsize, (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = database()) as tblcount;", 
 $this->_link ) ) {
-if ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) ) {
+if ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) ) {
 $dbsize['dbsize'] = $row[0];
 $dbsize['tblcount'] = $row[1];
 }
@@ -395,7 +428,7 @@ if ( ! empty( $pattern ) ) {
 $fsize = $this->getDbSize();
 $this->_progressCallback( MYSQL_SOURCE, $fname, 0, $fsize['dbsize'], 6, - 1 );
 $mysql_format = $this->_getDBConnectionParam( 'mysql_format' );
-if ( defined( __NAMESPACE__.'\\MYSQL_DUMP' ) && true == strToBool( $mysqldump ) )
+if ( 'sql' == $mysql_format && defined( __NAMESPACE__.'\\MYSQL_DUMP' ) && true == strToBool( $mysqldump ) )
 $result = $this->_dumpMySqlDb( $fname, $pattern, $mysql_format );
 else
 $result = $this->_getTableScript( $fname, $pattern, $mysql_format );
@@ -505,12 +538,12 @@ $result[$table_name] = array();
 foreach ( $options as $cmd => $cmd_enabled ) {
 $this->_outputCallback( $table_name, $cmd, 'status', 'prepare' );
 $this->_progressCallback( MYSQL_SOURCE, $table_name, $j++, $d, 6 );
-if ( $cmd_enabled && $rst =\mysql_query( "$cmd TABLE $table_name;", $this->_link ) )
-if ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) ) {
+if ( $cmd_enabled && $rst = \mysql_query( "$cmd TABLE $table_name;", $this->_link ) )
+if ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) ) {
 $result[$table_name][$cmd] = array( $row[2], $row[3] );
 $this->_outputCallback( $table_name, $cmd, $row[2], $row[3] );
 } else
-$this->_outputCallback( $table_name, $cmd, 'error',\mysql_errno( $this->_link ) );
+$this->_outputCallback( $table_name, $cmd, 'error', \mysql_errno( $this->_link ) );
 }
 }
 }

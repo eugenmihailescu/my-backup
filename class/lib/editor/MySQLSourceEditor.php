@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : MySQLSourceEditor.php $
  * 
- * @id      : MySQLSourceEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MySQLSourceEditor.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
@@ -59,7 +59,7 @@ try {
 if ( false !== $this->_link ) {
 $res = @\mysql_query( 'SHOW DATABASES;', $this->_link );
 if ( false !== $res )
-while ( $row =\mysql_fetch_assoc( $res ) )
+while ( $row = \mysql_fetch_assoc( $res ) )
 if ( 'information_schema' != $row['Database'] && 'performance_schema' != $row['Database'] &&
 'mysql' != $row['Database'] )
 $this->_db_list[] = $row['Database'];
@@ -216,7 +216,8 @@ parent.mysql_table_select(MynixRegexUtils.array2regex(obj.items)+'.+',!obj.items
 for(i=0;items.length>i;i+=1)
 items[i].onchange=callback;
 }
-};						
+};		
+parent.mysql_table_selected='<?php echo $this->settings ['tables'];?>';
 <?php
 $this->java_scripts[] = ob_get_clean();
 $this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );

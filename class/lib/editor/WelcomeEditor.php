@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : WelcomeEditor.php $
  * 
- * @id      : WelcomeEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WelcomeEditor.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
@@ -133,7 +133,7 @@ APP_ADDONS_SHOP_URI . 'shop/differential-backup-support' );
 $inc_restore_addon_link = getAnchor( 
 _esc( 'Incremental backup' ), 
 APP_ADDONS_SHOP_URI . 'shop/incremental-backup-support' );
-$wpmybackup_plugin_link = getAnchor( WPMYBACKUP, 'https://wordpress.org/plugins/wp-mybackup' );
+$wpmybackup_plugin_link = getAnchor( WPMYBACKUP, APP_PLUGIN_URI );
 $arcname_pattern = '[a-z0-9\-\.]';
 $gz_bz2_pre = '<pre>' . implode( '|', array( 'gz', 'bz2' ) ) . '</pre>';
 ! defined( __NAMESPACE__.'\\IMPORT_PAGE' ) && define( __NAMESPACE__.'\\IMPORT_PAGE', false );

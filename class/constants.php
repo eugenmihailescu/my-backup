@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : constants.php $
  * 
- * @id      : constants.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : constants.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
@@ -54,6 +54,7 @@ sprintf( 'a=%s&h=%s&o=%s&u=%s&%s', PROXY_APP_ID, PROXY_HOST_ID, PROXY_OPEN_ID, P
 define( __NAMESPACE__.'\\WPMYBACKUP', 'WP MyBackup' );
 ! defined( __NAMESPACE__.'\\PLUGIN_EDITION' ) && define( __NAMESPACE__."\\PLUGIN_EDITION", WPMYBACKUP . '%EDITION%' );
 define( __NAMESPACE__.'\\APP_ADDONS_SHOP_URI', 'http://mynixworld.info/shop/' );
+define( __NAMESPACE__.'\\APP_PLUGIN_URI', 'https://wordpress.org/plugins/wp-mybackup');
 define( __NAMESPACE__.'\\APP_ADDONS_URI', APP_ADDONS_SHOP_URI . 'product-category/addons' );
 define( __NAMESPACE__."\\WPMYBACKUP_LOGS", strtolower( preg_replace( '/[^\w]/', '', WPMYBACKUP ) ) );
 define( __NAMESPACE__.'\\MB', 1048576 );

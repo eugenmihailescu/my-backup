@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ActionHandler.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
@@ -445,7 +445,7 @@ $data .= PHP_EOL;
 }
 break;
 default :
-$greater_530 = version_compare( PHP_VERSION, '5.3.0-dev', '<' );
+$greater_530 = version_compare( PHP_VERSION, '5.3.0-dev', '>' );
 $data = json_encode( $result, $greater_530 ? JSON_PRETTY_PRINT : 0 );
 $greater_530 || $data = str_replace( 
 array( ',"', '{' ), 

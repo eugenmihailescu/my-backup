@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-3 $
- * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
- * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Feb 16 15:27:30 2016 +0100 $
+ * @version : 0.2.3-8 $
+ * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
+ * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @date    : Tue Feb 16 21:41:51 2016 UTC $
  * @file    : config-custom.php $
  * 
- * @id      : config-custom.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-custom.php | Tue Feb 16 21:41:51 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
 */
 
 namespace MyBackup;
@@ -68,8 +68,8 @@ $set_db( 'DB_COLLATE', '' );
 define( __NAMESPACE__.'\\SSL_ENFORCE', false ); 
 define( __NAMESPACE__.'\\DEFAULT_BACKUP_LIFESPAN', 5 ); 
 define( __NAMESPACE__.'\\GIT_BRANCH_TYPE', '' ); 
-define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-3' ); 
+define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-8' ); 
 define( __NAMESPACE__.'\\APP_VERSION_TYPE', 'hummingbird build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-3 - hummingbird build' ); 
+define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-8 - hummingbird build' ); 
 define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-02-16' ); 
 ?>
