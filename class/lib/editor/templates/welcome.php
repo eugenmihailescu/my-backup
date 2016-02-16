@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,17 +24,32 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : welcome.php $
  * 
- * @id      : welcome.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : welcome.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
+<style>
+.vertical ul li:active, a:FOCUS {
+-moz-box-shadow: none;
+-webkit-box-shadow: none;
+box-shadow: none;
+}
+.welcome ul {
+list-style: inside none square;
+}
+.welcome pre {
+display: inline-block;
+background-color: #E6F7FD;
+padding: 1px;
+}
+</style>
 <table class="welcome">
 <tr>
 <td style="text-align: center"><img
@@ -59,7 +74,7 @@ if ( ! empty( $this->_addons ) )
 printf( 
 '<p>' . _esc( 'Click %s to continue.' ) . '</p>', 
 '<input type="button" class="button" value="' . _esc( 'this button' ) . '" onclick="' .
-htmlspecialchars( str_replace( 'parent.', 'js56816af34b4f1.', $this->_js_addon_install ) ) . '">' );
+htmlspecialchars( str_replace( 'parent.', 'jsMyBackup.', $this->_js_addon_install ) ) . '">' );
 ?>
 </td>
 </tr>
@@ -76,8 +91,27 @@ _pesc(
 $schedule_tabs = array();
 defined( __NAMESPACE__.'\\APP_WP_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_WP_SCHEDULE' );
 defined( __NAMESPACE__.'\\APP_OS_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_OS_SCHEDULE' );
+$format_adv_li = function ( $option, $hint = '' ) {
+return sprintf( '<i>%s</i>%s', $option, empty( $hint ) ? '' : ( ' (' . $hint . ')' ) );
+};
+$fwh = _esc( 'Free Web Hosting' );
+$lmgfy = function ( $str ) use(&$fwh ) {
+return '`' . getAnchor( $str, lmgtfy( $fwh . ' ' . $str ) ) . '`';
+};
+echo '<tr><td class="highlight-box hintbox rounded-container">';
+echo '<p style="padding-left: 5px;border-left: 4px solid #1E8CBE;">', sprintf( 
+_esc( 
+'If you are using a %s provider then %s may reach some of their system limitations like %s or %s. Moreover, some %s providers will (temporarely) suspend your website if you exceed these limitation frequently.' ), 
+'<strong>' . $fwh . '</strong>', 
+WPMYBACKUP, 
+$lmgfy( _esc( 'CPU Limit Exceeded' ) ), 
+$lmgfy( _esc( 'Script Timeout' ) ), 
+$fwh ), '<br>';
+echo sprintf( 
+_esc( 'In order to overcome that situation you might want to tune the %s.' ), 
+WPMYBACKUP . ' ' . getAnchor( _esc( 'Expert settings' ), '#advanced', '_self' ) ), '</p>';
 if ( ! $this->_nocheck && $issue_count = count( $setup_issues ) ) {
-echo '<tr><td class="highlight-box hintbox rounded-container"><p>';
+echo '<p>';
 printf( 
 _esc( 'The following %s issues were found while checked if your system supports this application:' ), 
 '<strong>' . $issue_count . '</strong>' );
@@ -108,8 +142,8 @@ _esc( 'Use the %s on %s tab for an exhaustive report.' ),
 '<strong>' . _esc( 'Check PHP setup' ) . '</strong>', 
 getTabAnchor( APP_SUPPORT ) );
 echo '</p>';
-echo '</td></tr>';
 }
+echo '</td></tr>';
 ?>	
 <tr>
 <td>
@@ -119,13 +153,26 @@ echo '</td></tr>';
 <li><a href="#define"><?php _pesc('Define the backup job');?></a></li>
 <li><a href="#run"><?php _pesc('Run the backup job');?></a></li>
 <li><a href="#restore"><?php _pesc('Restore a backup copy');?></a>
+<ol>
+<?php if(is_wp()){?>
+<li><?php printf(_esc('if using the %s plug-in then:'),$wpmybackup_plugin_link)?><ol>
+<li><a href="#wp_full_restore"><?php _pesc('Full backup');?></a></li>
+</ol></li>
+<?php }?>
+<li><?php printf(_esc('if NOT having the %s then:'),$restore_addon_link);?>
 <ol style="list-style-type: decimal">
 <li><a href="#full_restore"><?php _pesc('Full backup');?></a></li>
 <li><a href="#diff_restore"><?php _pesc('Differential backup');?></a></li>
 <li><a href="#inc_restore"><?php _pesc('Incremental backup');?></a></li>
 </ol></li>
+<li><?php printf(_esc('if HAVING the %s then:'),$restore_addon_link);?>
+<ol style="list-style-type: decimal">
+<li><a href="#addon_restore"><?php _pesc('Restore via Addon');?></a></li>
+</ol></li>
+</ol></li>
 <li><a href="#multijob"><?php _pesc('Define multiple backup jobs');?></a></li>
 <li><a href="#addon"><?php _pesc('Install an addon');?></a></li>
+<li><a href="#advanced"><?php _pesc('Advanced options');?></a></li>
 <li><a href="#debug"><?php _pesc('Troubleshooting');?></a></li>
 </ol>
 </td>
@@ -148,7 +195,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <td><a id="requirements"></a>
 <h4>I. <?php _pesc('Check if your system meets the requirements');?></h4>
 <p>
-<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="js56816af34b4f1.php_setup();">');?>
+<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="jsMyBackup.php_setup();">');?>
 </p></td>
 </tr>
 <tr>
@@ -197,12 +244,14 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <ol style="list-style-type: decimal">
 <li><?php echo sprintf(_esc('go to the %s tab and then select the %s child tab, depending on what scheduler you want to use:'),getTabAnchor(APP_SCHEDULE),implode(_esc('or'), $schedule_tabs));?>
 <ul>
+<?php if(is_wp()){?>
 <li><b>WP-Cron</b>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('check the <b>Enable scheduler</b> checkbox then select one of those predefined schedule options and set the <b>Next run</b> datetime value (in the past if you want to start immediately, otherwise in the future)');?>
 </li>
 </ol></li>
-<li><b>OS-Cron</b>
+<?php }?>
+<li><b>OS-Cron</b><?php is_wp()&&printf(' ('._esc('requires the %s addon').')',getAnchor(_esc('Schedule the WP backup via OS'), APP_ADDONS_SHOP_URI.'wp-schedule-the-backup-via-os'));?>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('check the <b>Enable scheduler</b> checkbox then copy the command-line (that was automatically created) content in clipboard');?>
 </li>
@@ -216,31 +265,68 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <tr>
 <td><a id="restore"></a>
 <h4>V. <?php _pesc('Restore a backup copy');?></h4>
+<?php if(is_wp()){?>
 <p>
-<?php printf(_esc('If you don`t have installed the %s then restoring the backup assumes that (i) you have access to your website filesystem and/or MySQL database and (ii) you have a minimal knowledge of using SSH/FTP/mysqldump/phpMyAdmin or similar utilities that basically allow you to copy the files from your local system to the remote system:'),'<a href="'.APP_ADDONS_SHOP_URI.'shop/restore-wizard/" target="_blank">'._esc('Restore Addon').'</a>');?>
+<?php printf(_esc('If you are using the WordPress version of this software (%s) then restoring a backup can be done as described below:'),$wpmybackup_plugin_link);?>
+</p> <a id="wp_full_restore"></a>
+<h5>V.1.1 <?php _pesc('Full restore');?></h5>
+<ol style="list-style-type: lower-latin">
+<li><?php printf(_esc('restore the last successful backup created with %s'),WPMYBACKUP);?><ol>
+<li><?php printf(_esc('go to %s tab'),$dashboard_link);?></li>
+<li><?php printf(_esc('if a completed (ie. successful) backup is found then a "Last completed backup" widget should be visible; click the %s, where XXX is the last successful backup job Id'),'<pre>'._esc('Restore Backup #XXX').'</pre>');?></li>
+</ol></li>
+<li id="wp_full_restore_extern"><?php printf(_esc('restore a backup stored externally created (or not) by %s'),$wpmybackup_plugin_link);?>
+<ol>
+<li><?php printf(_esc('go to %s tab'),$dashboard_link);?></li>
+<li><?php printf(_esc('drag & drop (or %s) some backup archives into the dotted area shown on the dashboard page, with regards to:'),'<pre>'._esc('Select').'</pre>');?>
+<ul>
+<li><?php printf(_esc('supported formats (%s) are: %s'),'<i>EXT</i>',implode('|', $COMPRESSION_NAMES));?></li>
+<li><?php printf(_esc('%s archives are expected to be tar\'ed before compression (ie. .tar.%s)'),$gz_bz2_pre,$gz_bz2_pre);?></li>
+<li><?php printf(_esc('MySQL database backup archive should have the following pattern: %s'),$arcname_pattern.'<strong>.sql</strong>.<i>EXT</i>');?></li>
+<li><?php printf(_esc('WordPress files backup archive should have the following pattern: %s, where XXX={%s}'),$arcname_pattern.'<strong>-XXX</strong>.<i>EXT</i>',implode(',', $wp_components));?></li>
+<li><?php
+printf( 
+_esc( 'The uploaded file size should not be larger than your php.ini %s.' ), 
+implode( '|', $this->_upload_constraint_link ) );
+! ( defined( __NAMESPACE__.'\\IMPORT_PAGE' ) && IMPORT_PAGE ) && printf( 
+' ' . _esc( 
+'Your current php.ini is configured such that the uploaded file size cannot be larger than %s.' ) .
+' ' . _esc( 'You may overcome this by using %s option (see Expert settings).' ), 
+getHumanReadableSize( getUploadLimit() ), 
+'<strong>' . _esc( 'Upload files in chunks' ) . '</strong>' );
+?>
+</li>
+</ul></li>
+<li><?php printf(_esc('click the %s button under the selected file area (N is the number of selected files)'),'<pre>'._esc('Restore N files').'</pre>');?></li>
+</ol></li>
+</ol>
+<?php }?>
+<p>
+<?php printf(_esc('If not using the WP version and don`t have installed the %s then restoring the backup assumes that (i) you have access to your website filesystem and/or MySQL database and (ii) you have a minimal knowledge of using SSH/FTP/mysqldump/phpMyAdmin or similar utilities that basically allow you to copy the files from your local system to the remote system.'),$restore_addon_link);?>
 </p> <a id="full_restore"></a>
-<h5>V.1 <?php _pesc('Full restore');?></h5>
+<h5>V.2.1 <?php _pesc('Full restore');?></h5>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('download the backup archive from the remote storage location');?></li>
 <li><?php _pesc('extract to a temporary directory the backup archive(s)');?></li>
 <li><?php _pesc('connect via SSH/FTP/whatever the remote location and copy whatever file you want from the temporary directory to the remote location where your website files are located');?></li>
 <li><?php printf(_esc('in case you want to restore also the database content then you may use an application like %s (see this %s) to import the .sql file from the *.sql.* archive extracted earlier at the temporary location.'),'<a href="https://en.wikipedia.org/wiki/PhpMyAdmin" target="_blank">phpMyAdmin</a>','<a href="https://www.youtube.com/watch?v=jW5lrS6EUPM" target="_blank">'._esc('video tutorial').'</a>');?></li>
 </ol> <a id="diff_restore"></a>
-<h5>V.2 <?php _pesc('Differential restore');?></h5>
+<h5>V.2.2 <?php printf(_esc('Differential restore (requires %s)'),$diff_restore_addon_link);?></h5>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('find the last full backup (F) you are interested in');?></li>
 <li><?php _pesc('find the last differenatial backup (D) created between the date of (F) and the date of the next full backup');?></li>
-<li><?php printf(_esc('follow the same steps mentioned at %s for all found archives'),getAnchor('V.1', '#full_restore','_self'));?></li>
+<li><?php printf(_esc('follow the same steps mentioned at %s for all found archives'),getAnchor('V.2.1', '#full_restore','_self'));?></li>
 </ol> <a id="inc_restore"></a>
-<h5>V.3 <?php _pesc('Incremental restore');?></h5>
+<h5>V.2.3 <?php printf(_esc('Incremental restore (requires %s)'),$inc_restore_addon_link);?></h5>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('find the last full backup (F) you are interested in');?></li>
 <li><?php _pesc('find ALL the incremental backups (I) created between the date of (F) and the date of the next full backup');?></li>
-<li><?php printf(_esc('follow the same steps mentioned at %s for all found archives'),getAnchor('V.1', '#full_restore','_self'));?></li>
-</ol> <box class="highlight-box hintbox rounded-container"
-style="display:block">
+<li><?php printf(_esc('follow the same steps mentioned at %s for all found archives'),getAnchor('V.2.1', '#full_restore','_self'));?></li>
+</ol> <a id="addon_restore"></a>
+<h5>V.2.4 <?php _pesc('Restore via Addon');?></h5> <box
+class="highlight-box hintbox rounded-container" style="display:block">
 <p>
-<?php printf(_esc('However, if you have installed the %s then restoring the backup is like shooting fish in a barrel:'),'<a href="'.APP_ADDONS_SHOP_URI.'shop/restore-wizard/" target="_blank">'._esc('Restore Addon').'</a>');?>
+<?php printf(_esc('However, if you have installed the %s then restoring the backup is like shooting fish in a barrel:'),$restore_addon_link);?>
 </p>
 <ul style="list-style-position: inside;">
 <li><?php echo sprintf(_esc('go to the %s tab then follow the instruction provided there. Basically is just a "next-next-finish" 6-steps task assisted by Wizard.'),getTabAnchorByConstant('APP_RESTORE'));?></li>
@@ -304,6 +390,24 @@ style="list-style-type: decimal">
 </ol></td>
 </tr>
 <tr>
+<td><a id="advanced"></a>
+<h4>VIII. <?php _pesc('Advanced options');?></h4>
+<p><?php printf(_esc('By default the %s settings are tunned to fit everyone expectations. However, you might want to tune these settings in order to fit your needs. Here are few options you way want to consider:'),WPMYBACKUP);?></p>
+<ol>
+<li><?php printf('%s '._esc('Expert settings'),getTabAnchor(APP_BACKUP_JOB));?><ul>
+<li><?php echo $format_adv_li(_esc('Use file relative path'),_esc('important for restoring the backup at other location'));?></li>
+<li><?php echo $format_adv_li(_esc('Script memory limit'),_esc('inline with hosting limitations'));?></li>
+<li><?php echo $format_adv_li(_esc('Max. execution time'),_esc('inline with hosting limitations'));?></li>
+<li><?php echo $format_adv_li(_esc('CPU throttling'),_esc('overcomes `CPU Limit Exceeded`'));?></li>
+</ul></li>
+<li><?php printf('%s '._esc('Expert settings'),getTabAnchor(is_wp()?WP_SOURCE:SRCFILE_SOURCE));?><ul>
+<li><?php echo $format_adv_li(_esc('Do not compress files by extension'),_esc('spare the CPU when possible'));?></li>
+<li><?php echo $format_adv_li(_esc('Exclude files by extension'),_esc('eg. do not backup some huge files'));?></li>
+<li><?php echo $format_adv_li(_esc('Exclude file links'));?></li>
+</ul></li>
+</ol></td>
+</tr>
+<tr>
 <td><a id="debug"></a>
 <h4>VIII. <?php _pesc('Troubleshooting');?></h4>
 <p><?php _pesc('Hopefully you will never encounter a problem thus you will never need to know the instruction below. But we live in an imperfect world where imperfect people (like me) write imperfect software (like this one) so probably this chapter cannot be avoided forever.');?></p>
@@ -333,7 +437,7 @@ style="list-style-type: decimal">
 </li>
 <li><?php _pesc('if the problem seems to be related to some options not saved you may check the <b>Trace Action log</b>; this log traces all requests (like save, tab changed, etc) sent from your browser to this application; if you are a (former) sysadmin or coder you might eventually hack the problem');?>
 </li>
-<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="js56816af34b4f1.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
+<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="jsMyBackup.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
 </li>
 </ul></li>
 </ol></li>

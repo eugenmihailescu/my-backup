@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : AbstractTargetEditor.php $
  * 
- * @id      : AbstractTargetEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractTargetEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -166,7 +166,7 @@ ob_end_clean();
 return $result;
 }
 protected function getRefreshFolderJS() {
-return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)js56816af34b4f1.refreshFolderList(t.value,tid.value,js56816af34b4f1.isNull(sb.value,null),js56816af34b4f1.isNull(sa.value,null));" : ( "submitOptions(this,0);" );
+return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)jsMyBackup.refreshFolderList(t.value,tid.value,jsMyBackup.isNull(sb.value,null),jsMyBackup.isNull(sa.value,null));" : ( "submitOptions(this,0);" );
 }
 function __construct( $target_item ) {
 if ( null == $target_item )

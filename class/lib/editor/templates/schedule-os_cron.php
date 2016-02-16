@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : schedule-os_cron.php $
  * 
- * @id      : schedule-os_cron.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : schedule-os_cron.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -39,25 +39,25 @@ namespace MyBackup;
 <td style="width: 0px"></td>
 <td colspan="2" style="white-space: nowrap;"><input type="radio"
 id="schedule_grp_os_cron" name="schedule_grp" value="os_cron"
-onclick="js56816af34b4f1.toggle_wp_cron(false);"
+onclick="jsMyBackup.toggle_wp_cron(false);"
 <?php
 if ('os_cron' == $this->settings ['schedule_grp'])
 echo 'checked';
 ?>><label for="schedule_grp_os_cron"><?php _pesc('Schedule by OS-Cron');?></label>
 <a class='help'
 title="<?php _pesc('You should define a schedule/cron task in your OS with a command like the one shown by this option');?>"
-onclick="js56816af34b4f1.popupWindow('<?php _pesc('CLI usage');?>',js56816af34b4f1.globals.help,700,null,null,null,true);">[?]</a></td>
+onclick="jsMyBackup.popupWindow('<?php _pesc('CLI usage');?>',jsMyBackup.globals.help,700,null,null,null,true);">[?]</a></td>
 </tr>
 <tr id="schedule_cron_row3">
 <td colspan="3"><div
 class='hintbox <?php echo $this->container_shape;?>'
 id="os_cron_hint" style='display: none; background-color: #f0f0f0'
-onmouseover="js56816af34b4f1.showClipboardBtn(this,'visible','os_cron_clpb');"
-onmouseout="js56816af34b4f1.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
+onmouseover="jsMyBackup.showClipboardBtn(this,'visible','os_cron_clpb');"
+onmouseout="jsMyBackup.showClipboardBtn(this,'hidden','os_cron_clpb');"></div>
 <img id="os_cron_clpb"
 src="<?php echo $this->getImgURL ( 'edit-copy-32.png' ) ;?>"
 style="position: relative; float: right; right: 5px; visibility: hidden; cursor: pointer;"
 onmouseover="this.style.visibility='visible'"
-onclick="<?php echo sprintf("js56816af34b4f1.popupPrompt('%s','%s', null,{'%s':null},js56816af34b4f1.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
+onclick="<?php echo sprintf("jsMyBackup.popupPrompt('%s','%s', null,{'%s':null},jsMyBackup.stripHelpLink('os_cron_hint'),'textarea');",_esc('Compatibility-mode copy'),_esc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)'),_esc('Close (ESC)'));?>"
 title='<?php _pesc('Click to copy to clipboard');?>'></td>
 </tr>

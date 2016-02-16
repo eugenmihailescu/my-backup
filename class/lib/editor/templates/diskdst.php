@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : diskdst.php $
  * 
- * @id      : diskdst.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : diskdst.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -40,7 +40,7 @@ namespace MyBackup;
 <td colspan="3"><table style="width: 100%">
 <tr>
 <td><input type="checkbox" name="disk_enabled" id="disk_enabled"
-value="1" onclick='js56816af34b4f1.submitOptions(this,0);'
+value="1" onclick='jsMyBackup.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="disk_enabled" value="0"></td>
@@ -63,7 +63,7 @@ value=<?php
 echo "'" . $this->root . "'";
 ?> size=40
 <?php echo $this->enabled_tag; ?>><a class='help'
-onclick=<?php echo '"js56816af34b4f1.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
+onclick=<?php echo '"jsMyBackup.popupWindow(\''._esc('Help').'\',\''._esc('The location where to save the backup.<br>Leave it empty to disable this option.').'\');"'; ?>>[?]</a></td>
 <td><input type="button" id='update_disk_dir' class="button"
 value="<?php _pesc('Read disk');?>"
 onclick="<?php echo $this->getRefreshFolderJS();?>"

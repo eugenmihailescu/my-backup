@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : OAuthTargetEditor.php $
  * 
- * @id      : OAuthTargetEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : OAuthTargetEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -104,7 +104,7 @@ $this->_session = null;
 $target_auth_file = ROOT_OAUTH_FILE . $this->target_name . '.auth';
 if (isset ( $_GET [$this->target_name . '_unlink'] ) && file_exists ( $target_auth_file )) {
 unlink ( $target_auth_file );
-$this->java_scripts [] = "js56816af34b4f1.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
+$this->java_scripts [] = "jsMyBackup.popupWindow('" . _esc ( 'Success' ) . "','" . sprintf ( _esc ( "%s is no longer linked with %s.<br>You can, however, authorize the %s access anytime" ), WPMYBACKUP, $this->target_name_name, $this->target_name_name ) . "');";
 }
 $this->_authInfo = null;
 if (file_exists ( $target_auth_file )) {
@@ -138,7 +138,7 @@ if (null == $this->_authInfo) {
 require_once OAUTH_PATH . $session_class . '.php';
 echo "<!-- Storage-Cloud auth-box -->" . PHP_EOL;
 echo '<div id="storage_authorize_div"><p class="redcaption">' . sprintf ( _esc ( '%s is not yet configured</p><p>Before using this option you have to authorize %s to upload files to your %s account :' ), $this->target_name_name, WPMYBACKUP, $this->target_name_name );
-echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="js56816af34b4f1.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
+echo '<input type="button" class="button-primary" name="btnSubmit" value="' . _esc ( 'Authorize' ) . '" onclick="jsMyBackup.send_oauthrequest(\'post\',\'' . $this->target_name . '\',\'' . htmlspecialchars ( PROXY_PARAMS ) . '\');">';
 if ('google' == $this->target_name)
 echo '<br>' . readMoreHere ( 'https://developers.google.com/accounts/docs/OAuth2WebServer#offline', sprintf ( _esc ( 'about %s authorization scope' ), $this->target_name_name ) );
 echo '</div>' . PHP_EOL;
@@ -162,7 +162,7 @@ locationRedirect ( $this->_stripOAuthFromURL () );
 $this->_authInfo = null;
 echo "<div class='hintbox {$this->container_shape}' style='display:inline-block'>" . _esc ( 'An unexpected error occured while tried to authenticate at ' ) . ucwords ( $this->target_name ) . ":<br><p class='redcaption'>" . $e->getMessage () . '</p>';
 echo '<b>' . _esc ( 'Solution:' ) . '</b>';
-printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,\'' . http_build_query ( array (
+printf ( _esc ( '<p>Try again (eventually few more times at an interval of 60s or so). If it doesn`t work then %sclick here</a>.</p>' ), '<a href="#" onclick="jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl,\'' . http_build_query ( array (
 'action' => 'del_oauth',
 'service' => $this->target_name,
 'nonce' => wp_create_nonce_wrapper ( 'del_oauth' ) 

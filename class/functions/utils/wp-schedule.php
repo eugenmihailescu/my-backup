@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : wp-schedule.php $
  * 
- * @id      : wp-schedule.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-schedule.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -68,7 +68,7 @@ $params = array (
 'nonce' => wp_create_nonce_wrapper ( 'set_wpcron_schedule' ),
 'schedule' => $job_props ['schedule'] 
 );
-$img_click = 'js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
+$img_click = 'jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl,&quot;' . http_build_query ( $params ) . "&time=&quot;+document.getElementById(&quot;edt_$uniq_id&quot;).value);";
 $img_title = _esc ( 'Click to update the schedule datetime' );
 $img = "<img id='img_$uniq_id' src='" . plugins_url_wrapper ( 'img/save.png', IMG_PATH ) . "' style='display:none;cursor:pointer;' onclick='$img_click' title='$img_title'>";
 $input = "<input type='datetime' id='edt_$uniq_id' value='$timestamp' maxlength='19' size='19' style='display:none'>";
@@ -81,7 +81,7 @@ $result .= sprintf ( "<td>%s</td><td>%s</td><td>%s</td></tr>", $job_props ['sche
 }
 }
 $result = sprintf ( "<style>.schtbl{border: 1px solid #C0C0C0; border-radius: 5px} .schtbl tr td:nth-child(2),.schtbl tr td:nth-child(3){text-align:center;}</style><table class='schtbl'><tr style='background-color: #E0E0D0;'><th>%s</th><th>%s</th><th>%s</th><th>%s<br>(h)</th><th>%s</th></tr>$result</table>", _esc ( 'Next run' ), _esc ( 'Hook name' ), _esc ( 'Schedule' ), _esc ( 'Interval' ), _esc ( 'Args' ) );
-return $result . '<table style="width:100%"><tr><td>' . readMoreHere ( 'http://theme.fm/2011/11/wordpress-internals-the-cron-2715' ) . '</td><td style="text-align:right">' . sprintf ( _esc ( 'Local time: %s' ), date ( 'Y-m-d, H:i:s e' ) ) . '</td></tr></table>';
+return $result . '<table style="width:100%"><tr><td>' . readMoreHere ( 'http://theme.fm/2011/11/wordpress-internals-the-cron-2715' ) . '</td><td style="text-align:right">' . sprintf ( _esc ( 'Local time: %s' ), date ( DATETIME_FORMAT.' e' ) ) . '</td></tr></table>';
 }
 function get_schedule($schedule_name) {
 $result = array ();

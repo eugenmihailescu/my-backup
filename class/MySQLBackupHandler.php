@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : MySQLBackupHandler.php $
  * 
- * @id      : MySQLBackupHandler.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MySQLBackupHandler.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 require_once FUNCTIONS_PATH . 'utils.php';
-is_wp() && require_once\ABSPATH . 'wp-config.php';
+is_wp() && require_once \ABSPATH . 'wp-config.php';
 class MySQLBackupHandler {
 private $_options;
 private $_link;
@@ -161,9 +161,9 @@ $result .= '</table>' . PHP_EOL;
 return $result;
 }
 private function _getTableDefinition( $table_name ) {
-$rst = \mysql_query( 'DESCRIBE ' . $table_name );
+$rst =\mysql_query( 'DESCRIBE ' . $table_name, $this->_link );
 $defs = array();
-while ( $row =\mysql_fetch_row( $rst ) ) {
+while ( $row = \mysql_fetch_row( $rst ) ) {
 $defs[$row[0]] = array( 
 'type' => preg_replace( '/([^\(]+).*/', '$1', $row[1] ), 
 'allow_null' => strToBool( $row[2] ), 
@@ -236,18 +236,18 @@ fwrite( $fw, $result );
 foreach ( $tables as $table ) {
 $table_defs = $this->_getTableDefinition( $table );
 $tables_cols = array_keys( $table_defs );
-$rst = \mysql_query( 'SELECT * FROM ' . $table );
+$rst =\mysql_query( 'SELECT * FROM ' . $table, $this->_link );
 if ( FALSE !== $rst )
-$num_fields = \mysql_num_fields( $rst );
+$num_fields =\mysql_num_fields( $rst );
 else
 $num_fields = 0;
 if ( 'sql' == $format ) {
 $result = 'DROP TABLE IF EXISTS ' . $table . ';';
 fwrite( $fw, $result );
 }
-$rst1 = \mysql_query( 'SHOW CREATE TABLE ' . $table );
+$rst1 =\mysql_query( 'SHOW CREATE TABLE ' . $table, $this->_link );
 if ( FALSE !== $rst1 ) {
-$row2 = \mysql_fetch_row( $rst1 );
+$row2 =\mysql_fetch_row( $rst1 );
 $result = PHP_EOL . PHP_EOL . $row2[1] . ";" . PHP_EOL . PHP_EOL;
 'xml' == $format && $result = $this->_formatTableToXML( $result, $db_name, $table );
 fwrite( $fw, $result );
@@ -319,19 +319,30 @@ return getMySQLTableNamesFromPattern( $pattern, $close_link, $this->_options, fa
 }
 public function getServerInfo() {
 $info = array();
-if ( $rst = \mysql_query( 'SHOW VARIABLES LIKE "version%";' ) )
-while ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) )
+if ( $this->_link && $rst =\mysql_query( 'SHOW VARIABLES LIKE "version%";', $this->_link ) )
+while ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) )
 $info[$row[0]] = $row[1];
+else {
+$unknown = _esc( 'unknown' );
+$info = array( 
+'version' => $unknown, 
+'version_comment' => $unknown, 
+'version_compile_os' => $unknown, 
+'version_compile_machine' => $unknown );
+}
 return $info;
 }
 public function getDbSize() {
 $dbsize = array();
-if ( $rst = \mysql_query( 
-"select (SELECT SUM(data_length + index_length) as dbsize FROM information_schema.TABLES where table_schema=database() group by table_schema) as dbsize, (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = database()) as tblcount;" ) )
-if ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) ) {
+if ( $this->_link && $rst =\mysql_query( 
+"select (SELECT SUM(data_length + index_length) as dbsize FROM information_schema.TABLES where table_schema=database() group by table_schema) as dbsize, (SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = database()) as tblcount;", 
+$this->_link ) ) {
+if ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) ) {
 $dbsize['dbsize'] = $row[0];
 $dbsize['tblcount'] = $row[1];
 }
+} else
+$dbsize = array( 'dbsize' => 0, 'tblcount' => 0 );
 return $dbsize;
 }
 public function downloadSqlScript( $path, $pattern, $name, $type, $level ) {
@@ -494,12 +505,12 @@ $result[$table_name] = array();
 foreach ( $options as $cmd => $cmd_enabled ) {
 $this->_outputCallback( $table_name, $cmd, 'status', 'prepare' );
 $this->_progressCallback( MYSQL_SOURCE, $table_name, $j++, $d, 6 );
-if ( $cmd_enabled && $rst = \mysql_query( "$cmd TABLE $table_name;" ) )
-if ( FALSE !== $rst && $row = \mysql_fetch_row( $rst ) ) {
+if ( $cmd_enabled && $rst =\mysql_query( "$cmd TABLE $table_name;", $this->_link ) )
+if ( FALSE !== $rst && $row =\mysql_fetch_row( $rst ) ) {
 $result[$table_name][$cmd] = array( $row[2], $row[3] );
 $this->_outputCallback( $table_name, $cmd, $row[2], $row[3] );
 } else
-$this->_outputCallback( $table_name, $cmd, 'error', \mysql_errno( $this->_link ) );
+$this->_outputCallback( $table_name, $cmd, 'error',\mysql_errno( $this->_link ) );
 }
 }
 }

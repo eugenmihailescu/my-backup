@@ -28,16 +28,18 @@
  * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
  * @date    : Tue Feb 16 15:27:30 2016 +0100 $
- * @file    : support-expert.php $
+ * @file    : head.php $
  * 
- * @id      : support-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : head.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+
+$custom_head = 'custom head';
+insertHTMLSection( $custom_head );
 ?>
-<tr>
-<td><label for="whitespace_check"><?php echo _esc('Extra-whitespace check');?></label></td>
-<td><input id="whitespace_check" name="whitespace_check" type="number" size="5"
-min="0" value="<?php echo $this->settings['whitespace_check'];?>"><?php echo _esc('min');?><a
-class="help" onclick=<?php echoHelp( $help_whitespace );?>> [?]</a></td>
-</tr>
+<script type="text/javascript">
+Date.now = Date.now || function() { return +new Date; }; 
+window.page_start_loading=Date.now();
+window.jsnspace=window.jsMyBackup;
+</script><?php insertHTMLSection($custom_head,true);?>

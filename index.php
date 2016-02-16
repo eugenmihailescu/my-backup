@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : index.php $
  * 
- * @id      : index.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : index.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -98,7 +98,7 @@ $login_obj->onCheckJavaScript = 'checkJavaScriptAvailable';
 $login_obj->setEnforceStrongPassword();
 $login_obj->allowPasswordRecovery( true, selfURL() );
 $login_obj->setLoginTitle( sprintf( _esc( 'Login into %s' ), WPMYBACKUP ) );
-$login_obj->setOnPasswordStrength( 'js56816af34b4f1.passwordEntropy' );
+$login_obj->setOnPasswordStrength( 'jsMyBackup.passwordEntropy' );
 $is_logged = $login_obj->isLogged();
 ! $is_logged && _kill_too_many_requests( $login_obj );
 ! empty( $_POST['action'] ) && $_POST['action'] == 'login_recovery' && _do_password_recovery( $login_obj );
@@ -128,7 +128,7 @@ if ( $is_logged ) {
 define( 
 __NAMESPACE__."\\WPMYBACKUP_LOGOFF", 
 "<img src=\"" . plugins_url_wrapper( 'img/avatar.png', IMG_PATH ) .
-"\"> <a style='cursor:pointer' onclick='js56816af34b4f1.post(js56816af34b4f1.this_url,{action:\"logout\"});'>" .
+"\"> <a style='cursor:pointer' onclick='jsMyBackup.post(jsMyBackup.this_url,{action:\"logout\"});'>" .
 sprintf( _esc( 'Logoff %s' ), $username ) . "</a>" );
 define( __NAMESPACE__.'\\DO_NOT_AFTER_SETTINGS', true ); 
 $settings = loadSettings();
@@ -139,7 +139,7 @@ file_exists( $dashboard_file ) || $dashboard_class = 'Dashboard';
 require_once CLASS_PATH . "$dashboard_class.php";
 $dashboard_class = __NAMESPACE__ . '\\' . $dashboard_class;
 $dashboard = new $dashboard_class();
-$java_scripts = array_merge( $java_scripts, $dashboard->getJavaScripts() );
+$java_scripts = array_merge($java_scripts, $dashboard->getJavaScripts() );
 $footer_banner = $dashboard->getBanner( 'footer_banner' );
 $dashboard->show();
 }

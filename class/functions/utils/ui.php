@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : ui.php $
  * 
- * @id      : ui.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ui.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -71,9 +71,14 @@ function getTabAnchorByConstant( $constant, $query = null, $target = null, $esca
 global $forward_compatible_targets, $registered_forward_map;
 $nconstant = 0 !== strpos( $constant, __NAMESPACE__ . '\\' ) ? __NAMESPACE__ . '\\' . $constant : $constant;
 $tab = null !== @constant( $nconstant ) ? constant( $nconstant ) : ( isset( $registered_forward_map[$constant] ) ? $registered_forward_map[$constant][2] : null );
-return getTabAnchor( $tab, $query, $target, $escape, @constant( $nconstant ) ? null : $forward_compatible_targets );
+return getTabAnchor( 
+$tab, 
+$query, 
+@constant( $nconstant ) ? $target : '_self', 
+$escape, 
+@constant( $nconstant ) ? null : $forward_compatible_targets );
 }
-function getTabAnchor( $tab, $query = null, $target = null, $escape = false, $array = null ) {
+function getTabAnchor( $tab, $query = null, $target = null, $escape = false, $array = null, $remove_query = null ) {
 if ( isset( $tab ) ) {
 global $registered_targets, $TARGET_NAMES;
 $func = 'getAnchor' . ( $escape ? 'E' : '' );
@@ -83,7 +88,9 @@ if ( is_array( $array ) )
 $link = ( isset( $tabs[$tab] ) && isset( $tabs[$tab]['link'] ) ? $tabs[$tab]['link'] : '#' );
 else
 $link = getTabLink( $TARGET_NAMES[$tab] ) . ( empty( $query ) ? '' : $query );
-is_array( $array ) && $target = '_blank'; 
+if ( $remove_query )
+$link = stripUrlParams( $link, $remove_query );
+is_array( $array ) && empty( $target ) && $target = '_blank'; 
 if ( isset( $title ) && isset( $link ) )
 return _call_user_func( $func, $title, $link, empty( $target ) ? '_self' : $target );
 }
@@ -96,7 +103,7 @@ function getSSLIcon() {
 if ( ! isSSL() ) {
 $icon = 'security-high.png';
 $title = _esc( 'Warning' );
-$function = "js56816af34b4f1.popupError";
+$function = "jsMyBackup.popupError";
 $msg = sprintf( 
 "Password fields present on an insecure (http://) page. This is a security risk that allows user login credentials to be stolen.%s : %s", 
 sprintf( '<br><br><b>%s</b>', _esc( 'Solution' ) ), 
@@ -109,7 +116,7 @@ escape_quotes( '<ol type="i"><li>' ) ) );
 } else {
 $icon = 'security-low.png';
 $title = _esc( 'Notice' );
-$function = "js56816af34b4f1.popupWindow";
+$function = "jsMyBackup.popupWindow";
 $msg = _esc( 
 "Password fields present on an secure (https://) page.<br>Thanks to the SSL your password is safe, nobody between this<br>PC and the web server can read/stole your password likewise<br>no other data send/received between these two machines." ) .
 '<br>';
@@ -162,7 +169,7 @@ return false;
 function bindInfo2JavaScript( $element, $text, &$java_scripts ) {
 ob_start();
 ?>
-parent.globals.HOVER_HINT = null, el = document.getElementById('$element'), fct_prefix = parent.ie < 9 ? 'on' : '';
+parent.globals.HOVER_HINT = null, el = document.getElementById('$element'), fct_prefix = parent.isNull(parent.ie,10) < 9 ? 'on' : '';
 if (el) {
 el.style.cursor = 'help';
 el.style.backgroundColor = '#00F25A';
@@ -173,7 +180,7 @@ parent.globals.HOVER_HINT.style.position = 'absolute';
 return;
 }
 parent.globals.HOVER_HINT = parent.createDocElement(document.body, 'div', {
-'style': 'z-index:1001;position:absolute;background-color:rgb' + (parent.ie < 9 ? '' : 'a') + '(255,255,196' + (parent.ie < 9 ? '' : ',0.75') + ');padding:10px;border:1px solid #c0c0c0;border-radius:10px;'
+'style': 'z-index:1001;position:absolute;background-color:rgb' + (parent.isNull(parent.ie,10) < 9 ? '' : 'a') + '(255,255,196' + (parent.isNull(parent.ie,10)< 9 ? '' : ',0.75') + ');padding:10px;border:1px solid #c0c0c0;border-radius:10px;'
 }, null, true);
 parent.globals.HOVER_HINT.innerHTML = '<?php echo str_replace( PHP_EOL, '', $text ) ;?>';
 });
@@ -191,8 +198,8 @@ parent.globals.HOVER_HINT.style.top = clientY + 'px';
 }
 });
 }
-<?php 
-$java_scripts[]=ob_get_clean();
+<?php
+$java_scripts[] = ob_get_clean();
 }
 function bindSSLInfo( $element, $ssl_info, &$java_scripts, $ssl_hint = null ) {
 if ( ! ( is_array( $ssl_info ) && isset( $ssl_info['version'] ) && ! empty( $ssl_info['version'] ) ) )

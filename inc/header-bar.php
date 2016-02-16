@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : header-bar.php $
  * 
- * @id      : header-bar.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : header-bar.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -41,17 +41,17 @@ namespace MyBackup;
 style='font-size: 1.5em; margin: .75em 0; font-weight: bold;'><?php echo $title; ?><a
 class='help'
 onclick=<?php
-echoHelp ( sprintf ( $title_desc, escape_quotes ( $title ) ) );
+echoHelp( sprintf( $title_desc, escape_quotes( $title ) ) );
 ?>>*</a><?php echo defined(__NAMESPACE__.'\\SANDBOX')&&SANDBOX?(sprintf('%s <span style="font-size:0.75em;font-weight:normal">(%s)</span>',_esc('SANDBOX'),sprintf(_esc('%d active sessions'),getActiveSandboxes()))):'';?></span> 
 <?php
-if (! isSSL ()) {
-echo getSSLIcon ();
-if (! isset ( $java_scripts ['ssl'] ))
-$java_scripts ['ssl'] = "setInterval(parent.fadeSSLIcons," . SSL_ALERT_FADE_INTERVAL . ");";
+if ( ! isSSL() ) {
+echo getSSLIcon();
+if ( ! isset( $java_scripts['ssl'] ) )
+$java_scripts['ssl'] = "setInterval(parent.fadeSSLIcons," . SSL_ALERT_FADE_INTERVAL . ");";
 }
 ?>
 </td>
-<td id="notification_bar" style="text-align: center;width:100%;">
+<td id="notification_bar" style="text-align: center; width: 100%;">
 <?php if(defined(__NAMESPACE__.'\\DEBUG_STATUSBAR')&&DEBUG_STATUSBAR){?>
 <div
 style="display: inline-block; bottom: 0; position: fixed; left: 0; right: 0; z-index: 1000; opacity: 0.75"
@@ -61,8 +61,11 @@ style="border-radius: 5px; display: none"> </span>
 </div><?php }?>
 <div id="notification_msg" style="display: inline-block"></div>
 </td>
+<td style="width: 0; text-align: right; white-space: nowrap;">
+<?php echo getAnchor( _esc( 'How it works' ), getTabLink( $TARGET_NAMES[APP_WELCOME] ) . '&nocheck', '_self' );?>
+</td>
 <td style="width: 0; text-align: right; white-space: nowrap;"><?php
-if (defined ( __NAMESPACE__.'\\WPMYBACKUP_LOGOFF' ))
+if ( defined( __NAMESPACE__.'\\WPMYBACKUP_LOGOFF' ) )
 echo WPMYBACKUP_LOGOFF;
 ?></td>
 </tr>

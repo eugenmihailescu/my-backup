@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : wp-wrappers.php $
  * 
- * @id      : wp-wrappers.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-wrappers.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -153,7 +153,7 @@ if ( ! empty( $array ) ) {
 $filename = get_wp_config_path();
 $backup = $filename . '.' . time();
 $buffer = file_get_contents( $filename );
-$comment = ' by ' . WPMYBACKUP . ' @ ' . date( 'Y-m-d H:i:s e' );
+$comment = ' by ' . WPMYBACKUP . ' @ ' . date( DATETIME_FORMAT.' e' );
 $summary = array();
 foreach ( $array as $key => $value ) {
 $pattern = '/((define\s*\(\s*[\'"]' . $key . '[\'"]\s*,\s*)([\w]+)([^;]+;)).*/';

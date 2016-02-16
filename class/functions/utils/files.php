@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : files.php $
  * 
- * @id      : files.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : files.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -112,6 +112,12 @@ $dates[] = $date;
 }
 }
 return $dates;
+}
+function getFilesSize( $files ) {
+$result = 0;
+foreach ( $files as $filename )
+is_file( $filename ) && $result += @filesize( $filename );
+return $result;
 }
 function createFileList( 
 $temp_file, 
@@ -451,7 +457,7 @@ fclose( $fr );
 return $result;
 }
 function addTrailingSlash( $path, $separator = DIRECTORY_SEPARATOR, $escape_separator = false ) {
-return ( empty( $path ) || ! empty( $path ) && substr( $path, - 1 ) != $separator ) ? $path .
+return ( empty( $path ) || substr( $path, - 1 ) != $separator ) ? $path .
 ( $escape_separator ? addslashes( $separator ) : $separator ) : $path;
 }
 function delTrailingSlash( $path, $separator = DIRECTORY_SEPARATOR ) {
@@ -548,10 +554,10 @@ $result = $result && copy( $src . $file, $dst . $file );
 closedir( $dir );
 return $result;
 }
-function normalize_path( $path, $reverse = false ) {
+function normalize_path( $path, $reverse = false, $count = 1 ) {
 $from = '\\';
-$to = '\\\\';
-$reverse && swap_items( $from, $to );
+$to = str_repeat( $from, ( $count + 1 ) );
+$reverse && swap_items( $from, $to ) || $path = normalize_path( $path, true );
 return str_replace( $from, $to, $path );
 }
 function getUserHomeDir() {
@@ -632,5 +638,54 @@ rsort( $files );
 array_walk( $files, function ( $item, $key ) {
 is_dir( $item ) && rmdir( $item ) || unlink( $item );
 } );
+}
+if ( ! function_exists( '\\sanitize_file_name' ) ) {
+function sanitize_file_name( $filename ) {
+$special_chars = array( 
+"?", 
+"[", 
+"]", 
+"/", 
+"\\", 
+"=", 
+"<", 
+">", 
+":", 
+";", 
+",", 
+"'", 
+"\"", 
+"&", 
+"$", 
+"#", 
+"*", 
+"(", 
+")", 
+"|", 
+"~", 
+"`", 
+"!", 
+"{", 
+"}", 
+"%", 
+"+", 
+chr( 0 ) );
+$filename = preg_replace( "#\x{00a0}#siu", ' ', $filename );
+$filename = str_replace( $special_chars, '', $filename );
+$filename = str_replace( array( '%20', '+' ), '-', $filename );
+$filename = preg_replace( '/[\r\n\t -]+/', '-', $filename );
+$filename = trim( $filename, '.-_' );
+$parts = explode( '.', $filename );
+if ( count( $parts ) <= 2 ) {
+return $filename;
+}
+$filename = array_shift( $parts );
+$extension = array_pop( $parts );
+foreach ( (array) $parts as $part ) {
+$filename .= '.' . $part;
+}
+$filename .= '.' . $extension;
+return $filename;
+}
 }
 ?>

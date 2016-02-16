@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : header.php $
  * 
- * @id      : header.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : header.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -45,13 +45,13 @@ namespace MyBackup;
 <meta http-equiv="x-ua-compatible" content="IE=8">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <?php
-$styles = array (
-'admin',
-'admin1' 
-);
+$styles = array( 'admin', 'admin1' );
 foreach ( $styles as $s )
-if (file_exists ( CSS_PATH . WPMYBACKUP_LOGS . '-' . $s . '.css' ))
-printf ( "<link rel='stylesheet' id='" . WPMYBACKUP_LOGS . "_options_stylesheet-css' href='css/" . WPMYBACKUP_LOGS . "-$s.css?ver=%s' type='text/css' media='all'/>", APP_VERSION_NO );
+if ( file_exists( CSS_PATH . WPMYBACKUP_LOGS . '-' . $s . '.css' ) )
+printf( 
+"<link rel='stylesheet' id='" . WPMYBACKUP_LOGS . "_options_stylesheet-css' href='css/" . WPMYBACKUP_LOGS .
+"-$s.css?ver=%s' type='text/css' media='all'/>", 
+APP_VERSION_NO );
 ?>
 <style type="text/css">
 body {
@@ -61,14 +61,10 @@ background-color: #d4f2fe;
 }
 </style>
 <?php
-foreach ( array (
-'globals',
-'admin',
-'blockui' 
-) as $js )
-if (file_exists ( JS_PATH . WPMYBACKUP_LOGS . '-' . $js . '.js' ))
-printf ( '<script src="js/' . WPMYBACKUP_LOGS . '-' . $js . '.js?ver=%s"></script>', APP_VERSION_NO ) . PHP_EOL;
+foreach ( array( 'globals', 'admin', 'blockui', 'regex-utils' ) as $js )
+if ( file_exists( JS_PATH . WPMYBACKUP_LOGS . '-' . $js . '.js' ) )
+printf( '<script src="js/' . WPMYBACKUP_LOGS . '-' . $js . '.js?ver=%s"></script>', APP_VERSION_NO ) . PHP_EOL;
+include_once INC_PATH . 'head.php';
 ?>
-<script type="text/javascript">Date.now = Date.now || function() { return +new Date; }; window.page_start_loading=Date.now();</script>
 <title><?php echo WPMYBACKUP;?> admin page</title>
 </head>

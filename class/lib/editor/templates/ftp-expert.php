@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : ftp-expert.php $
  * 
- * @id      : ftp-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ftp-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -109,7 +109,7 @@ onclick=<?php echoHelp($help_9);?>><?php _pesc('Why do we need all this stuff? H
 <td><label for="ftpproto"><?php _pesc('Transport protocol');?></label></td>
 <td><select name='ftpproto' id="ftpproto"
 <?php echo $this->enabled_tag;?> style='width: 100%'
-onchange='<?php echo isWin()?'validateSSLonWin(this);':'';?>;validateSSLCAInfo(this);'
+onchange='<?php echo isWin()?'jsMyBackup.validateSSLonWin(this);':'';?>;jsMyBackup.validateSSLCAInfo(this);'
 onkeyup='this.onchange();'>
 <option value="<?php echo CURLPROTO_FTP;?>"
 <?php if (CURLPROTO_FTP==$this->_ftpproto) echo $selected;?>><?php _pesc('FTP');?></option>
@@ -124,7 +124,7 @@ echoHelp ( $help_2 );
 <td><label for="ftp_lib"><?php _pesc('Transport library');?></label></td>
 <td><select id="ftp_lib" name="ftp_lib"
 <?php echo $this->enabled_tag;?> style='width: 100%'
-onchange="var el=document.getElementById('ftpproto');validateSSLCAInfo(el);<?php echo isWin()?'validateSSLonWin(el);':'';?>"
+onchange="var el=document.getElementById('ftpproto');jsMyBackup.validateSSLCAInfo(el);<?php echo isWin()?'jsMyBackup.validateSSLonWin(el);':'';?>"
 onkeyup="this.onchange();">
 <option value="curl"
 <?php if('curl'==$this->settings['ftp_lib'])echo $selected;?>><?php _pesc('Curl library');?></option>

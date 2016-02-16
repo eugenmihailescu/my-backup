@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : StatisticsManager.php $
  * 
- * @id      : StatisticsManager.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : StatisticsManager.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -74,6 +74,7 @@ define( __NAMESPACE__."\\COL_TEXT50", 4 );
 define( __NAMESPACE__."\\COL_TEXT", 5 );
 define( __NAMESPACE__."\\COL_TEXT30", 6 );
 define( __NAMESPACE__."\\COL_TEXT100", 7 );
+define( __NAMESPACE__."\\COL_BIGINT", 8 );
 ! defined( __NAMESPACE__.'\\TBL_PREFIX' ) && define( __NAMESPACE__."\\TBL_PREFIX", wp_get_db_prefix() . "_wpmybk_" );
 define( __NAMESPACE__."\\TBL_JOBS", "jobs" );
 define( __NAMESPACE__."\\TBL_SOURCES", "sources" );
@@ -86,11 +87,13 @@ define( __NAMESPACE__."\\TBL_SYSCPU", "sysinfo_cpu" );
 define( __NAMESPACE__."\\TBL_SYSMEM", "sysinfo_mem" );
 define( __NAMESPACE__.'\\STATISTICS_DEBUG_LOG_MAXROWS', 10 );
 class StatisticsManager {
+private $_settings;
 private $_logfile;
 private $_db;
 private $_connection_params;
 private $_is_sqlite;
 private $_sql_open_quote, $_sql_close_quote;
+private $_upgrade_db_callbacks;
 public function escape( $string ) {
 if ( $this->isSQLite() )
 return $this->_db->escapeString( $string );
@@ -140,9 +143,9 @@ $single_row && $this->seek( $rst, 0 );
 while ( $data = $this->fetchArray( $rst ) ) {
 if ( STATISTICS_DEBUG_LOG_MAXROWS == count( $result_array ) ) {
 $result_array[] = sprintf( 
-_esc( 'Result is limited to max %d rows (out of %d)' ), 
+_esc( 'Result is limited to max %d rows (out of %s)' ), 
 STATISTICS_DEBUG_LOG_MAXROWS, 
-mysql_affected_rows( $this->_db ) );
+$this->isSQLite() ? '?' : mysql_affected_rows( $this->_db ) );
 break;
 } else
 $result_array = $result_array + $data;
@@ -215,6 +218,9 @@ break;
 case COL_TEXT100 :
 $result = 'VARCHAR(100)';
 break;
+case COL_BIGINT :
+$result = 'BIGINT';
+break;
 default :
 $result = 'VARCHAR(250)';
 break;
@@ -273,7 +279,7 @@ METRIC_TOOLCHAIN => COL_TEXT10,
 METRIC_BZIP_VER => COL_TEXT10, 
 METRIC_RATIO => COL_NUMERIC, 
 'result_code' => COL_INT, 
-'job_size' => COL_INT, 
+'job_size' => COL_BIGINT, 
 'volumes_count' => COL_INT, 
 'files_count' => COL_INT, 
 'job_status' => array( COL_INT, null, true ), 
@@ -346,10 +352,10 @@ $field_defs = array(
 'jobs_id' => array( COL_INT, null, true ), 
 'sources_id' => array( COL_INT, null, true ), 
 METRIC_FILENAME => COL_TEXT, 
-METRIC_UNCOMPRESSED => COL_INT, 
+METRIC_UNCOMPRESSED => COL_BIGINT, 
 METRIC_RATIO => COL_REAL, 
-METRIC_SIZE => COL_INT, 
-METRIC_DISK_FREE => COL_INT, 
+METRIC_SIZE => COL_BIGINT, 
+METRIC_DISK_FREE => COL_BIGINT, 
 JOBTBL_FILE_CHECKSUM => COL_TEXT50 );
 $this->_createTable( TBL_FILES, $field_defs );
 }
@@ -416,6 +422,25 @@ throw new MyException( \mysql_error(), \mysql_errno() );
 if ( ! $db_exists )
 $this->_createDbTables();
 return $this->_db;
+}
+public function upgrade_db() {
+$result = array();
+foreach ( $this->_upgrade_db_callbacks as $new_version => $callbacks ) {
+ksort( $callbacks );
+foreach ( $callbacks as $callback ) {
+if ( ! _is_callable( $callback ) || true !== ( $e = _call_user_func( $callback, $this ) ) )
+$result = $result + $e;
+}
+}
+return empty( $result ) ? true : $result;
+}
+public function register_upgrade_callback( $callback, $new_version, $priority = -1 ) {
+if ( _is_callable( $callback ) ) {
+isset( $this->_upgrade_db_callbacks[$new_version] ) || $this->_upgrade_db_callbacks[$new_version] = array();
+$this->_upgrade_db_callbacks[$new_version][$priority < 0 ? count( $this->_upgrade_db_callbacks ) - 1 : $priority] = $callback;
+return true;
+}
+return false;
 }
 private function _insertRecord( $tbl_name, $array, $unique = false ) {
 if ( empty( $array ) )
@@ -491,11 +516,9 @@ return $this->_insertRecord( TBL_SYSINFO, $array, true );
 private function _pushKeys( $timestamp, $keys ) {
 if ( empty( $keys ) || ! isset( $keys['cipher'] ) )
 return;
-$array = array( 
-'cipher' => $keys['cipher'], 
-'key' => $keys['key'], 
-'iv' => $keys['iv'], 
-'timestamp' => $timestamp );
+$array = array( 'cipher' => $keys['cipher'], 'timestamp' => $timestamp );
+isset( $keys['key'] ) && $array['key'] = $keys['key'];
+isset( $keys['iv'] ) && $array['iv'] = $keys['iv'];
 return $this->_insertRecord( TBL_KEYS, $array, true ); 
 }
 private function _pushDataArray( $tbl_name, $data_array, $jobs_id, $timestamp ) {
@@ -521,9 +544,11 @@ $mem = getSystemMemoryInfo();
 return $this->_pushDataArray( TBL_SYSMEM, $mem, $jobs_id, $timestamp );
 }
 function __construct( $params, $settings = null ) {
+$this->_settings = $settings;
 $this->_logfile = new LogFile( defined( __NAMESPACE__.'\\STATISTICS_DEBUG_LOG' ) ? STATISTICS_DEBUG_LOG : null, $settings );
+$this->_upgrade_db_callbacks = array();
 $this->_connection_params = $params;
-$this->_is_sqlite = true;
+$this->_is_sqlite = ! isset( $settings ) || ( 'sqlite' == $settings['historydb'] );
 $this->_db = $this->_createDb( $params );
 }
 function __destruct() {
@@ -587,15 +612,17 @@ if ( $this->_is_sqlite ) {
 if ( file_exists( $this->_connection_params ) )
 $result = @unlink( $this->_connection_params );
 } else {
-$result = $this->_sqlExec( 
-sprintf( 
-'DROP TABLE IF EXISTS %s,%s,%s,%s,%s,%s;', 
+$tables = array( 
 TBL_PREFIX . TBL_SYSMEM, 
 TBL_PREFIX . TBL_SYSCPU, 
 TBL_PREFIX . TBL_SYSINFO, 
 TBL_PREFIX . TBL_FILES, 
 TBL_PREFIX . TBL_STATS, 
-TBL_PREFIX . TBL_JOBS ) );
+TBL_PREFIX . TBL_SOURCES, 
+TBL_PREFIX . TBL_PATHS, 
+TBL_PREFIX . TBL_JOBS, 
+TBL_PREFIX . TBL_KEYS );
+$result = $this->_sqlExec( sprintf( 'DROP TABLE IF EXISTS %s;', implode( ',', $tables ) ) );
 $this->_createDbTables();
 }
 return $result !== false;
@@ -634,6 +661,23 @@ if ( \mysql_affected_rows( $this->_db ) )
 return \mysql_data_seek( $rst, $offset );
 }
 return false;
+}
+public function getSettings() {
+return $this->_settings;
+}
+public function basename( $str, $quote = true ) {
+if ( $this->isSQLite() ) {
+$this->_db->createFunction( 'basename', function ( $str ) {
+return basename( $str );
+} );
+return sprintf( 'basename(%s%s%s)', $quote ? '"' : '', $str, $quote ? '"' : '' );
+} else
+return sprintf( 
+'substring_index(%s%s%s, "%s", -1) ', 
+$quote ? '"' : '', 
+$str, 
+$quote ? '"' : '', 
+'\\' . DIRECTORY_SEPARATOR );
 }
 }
 ?>

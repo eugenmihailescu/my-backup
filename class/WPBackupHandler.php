@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : WPBackupHandler.php $
  * 
- * @id      : WPBackupHandler.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WPBackupHandler.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -186,7 +186,7 @@ $target = $this->getTarget( MYSQL_SOURCE );
 if ( $target->isEnabled() ) {
 $params = $target->getParams();
 if ( ! empty( $params['tables'] ) ) {
-if ( is_wp() )
+if ( is_wp() && $this->_statistics_manager )
 $this->_statistics_manager->_sqlExec( 
 sprintf( "DELETE FROM %s_options where option_name like '_transient_%%';", wp_get_db_prefix() ), 
 true );
@@ -979,8 +979,9 @@ basename( $archive_path ) ),
 $this->startCompress( $archive_path );
 $arcname = $archive->compress( $this->getCompressionMethod(), $this->getCompressionLevel() );
 $archive->unlink();
-if ( ! ( false === $arcname || empty( $arcname ) ) )
+if ( ! ( false === $arcname || empty( $arcname ) ) ) {
 $this->onNewArc( $arcname, $archive_size, filesize( $arcname ), count( $volumes ) + 1 );
+}
 $archive_path = sprintf( "%s-%d", $this->getBackupName(), count( $volumes ) );
 $volumes[] = $archive_path;
 $archive->setFileName( $archive_path );
@@ -1109,8 +1110,8 @@ false,
 $err_params );
 }
 }
-}
 $this->uploaded += $saved;
+}
 $sufix = $saved ? _esc( 'although you have enabled at least one' ) : _esc( '(no target specified)' );
 if ( ! $saved && ( null !== ( $job_id = $this->getCurrentJobId() ) || $job_id >= 0 ) &&
 0 == $this->getTargetCount() )

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : mysql.php $
  * 
- * @id      : mysql.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td><label for="mysql_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="mysql_enabled" id="mysql_enabled" value="1"
-onclick='js56816af34b4f1.submitOptions(this,0);'
+onclick='jsMyBackup.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" name="mysql_enabled" value="0"></td>
@@ -72,7 +72,7 @@ onclick=<?php echoHelp($help_1); ?>>[?]</a>
 id="btn_dwl_script"
 value=<?php echo '"&nbsp;&nbsp;&nbsp;'._esc('Download').' '.($mysqldump?_esc('db dump'):($mysql_format.' '._esc('file'))).'"';?>
 onclick=<?php
-echo '"js56816af34b4f1.post(js56816af34b4f1.ajaxurl,{action:\'dwl_sql_script\',nonce:\'' . wp_create_nonce_wrapper ( 'dwl_sql_script' ) . '\',tables:\'' . $this->settings ['tables'] . '\',name:\'' . (isset ( $this->settings ['name'] ) && ! empty ( $this->settings ['name'] ) ? $this->settings ['name'] : $this->settings ['url']) . '\',type:' . $this->settings ['compression_type'] . ',level:' . $this->settings ['compression_level'] . '});"';
+echo '"jsMyBackup.post(jsMyBackup.ajaxurl,{action:\'dwl_sql_script\',nonce:\'' . wp_create_nonce_wrapper ( 'dwl_sql_script' ) . '\',tables:\'' . $this->settings ['tables'] . '\',name:\'' . (isset ( $this->settings ['name'] ) && ! empty ( $this->settings ['name'] ) ? $this->settings ['name'] : $this->settings ['url']) . '\',type:' . $this->settings ['compression_type'] . ',level:' . $this->settings ['compression_level'] . '});"';
 ?>
 title='<?php _pesc('Click to download the MySQL script now');?>'
 <?php echo $this->enabled_tag; ?>><a class='help'

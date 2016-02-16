@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ActionHandler.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -187,7 +187,7 @@ $result = $ftp->ftpExecRawCmds( $cmds[0], $cmds[1] );
 foreach ( $cmds[0] as $cmd ) {
 echo getAnchor( 
 getSpanE( $cmd, 'cyan', 'bold' ), 
-'http://lmgtfy.com/?q=' . ( $is_sftp ? 's' : '' ) . 'ftp+rfc+$cmd+command' );
+lmgtfy (( $is_sftp ? 's' : '' ) . 'ftp rfc '.$cmd.' command' ));
 echo getSpanE( _esc( 'returned the following result:' ), 'yellow' );
 echo '<blockquote>';
 if ( is_array( $result ) && isset( $result[$cmd] ) )
@@ -285,7 +285,7 @@ $wp_plugins[$plugin_path] = array(
 }
 if ( ! $return_array ) {
 printf( 
-'<div style="text-align:center"><input type="button" class="button" value="%s" onclick="js56816af34b4f1.copy2clpb(this);" data-altcaption="%s"></div>', 
+'<div style="text-align:center"><input type="button" class="button" value="%s" onclick="jsMyBackup.copy2clpb(this);" data-altcaption="%s"></div>', 
 _esc( 'Copy to Clipboard' ), 
 _esc( '<< Back' ) );
 echo '<div class="check-setup-wrapper"><div>'; 
@@ -408,29 +408,49 @@ break;
 echo htmlentities( $buffer );
 }
 function export_settings() {
+global $factory_options;
 $js = '<script>setTimeout(function(){history.back();},3000);</script>';
 $err = false;
 ! isset( $this->method['format'] ) || empty( $this->method['format'] ) && $err = _esc( 'Unknown export format' );
-! file_exists( LOCAL_OPTION_DB_PATH ) &&
-$err = sprintf( _esc( 'File "%s" does not exist. That`s rather odd' ), LOCAL_OPTION_DB_PATH );
+$result = array();
+$array = getSettings();
+foreach ( $factory_options as $group => $options ) {
+$result[$group] = array();
+foreach ( $options as $option => $default_value )
+$result[$group][$option] = isset( $array[$option] ) ? $array[$option] : $default_value[0];
+}
+empty( $result ) && $err = _esc( 'The settings are empty. That`s rather odd.' );
 if ( false !== $err )
 return printf( $err . $js );
-$array = json_decode( file_get_contents( LOCAL_OPTION_DB_PATH ), true );
-$key = key( $array );
-$array = $array[$key];
-$file = addTrailingSlash( $this->settings['wrkdir'] ) . $key . '.' . $this->method['format'];
+$file = addTrailingSlash( $this->settings['wrkdir'] ) . WPMYBACKUP_LOGS . '-settings.' . $this->method['format'];
+is_file( $file ) && unlink( $file );
 switch ( $this->method['format'] ) {
 case 'xml' :
 $xml = new Array2XML();
-$data = $xml->createXML( WPMYBACKUP_LOGS . '_options', $array )->saveXML();
+$data = $xml->createXML( WPMYBACKUP_LOGS . '_options', $result )->saveXML();
 break;
 case 'ini' :
 $data = '';
-foreach ( $array as $key => $value )
+foreach ( $result as $group => $options ) {
+$data .= sprintf( '[%s]', $group ) . PHP_EOL;
+foreach ( $options as $key => $value ) {
+isset( $factory_options[$group][$key][3] ) &&
+$data .= PHP_EOL . '# ' . $factory_options[$group][$key][3] . PHP_EOL;
+if ( is_array( $value ) )
+$data .= sprintf( '%s = %s', $key, print_r( $value, 1 ) ) . PHP_EOL;
+else
 $data .= sprintf( '%s = %s', $key, $value ) . PHP_EOL;
+}
+$data .= PHP_EOL;
+}
 break;
 default :
-$data = json_encode( $array, JSON_PRETTY_PRINT );
+$greater_530 = version_compare( PHP_VERSION, '5.3.0-dev', '<' );
+$data = json_encode( $result, $greater_530 ? JSON_PRETTY_PRINT : 0 );
+$greater_530 || $data = str_replace( 
+array( ',"', '{' ), 
+array( ',' . PHP_EOL . '"', '{' . PHP_EOL ), 
+$data );
 break;
 }
 file_put_contents( $file, $data ) && file_exists( $file ) &&
@@ -465,7 +485,7 @@ function test_dwl() {
 $_this_ = $this;
 include_once ADDONFUNC_PATH . 'test_dwl.php';
 }
-function mybackup_core_backup(){
+function mybackup_core_backup() {
 submit_options();
 }
 function del_file() {
@@ -618,7 +638,7 @@ empty( $log_type ) && isset( $_POST['log_type'] ) && $log_type = $_POST['log_typ
 if ( ( $log = getLogfileByType( $log_type ) ) && file_exists( $log ) ) {
 @unlink( $log );
 $java_scripts[] = sprintf( 
-'js56816af34b4f1.popupWindow("%s","%s");', 
+'jsMyBackup.popupWindow("%s","%s");', 
 _esc( 'Notice' ), 
 sprintf( _esc( 'Log file <i>%s</i> deleted successfully!' ), normalize_path( $log ) ) );
 }
@@ -640,12 +660,13 @@ delete_option_wrapper( WPMYBACKUP_OPTION_NAME );
 update_option_wrapper( WPMYBACKUP_OPTION_NAME, $default_options );
 defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) && file_exists( TARGETLIST_DB_PATH ) && @unlink( TARGETLIST_DB_PATH );
 $java_scripts[] = sprintf( 
-'js56816af34b4f1.popupWindow("%s","%s",null,null,"#ffb600");', 
+'jsMyBackup.popupWindow("%s","%s",null,null,"#ffb600");', 
 _esc( 'Confirmation' ), 
 sprintf( 
 _esc( 
 'The application settings were reseted to their factory defaults.<br>%sPlease setup again the application in order to fit your needs.' ), 
 $bak_str ) );
+unset( $_SESSION['edit_step'] );
 }
 function del_oauth() {
 $service_name = $this->method['service'];

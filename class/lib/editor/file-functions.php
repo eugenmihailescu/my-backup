@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : file-functions.php $
  * 
- * @id      : file-functions.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : file-functions.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -444,7 +444,7 @@ array_unshift( $result, $path );
 return $result;
 }
 function getWPThemes( $count = false ) {
-$func_name = version_compare( get_bloginfo( 'version', 'display' ), '3.4', '<' ) ? 'get_themes' : 'wp_get_themes';
+$func_name = version_compare( get_bloginfo( 'version', 'display' ), '3.4-dev', '<' ) ? 'get_themes' : 'wp_get_themes';
 $result = _function_exists( $func_name ) ? wp_exec_in_blog( 
 $func_name, 
 array( array( 'allowed' => true, 'blog_id' => wp_get_current_blog_id() ) ) ) : array();

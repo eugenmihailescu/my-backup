@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : ssh.php $
  * 
- * @id      : ssh.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ssh.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td><label for="ssh_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="ssh_enabled" id="ssh_enabled" value="1"
-onclick='js56816af34b4f1.submitOptions(this,0);'
+onclick='jsMyBackup.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ssh_enabled"></td>
@@ -120,7 +120,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ssh_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote SSH command');?>'
-onclick="<?php printf( "js56816af34b4f1.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'js56816af34b4f1.ftpExecCmd(js56816af34b4f1.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
+onclick="<?php printf( "jsMyBackup.popupPrompt('%s','%s&lt;br&gt;%s&lt;a href=\'http://curl.haxx.se/docs/manpage.html#-q\' target=\'_blank\'&gt;%s&lt;/a&gt;%s',null,{'%s':'jsMyBackup.ftpExecCmd(jsMyBackup.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ssh=1&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','%s':null},'%s');",_esc('Execute remote SSH command'),_esc('Enter the remote SSH commands (comma-delimited)'),_esc('See also the '),_esc('Curl man-page'),_esc(' for a complete list of supported commands'),_esc('Execute'),_esc('Cancel'),_esc('(eg. mkdir <name>,rmdir <name>)'));?>"
 <?php echo $this->enabled_tag; ?>></td>
 <?php }?>
 </tr>

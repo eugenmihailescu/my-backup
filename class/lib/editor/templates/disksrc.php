@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : disksrc.php $
  * 
- * @id      : disksrc.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : disksrc.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -62,8 +62,7 @@ echo getHumanReadableSize( getDirCacheSize() );
 value=<?php echo "'" . $this->root . "'"; ?> size=40
 <?php echo $this->_readonly;?>><a class='help'
 onclick=<?php
-echo '"js56816af34b4f1.popupWindow(\'' . _esc( 'Help' ) . '\',\'' .
-sprintf( 
+echo '"jsMyBackup.popupWindow(\'' . _esc( 'Help' ) . '\',\'' . sprintf( 
 _esc( 'The root directory to backup. When left empty then<br><b>%s</b>' ), 
 addslashes( WPMYBACKUP_ROOT ) ) . '\');"';
 ?>>[?]</a></td>
@@ -74,22 +73,18 @@ title='<?php _pesc('Click to read this folder now');?>'></td>
 <?php if($this->_show_dir_buttons){?>
 <td><input type="button" name="folder_home"
 id="<?php echo $this->is_wp?'btn_wp_folder':'btn_folder';?>"
-onclick=<?php
-echo '"document.getElementById(\'dir\').value=\'' . addslashes( WPMYBACKUP_ROOT ) . '\';' . $reload_file_list .
-'"';
-?>
-class=<?php echo '"button '.($this->is_wp?'btn_wp_folder':'btn_folder').'"';?>
+onclick="<?php
+echo 'document.getElementById(\'dir\').value=\'' . addslashes( WPMYBACKUP_ROOT ) . '\';' . $reload_file_list;
+?>"
+class="<?php echo 'button '.($this->is_wp?'btn_wp_folder':'btn_folder');?>"
 title=<?php
 echo '\'' . WPMYBACKUP_ROOT . '\'';
 ?>></td>
 <?php } if($this->is_wp &&$this->_show_dir_buttons){$plugin_dir=ROOT_PATH;;?>
 <td><input type="button" name="folder_plugin" id="btn_plugin"
-onclick=<?php
-echo '"document.getElementsByName(\'dir\')[0].value=\'' . addslashes( $plugin_dir ) . '\';' .
-$reload_file_list . '"';
-?>
-class="button"
-title=<?php
-echo '\'' . $plugin_dir . '\'';
-?>></td><?php }?>
+onclick="<?php
+echo 'document.getElementsByName(\'dir\')[0].value=\'' . addslashes( $plugin_dir ) . '\';' .
+$reload_file_list;
+?>"
+class="button" title="<?php echo $plugin_dir;?>"></td><?php }?>
 </tr>

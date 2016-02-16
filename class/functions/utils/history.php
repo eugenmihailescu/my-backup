@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,31 +24,58 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : history.php $
  * 
- * @id      : history.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : history.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 function getJobsStatManager( $opts = null ) {
 global $settings;
+$upgrade_db = function ( $instance, &$opts ) {
+global $registered_db_upgrades;
+ksort( $registered_db_upgrades );
+$last_ver = '';
+foreach ( $registered_db_upgrades as $new_version => $callbacks ) {
+if ( ! isset( $opts['db_ver'] ) || version_compare( $opts['db_ver'], $new_version, '<' ) )
+foreach ( $callbacks as $priority => $callback )
+$instance->register_upgrade_callback( $callback, $new_version, $priority );
+version_compare( $last_ver, $new_version, '<' ) && $last_ver = $new_version;
+}
+$success = $instance->upgrade_db();
+if ( true === $success && ! ( empty( $last_ver ) || empty( $opts ) ) ) {
+if ( ! ( isset( $opts['db_ver'] ) && ( $opts['db_ver'] == $last_ver ) ) ) {
+$opts['db_ver'] = $last_ver;
+submit_options( null, $opts );
+}
+} else {
+global $java_scripts;
+$java_scripts[] = sprintf( 
+"jsMyBackup.popupError('%s','%s');", 
+_esc( 'DB Upgrade Error' ), 
+implode( PHP_EOL, $success ) );
+}
+};
 if ( null == $opts )
 $opts = $settings;
-if ( $opts['historydb'] == 'sqlite' )
+if ( $opts['historydb'] == 'sqlite' ) {
 $params = STATISTICS_LOGFILE;
-else
+} else {
 $params = array( 
 'host' => $opts['mysql_host'], 
 'port' => $opts['mysql_port'], 
 'db_name' => $opts['mysql_db'], 
 'user' => $opts['mysql_user'], 
 'pwd' => $opts['mysql_pwd'] );
-return new StatisticsManager( $params, $opts );
+}
+$result = new StatisticsManager( $params, $opts );
+$upgrade_db( $result, $opts );
+return $result;
 }
 function getJobInfo( $stat_mngr, $job_id ) {
 if ( ! ( $stat_mngr && $job_id ) )
@@ -82,7 +109,7 @@ continue;
 $operation = ceil( $data['operation'] / 2 );
 $result['operation'][$operation] = $operation;
 isset( $result['files'][$data['source_type']] ) || $result['files'][$data['source_type']] = array();
-$result['files'][$data['source_type']][$data['id']] = array( $data['filename'], $data['filesize'] );
+$result['files'][$data['source_type']][$data['id']] = array( $data['filename'], $data['filesize'], $operation );
 isset( $result['mode'] ) || $result['mode'] = $data['mode'];
 isset( $result['started_time'] ) || $result['started_time'] = $data['started_time'];
 isset( $result['job_status'] ) || $result['job_status'] = $data['job_status'];

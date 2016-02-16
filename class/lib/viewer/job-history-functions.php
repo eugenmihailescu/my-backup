@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : job-history-functions.php $
  * 
- * @id      : job-history-functions.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : job-history-functions.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -96,11 +96,11 @@ $rst = $stat_mngr->queryData( $sql );
 $i = 0;
 while ( $row = $stat_mngr->fetchArray( $rst ) ) {
 $onclick = "
-js56816af34b4f1.asyncGetMediaInfo ( " . $row['id'] . ", null );";
+jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", null );";
 $onclick .= "
-js56816af34b4f1.asyncGetMediaInfo ( " . $row['id'] . ", 'd' );";
+jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'd' );";
 $onclick .= "
-js56816af34b4f1.asyncGetMediaInfo ( " . $row['id'] . ", 'sysinfo' );";
+jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'sysinfo' );";
 $events = array( 'onclick="' . $onclick . '"' );
 $bg = '';
 switch ( $row['job_status'] ) {
@@ -108,7 +108,7 @@ case JOB_STATUS_RUNNING :
 if ( time() - $row['started_time'] > LONG_RUNNING_JOB_TIMEOUT ) {
 $status = 'suspect';
 $bg = 'rgba(255,0,0,0.25)';
-$events[] = "oncontextmenu='js56816af34b4f1.onHistoryListContextMenu(event);'";
+$events[] = "oncontextmenu='jsMyBackup.onHistoryListContextMenu(event);'";
 } else
 $bg = '#FFC';
 break;
@@ -128,7 +128,7 @@ $bg = 'rgba(255,0,0,0.25)';
 break;
 default :
 $status = 'unknown';
-$events[] = "oncontextmenu='js56816af34b4f1.onHistoryListContextMenu(event);'";
+$events[] = "oncontextmenu='jsMyBackup.onHistoryListContextMenu(event);'";
 break;
 }
 $style = empty( $bg ) ? '' : 'style="background-color:' . $bg . ';"';
@@ -211,7 +211,7 @@ $compression_type = isset( $COMPRESSION_APPS[$row['compression_type']] ) ? $COMP
 'unknown' );
 $job_size = round( $row['job_size'] / MB, 2 );
 $job_ratio = round( $row['ratio'], 2 );
-$job_duration = date( "H:i:s", $row['duration'] );
+$job_duration = date( TIME_FORMAT, $row['duration'] );
 $job_avg_speed = round( $row['avg_speed'] / MB, 2 );
 $job_peak_mem = round( $row['peak_mem'] / MB, 2 );
 $job_avg_cpu_style = $row['avg_cpu'] < 0.7 ? 'green' : ( $row['avg_cpu'] < 1 ? '#FF8000' : 'red' );
@@ -278,7 +278,7 @@ class='help' onclick=<?php echoHelp ( $help_2 ); ?>>[?]</a></td>
 <td>:</td>
 <td colspan="4"><img class="help"
 src="<?php echo plugins_url_wrapper('img/report.png', IMG_PATH);?>"
-onclick="js56816af34b4f1.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
+onclick="jsMyBackup.asyncGetJobLog('<?php echo strToBool($settings['logbranched'])&&!empty($row['unique_id'])?$row['unique_id']:$row['id'];?>')">
 <a class="help" onclick=<?php echoHelp ( $help_3 ); ?>><?php echo $row['unique_id'];?></a></td>
 </tr>
 <tr>
@@ -397,7 +397,8 @@ $stat_tbl = TBL_PREFIX . TBL_STATS;
 $files_tbl = TBL_PREFIX . TBL_FILES;
 $sources_tbl = TBL_PREFIX . TBL_SOURCES;
 $path_sql_subquery = '(SELECT path FROM ' . $paths_tbl . ' WHERE ' . $paths_tbl . '.jobs_id = ' . $stat_tbl .
-'.jobs_id AND cast(' . $paths_tbl . '.operation/2 as INT) = cast(' . $stat_tbl . '.operation/2 as INT))';
+'.jobs_id AND CAST(' . $paths_tbl . '.operation/2 as UNSIGNED) = CAST(' . $stat_tbl .
+'.operation/2 as UNSIGNED))';
 $sql = 'SELECT A.filename,' . $path_sql_subquery . ' as path,' . $stat_tbl . '.files_id,' . $stat_tbl .
 '.operation_time AS transfer_time,A.filesize,A.uncompressed,A.ratio,A.compress_time,A.disk_free,A.script_mem_usage AS compress_mem_usage,A.checksum,' .
 $stat_tbl . '.script_mem_usage AS transfer_mem_usage,A.source_type,A.source_path FROM ' . $stat_tbl .
@@ -407,8 +408,9 @@ $stat_tbl . '.script_mem_usage AS transfer_mem_usage,A.source_type,A.source_path
 $sources_tbl . '.source_type,' . $sources_tbl . '.path as source_path  FROM ' . $stat_tbl . ' INNER JOIN ' .
 $files_tbl . ' ON ' . $stat_tbl . '.files_id = ' . $files_tbl . '.id LEFT OUTER JOIN ' . $sources_tbl . ' ON ' .
 $files_tbl . '.sources_id=' . $sources_tbl . '.id WHERE ' . $stat_tbl . '.jobs_id=' . $params['id'] .
-' and action=' . METRIC_ACTION_COMPRESS . ')A ON ' . $files_tbl . '.filename=A.filename WHERE ' . $stat_tbl .
-'.jobs_id=' . $params['id'] . ' AND ' . $stat_tbl . '.action=' . METRIC_ACTION_TRANSFER . ' AND ' .
+' and action=' . METRIC_ACTION_COMPRESS . ')A ON ' . $stat_mngr->basename( $files_tbl . '.filename', false ) .
+'=' . $stat_mngr->basename( 'A.filename', false ) . ' WHERE ' . $stat_tbl . '.jobs_id=' . $params['id'] .
+' AND ' . $stat_tbl . '.action=' . METRIC_ACTION_TRANSFER . ' AND ' .
 sqlFloor( $stat_tbl . '.operation/2', $stat_mngr->isSQLite() ) . '=' . $params['media_info'] . ';';
 $sql_err = 'SELECT id,error FROM ' . $stat_tbl . ' WHERE jobs_id=' . $params['id'] . ' AND action=%d AND ' .
 sqlFloor( 'operation/2', $stat_mngr->isSQLite() ) . ' =' . $params['media_info'] .
@@ -447,10 +449,21 @@ $compress_err_style = count( $compress_errs ) > 0 ? $err_style : '';
 $transfer_err_style = count( $transfer_errs ) > 0 ? $err_style : '';
 $compress_speed = $row['compress_time'] > 0 ? round( $row['uncompressed'] / $row['compress_time'] / MB, 2 ) : 'inf';
 $transfer_speed = $row['transfer_time'] > 0 ? round( $row['filesize'] / $row['transfer_time'] / MB, 2 ) : 'inf';
-$source_type = ( SRCFILE_SOURCE == $row['source_type'] ? 'file' : ( MYSQL_SOURCE == $row['source_type'] ? 'MySQL database' : 'unknown' ) );
+$source_type = ( in_array( $row['source_type'], array( SRCFILE_SOURCE, WP_SOURCE ) ) ? 'file' : ( MYSQL_SOURCE ==
+$row['source_type'] ? 'MySQL database' : 'unknown' ) );
 if ( MYSQL_SOURCE == $row['source_type'] ) {
-extract( json_decode( str_replace( '""', '"', $row['source_path'] ), true ) );
-$source_path = sprintf( 'mysql://%s:%s@%s:%s/%s', $mysql_user, '****', $mysql_host, $mysql_port, $mysql_db );
+$array = json_decode( str_replace( '""', '"', $row['source_path'] ), true );
+( null == $array ) && $array = json_decode( $row['source_path'], true );
+if ( is_array( $array ) ) {
+extract( $array );
+$source_path = sprintf( 
+'mysql://%s:%s@%s:%s/%s', 
+$mysql_user, 
+'****', $mysql_host, 
+$mysql_port, 
+$mysql_db );
+} else
+$source_path = normalize_path( $row['source_path'] );
 } else
 $source_path = normalize_path( $row['source_path'] );
 $checksum = 'The original file <a href=\\\'http://en.wikipedia.org/wiki/MD5\\\'>MD5 hash</a> was : <b>' .
@@ -516,7 +529,7 @@ while ( $row = $stat_mngr->fetchArray( $rst ) ) {
 if ( $row['operation'] < 0 )
 continue;
 if ( null !== $row['operation'] ) {
-$onclick = "js56816af34b4f1.asyncGetMediaInfo(" . $params['id'] . "," . $row['operation'] / 2 . ");";
+$onclick = "jsMyBackup.asyncGetMediaInfo(" . $params['id'] . "," . $row['operation'] / 2 . ");";
 $onclick .= "document.getElementById('folder_info').style.display='inline-block';";
 } else
 $onclick = '';
@@ -588,9 +601,9 @@ $cpus[$row['core_id']] = array(
 'max_speed' => $row['max_speed'] );
 }
 $stat_mngr->freeResult( $rst );
+$html_rows = '<tr><th colspan="3" style="border-color:#fff;background-color:#f4ce2d;color:#000">%s</th></tr>';
 if ( count( $cpus ) > 0 ) {
-$html_rows = '<tr><th colspan="3" style="border-color:#fff;background-color:#f4ce2d;color:#000">' .
-$cpus[0]['model'] . '</th></tr>';
+$html_rows = sprintf( $html_rows, $cpus[0]['model'] );
 $first = true;
 foreach ( $cpus as $core_id => $cpu_data ) {
 $html_rows .= '<tr><th>core ' . $core_id . '</th><td>' . round( $cpu_data['min_speed'], 0 ) . 'MHz' .
@@ -600,7 +613,8 @@ $html_rows .= '<tr><th>core ' . $core_id . '</th><td>' . round( $cpu_data['min_s
 '</tr>';
 $first = false;
 }
-}
+} else
+$html_rows = sprintf( $html_rows, _esc( 'CPU info not available' ) );
 echo $html_rows;
 $sql = 'select MemTotal,MemFree,MemAvailable,SwapTotal,SwapFree from ' . $tbl_sysinfo_mem . ' where jobs_id=' .
 $params['id'] . ';';

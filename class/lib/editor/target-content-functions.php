@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : target-content-functions.php $
  * 
- * @id      : target-content-functions.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : target-content-functions.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -44,10 +44,10 @@ $is_win = isWin();
 if ( 'fssource' == $method['sender'] )
 if ( DIRECTORY_SEPARATOR != $root && ! $is_win || $is_win && strlen( $root ) > 3 ) {
 $div_id = uniqid( "dwl_spin_", MORE_ENTROPY );
-$folder_up_onclick = 'js56816af34b4f1.navFilesList("' . normalize_path( dirname( $root ) ) . '",-1,"' .
+$folder_up_onclick = 'jsMyBackup.navFilesList("' . normalize_path( dirname( $root ) ) . '",-1,"' .
 wp_create_nonce_wrapper( 'auto_save' ) . '");';
 echo sprintf( 
-"<tr  onclick='%s'><td><div class='folderup' style='background-image: url(img/go-back.png)' id='%s' onclick='%s'></div><a>&nbsp;..</a></td>", 
+"<tr onclick='%s'><td><div class='folderup' style='background-image: url(img/go-back.png)' id='%s' onclick='%s'></div><a>&nbsp;..</a></td>", 
 $folder_up_onclick, 
 $div_id, 
 $folder_up_onclick );
@@ -59,7 +59,7 @@ echo '<tr><td class="caption">' . _esc( 'Folder' ) . '</td><td class="caption" a
 _esc( 'Size' ) . '</td></tr>';
 $chk = ( "" == $method["excludedirs"] ? "checked='checked'" : "" );
 $root_id = uniqid( 'f_', MORE_ENTROPY );
-echo "<tr ><td><input type='checkbox' id='root_dir' onclick='js56816af34b4f1.toggle_children(this);' name='$root_id' $chk>" .
+echo "<tr ><td><input type='checkbox' id='root_dir' onclick='jsMyBackup.toggle_children(this);' name='$root_id' $chk>" .
 getSpanE( $root ) . "</td>";
 if ( $dir_show_size )
 echo '<td>' . getHumanReadableSize( getDirSizeFromCache( $root ) ) . '</td>';
@@ -69,12 +69,14 @@ $files = _call_user_func( $method['file_function'], $root, $dir_show_size );
 else
 $files = array();
 ksort( $files );
-getFileListContent( $files, $dir_show_size, 1, $root_id, $settings );
+getFileListContent( $files, $dir_show_size, $method['sender'], 1, $root_id, $settings );
 echo "</table>";
 }
 function _dir_is_excluded( $dir, &$excludedirs ) {
+$dir = delTrailingSlash( $dir );
 $result = false;
 foreach ( $excludedirs as $dirname ) {
+$dirname = delTrailingSlash( $dirname );
 $result = 0 === strpos( $dir, $dirname );
 if ( $result )
 break;
@@ -90,10 +92,11 @@ DIRECTORY_SEPARATOR != substr( $value, - 1 ) && $value .= DIRECTORY_SEPARATOR;
 } );
 return $excludedirs;
 }
-function getFileListContent( &$dirs, $dir_show_size, $level = 1, $parent_id = null, $settings = null ) {
+function getFileListContent( &$dirs, $dir_show_size, $sender, $level = 1, $parent_id = null, $settings = null ) {
 global $settings;
-$excludedirs = _get_excluded_dirs( $settings['excludedirs'] );
 $parent_id = ( empty( $parent_id ) ? uniqid( '', MORE_ENTROPY ) : $parent_id ) . ".$level";
+$root = key( $dirs );
+$excludedirs = _get_excluded_dirs( $settings['excludedirs'] );
 $i = 0;
 foreach ( $dirs as $fname => $dir ) {
 $style['link'] = '';
@@ -102,29 +105,30 @@ $fsize = $dir['size'];
 isset( $dir['desc'] ) && $fdesc = $dir['desc'];
 isset( $dir['style'] ) && $style = $dir['style'];
 isset( $dir['class'] ) && $class = $dir['class'];
-$onclick = isset( $dir['click'] ) ? trim( $dir['click'] ) : 'js56816af34b4f1.refreshFileList(this);';
+$onclick = isset( $dir['click'] ) ? trim( $dir['click'] ) : 'jsMyBackup.refreshFileList(this);';
 }
 $chk_id = $parent_id . '.' . $i++;
 $indent = 2 * $level . 'em';
 $chk = '';
-if ( ! _dir_is_excluded( 
-$fname . ( DIRECTORY_SEPARATOR != substr( $fname, - 1 ) ? DIRECTORY_SEPARATOR : '' ), 
-$excludedirs ) )
+$value = empty( $fdesc ) ? str_replace( 
+addTrailingSlash( normalize_path( dirname( $root ), true ) ), 
+'', 
+$fname ) : $fdesc;
+if ( ! _dir_is_excluded( $fname, $excludedirs ) )
 $chk = "checked='checked'";
 else
 $style['link'] .= ';text-decoration:line-through';
 $title = ! empty( $fdesc ) ? " title='$fname' " : '';
 echo "<tr" . ( ! isset( $style['row'] ) ? '' : " style='{$style['row']}'" ) .
-"><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='js56816af34b4f1.toggle_children(this);' $chk><a " .
+"><td style='padding-left:$indent'><input type='checkbox' name='$chk_id' onclick='jsMyBackup.toggle_children(this);' $chk data-path='$fname'><a " .
 ( empty( $class ) ? '' : " class=\"$class\"" ) . $title .
 ( empty( $onclick ) ? '' : 'onclick="' . $onclick . '"' ) .
-( ! empty( $style['link'] ) ? 'style="' . $style['link'] . '"' : '' ) . ">" .
-( empty( $fdesc ) ? str_replace( $settings['dir'], '', $fname ) : $fdesc ) . "</a></td>";
+( ! empty( $style['link'] ) ? 'style="' . $style['link'] . '"' : '' ) . ">" . $value . "</a></td>";
 if ( $dir_show_size )
 echo '<td>' . getHumanReadableSize( $fsize ) . '</td>';
 echo '</tr>';
 if ( isset( $dir['child'] ) )
-getFileListContent( $dir['child'], $dir_show_size, $level + 1, $chk_id, $settings );
+getFileListContent( $dir['child'], $dir_show_size, $sender, $level + 1, $chk_id, $settings );
 }
 }
 function getFileListInfo( &$dirs, $settings = null, $level = 0 ) {

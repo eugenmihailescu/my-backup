@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : MySQLSourceEditor.php $
  * 
- * @id      : MySQLSourceEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MySQLSourceEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -195,7 +195,7 @@ parent.removePopupLast();
 parent.mysql_table_selector=function(){
 var e=document.getElementById('tables'),items,i,p='',r,callback;
 if(parent.globals.UNDEFINED==typeof e)return; 
-parent.popupConfirm('Table Selector','<?php echo str_replace(PHP_EOL,'',$tables);?>',null,{ 'Select all' : 'js56816af34b4f1.mysql_table_select(true);','Deselect all' : 'js56816af34b4f1.mysql_table_select(null,true);','Save' : 'js56816af34b4f1.mysql_table_save();','Cancel' :null },'auto');
+parent.popupConfirm('Table Selector','<?php echo str_replace(PHP_EOL,'',$tables);?>',null,{ 'Select all' : 'jsMyBackup.mysql_table_select(true);','Deselect all' : 'jsMyBackup.mysql_table_select(null,true);','Save' : 'jsMyBackup.mysql_table_save();','Cancel' :null },'auto');
 if(i=e.value.indexOf('[')){
 p=e.value.substr(0,i);
 r=new RegExp('^'+p+'.+$');
@@ -206,7 +206,9 @@ items[i].checked='.+'==e.value||(''!=p && r.test(items[i].id));
 parent.mysql_table_select(e.value);
 if(parent.globals.UNDEFINED!=typeof items){
 callback=function(sender){
-if(parent.globals.UNDEFINED!=sender.target){
+sender=sender||window.event;
+sender=sender.target||sender.srcElement;
+if(parent.globals.UNDEFINED!=sender){
 var obj=parent.mysql_table_selector_get_tables('prefix');
 parent.mysql_table_select(MynixRegexUtils.array2regex(obj.items)+'.+',!obj.items.length);
 }
@@ -287,7 +289,7 @@ $mysql_format = $this->settings['mysql_format'];
 $mysqldump = strToBool( $this->settings['mysqldump'] );
 $prefix_label = empty( $this->_db_prefix ) || count( $this->_db_prefixes ) > 1 ? '[*]' : $this->_db_prefix;
 if ( $this->enabled )
-$prefix_html = sprintf( '<a class="help" onclick="js56816af34b4f1.mysql_table_selector();">%s</a>', $prefix_label );
+$prefix_html = sprintf( '<a class="help" onclick="jsMyBackup.mysql_table_selector();">%s</a>', $prefix_label );
 else
 $prefix_html = getSpan( $prefix_label, '#00adee' );
 require_once $this->getTemplatePath( 'mysql.php' );

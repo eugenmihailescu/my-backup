@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : AbstractJob.php $
  * 
- * @id      : AbstractJob.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractJob.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -560,14 +560,16 @@ $this->printJobSettings( $job_type, $this->_mode );
 protected function stopCompress( $filename, $uncompressed, $ratio, $vol_no = 0, $decompress = false ) {
 $duration = time() - $this->compress_start;
 $this->_cpu_peak = max( $this->_cpu_peak, get_system_load( $duration ) );
+$fs = getHumanReadableSize( @filesize( $filename ) );
+$us = $uncompressed > 0 ? getHumanReadableSize( $uncompressed ) : _esc( 'unknown bytes' );
 $this->logOutputTimestamp( 
 sprintf( 
 "<yellow><b>" . _esc( 'TAR volume(#%d) %s successfully (%s @ ratio %.2f => %s)' ) . "</b></yellow>", 
 $vol_no, 
 $decompress ? _esc( 'decompressed' ) : _esc( 'compressed' ), 
-$uncompressed > 0 ? getHumanReadableSize( $uncompressed ) : _esc( 'unknown bytes' ), 
+$decompress ? $fs : $us, 
 $ratio > 0 ? sprintf( '%.2f', $ratio ) : _esc( 'unknown' ), 
-getHumanReadableSize( filesize( $filename ) ) ), 
+$decompress ? $us : $fs ), 
 BULLET, 
 2 );
 if ( null !== $this->_statistics_manager ) {
@@ -578,7 +580,7 @@ $stat_data = array(
 'METRIC_UNCOMPRESSED' => $uncompressed, 
 'METRIC_RATIO' => $ratio, 
 'METRIC_TIME' => $duration, 
-'METRIC_SIZE' => ( file_exists( $filename ) ? filesize( $filename ) : 0 ), 
+'METRIC_SIZE' => ( is_file( $filename ) ? @filesize( $filename ) : 0 ), 
 'METRIC_DISK_FREE' => disk_free_space( $this->getWorkDir() ), 
 'JOBTBL_FILE_CHECKSUM' => file_checksum( $filename ), 
 'METRIC_SOURCE' => SRCFILE_SOURCE, 
@@ -958,6 +960,9 @@ return $this->bzipver;
 }
 public function getCompressionMethod() {
 return $this->method;
+}
+public function setCompressionMethod( $method ) {
+$this->method = $method;
 }
 public function getCompressionLevel() {
 return $this->level;

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : TarArchive.php $
  * 
- * @id      : TarArchive.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : TarArchive.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -44,8 +44,8 @@ define( __NAMESPACE__.'\\TAR_BUFFER_LENGTH', 8192 );
 define( __NAMESPACE__.'\\TAR_LONGLINK', '././@LongLink' );
 define( __NAMESPACE__.'\\BZ_OK', 0 );
 class TarArchive extends GenericArchive {
-function __construct( $filename, $provider = null ) {
-parent::__construct( $filename . '.tar', $provider );
+function __construct( $filename, $provider = null, $auto_ext = true ) {
+parent::__construct( $filename . ( $auto_ext ? '.tar' : '' ), $provider );
 $this->setDefaultComment();
 }
 private function _isValidHeader( $header ) {
@@ -245,7 +245,7 @@ $abort_signal_received = false;
 $ext = '.' . $COMPRESSION_NAMES[$method];
 $filter = '';
 list( $filter, $mode ) = $this->_getFilterMode( $method, $level, false );
-if ( ! _function_exists( $filter . 'open' ) )
+if ( in_array( $method, array( GZ, BZ2 ) ) && ! _function_exists( $filter . 'open' ) )
 throw new MyException( 
 sprintf( 
 _esc( 
@@ -305,7 +305,7 @@ preg_match( '/\.((' . implode( '|', $COMPRESSION_NAMES ) . ')$)/i', $this->getFi
 $mode = 'r';
 }
 ( null !== $method ) && list( $filter, $mode ) = $this->_getFilterMode( $method );
-if ( empty( $filter ) || ! _function_exists( $filter . 'open' ) )
+if ( empty( $filter ) || in_array( $method, array( GZ, BZ2 ) ) && ! _function_exists( $filter . 'open' ) )
 throw new MyException( 
 sprintf( 
 _esc( 

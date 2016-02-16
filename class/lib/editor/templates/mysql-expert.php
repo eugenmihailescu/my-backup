@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : mysql-expert.php $
  * 
- * @id      : mysql-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : mysql-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -42,7 +42,7 @@ id="mysql_maint"
 if ($enabled)
 echo 'checked';
 if ($this->enabled)
-echo " onclick='js56816af34b4f1.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
+echo " onclick='jsMyBackup.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
 echo $this->enabled ? '' : ' disabled';
 ?>><input type="hidden" name="mysql_maint" value="0"></td>
 <td><label for="mysql_maint"><?php _pesc('MySQL Table maintenance');?></label><a
@@ -53,7 +53,7 @@ echoHelp ( $help_1 );
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
 title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="js56816af34b4f1.run_mysql_maint();"
+name="mysql_maint_run" onclick="jsMyBackup.run_mysql_maint();"
 id="btn_mysql_maint" <?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>

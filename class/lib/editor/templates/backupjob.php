@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : backupjob.php $
  * 
- * @id      : backupjob.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -39,14 +39,14 @@ namespace MyBackup;
 <td><label for="name"><?php _pesc('Backup name');?></label></td>
 <td><input type="text" name="name" id='name'
 value=<?php echo '"' . $this->settings['name'] . '" '; ?>
-onchange="js56816af34b4f1.toggle_backup_name(this);" onkeypress="this.onchange();"
+onchange="jsMyBackup.toggle_backup_name(this);" onkeypress="this.onchange();"
 size="30"><a class='help' onclick=<?php echo echoHelp($help_1); ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="url"><?php _pesc('Backup prefix');?></label></td>
 <td><input type="text" name="url" id='url'
 value=<?php echo '"' . $this->settings['url'] . '" '; ?>
-onchange="js56816af34b4f1.toggle_backup_name(this);" onkeypress="this.onchange();"
+onchange="jsMyBackup.toggle_backup_name(this);" onkeypress="this.onchange();"
 size="30"><a class='help' onclick=<?php echo echoHelp($help_2); ?>>[?]</a></td>
 </tr>
 <tr>
@@ -76,12 +76,12 @@ echoHelp( $help_3 );
 <td><table class="form-settings" style=''>
 <tr>
 <td><select name="compression_type" id='compression_type'
-onchange="js56816af34b4f1.toggle_compression_type(this);">
+onchange="jsMyBackup.toggle_compression_type(this);">
 <?php echo $compression_ext;?>
 </select><a class='help' onclick=<?php echo echoHelp($help_6); ?>>[?]</a></td>
 <td><label for="compression_level"><?php _pesc('Level');?></label></td>
 <td><select name="compression_level" id="compression_level"
-onchange="js56816af34b4f1.submitOptions(this,0);" style='width: 100%'>
+onchange="jsMyBackup.submitOptions(this,0);" style='width: 100%'>
 <?php echo $clo_str;?>
 </select></td>
 </tr>
@@ -92,14 +92,14 @@ onchange="js56816af34b4f1.submitOptions(this,0);" style='width: 100%'>
 <td><table id="toolchain_grp">
 <tr>
 <td><input type="radio" name="toolchain" id="toolchain_int" value="intern"
-<?php echo $intern_checked; ?> onclick="js56816af34b4f1.submitOptions(this,0);"><label
+<?php echo $intern_checked; ?> onclick="jsMyBackup.submitOptions(this,0);"><label
 for="toolchain_int"><?php echo WPMYBACKUP; ?></label></td>
 <td><?php if(defined(__NAMESPACE__.'\\OPER_COMPRESS_EXTERN')){?>
 <table>
 <tr>
 <td><input type="radio" name="toolchain" id="toolchain_ext"
 value="extern" <?php echo $extern_checked . $extern_enabled; ?>
-onclick="js56816af34b4f1.submitOptions(this,0);">
+onclick="jsMyBackup.submitOptions(this,0);">
 <?php
 if ( isWin() ) {
 ?><a class='help' onclick=<?php echo echoHelp ( $help_7 ); ?>>[?]</a><?php
@@ -128,13 +128,13 @@ value="&nbsp;&nbsp;&nbsp;<?php _pesc('Benchmark');?>" id="btn_benchmark"
 title="<?php _pesc('Run a toolchain benchmark test now');?>"
 <?php if(0==feature_is_licensed('benchmark',$this->license[$this->license_id]))echo 'disabled';?>
 onclick="<?php
-echo "js56816af34b4f1.popupConfirm('" . _esc( 'Choose what to test' ) . "','" . sprintf( 
+echo "jsMyBackup.popupConfirm('" . _esc( 'Choose what to test' ) . "','" . sprintf( 
 _esc( 
 "This will create a %s random file and will try to use both (<b>%s</b> and <b>%s</b>) compression tools to measure/compair their performance. Its aim is to assist you deciding which tool to use and why.<br>On the other hand perhaps you might want to test some real-life data, namely those files you selected on the <b>Backup source</b> tab. So what is going to be?" ), 
 getHumanReadableSize( BENCHMARK_FILE_SIZE * MB ), 
 WPMYBACKUP, 
-PHP_OS ) . "',null,{'" . _esc( 'Random file' ) . "':'js56816af34b4f1.removePopupLast();js56816af34b4f1.do_benchmark(1);','" .
-_esc( 'My files' ) . "':'js56816af34b4f1.removePopupLast();js56816af34b4f1.do_benchmark(0);','" . _esc( 'Cancel' ) . "':null});";
+PHP_OS ) . "',null,{'" . _esc( 'Random file' ) . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(1);','" .
+_esc( 'My files' ) . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(0);','" . _esc( 'Cancel' ) . "':null});";
 ?>"></td>
 <td><a class="help" onclick=<?php
 echo echoHelp( $help_8 );
@@ -151,14 +151,14 @@ if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) && 'extern' == $compressi
 <td>
 <div class='hintbox <?php echo $this->container_shape;?>'
 id="comp_cmd_hint"
-onmouseover="js56816af34b4f1.showClipboardBtn(this,'visible','comp_cmd_clpb');"
-onmouseout="js56816af34b4f1.showClipboardBtn(this,'hidden','comp_cmd_clpb');">
+onmouseover="jsMyBackup.showClipboardBtn(this,'visible','comp_cmd_clpb');"
+onmouseout="jsMyBackup.showClipboardBtn(this,'hidden','comp_cmd_clpb');">
 <?php !$os_tool_ok && print('<p style="color:red">'._esc('The following command doesn`t work on your local system. Hint: check if your PHP has the necessary execute permission (ie. copy and execute the command below at the command prompt).').'</p>');echo $compress_cmd;?></div>
 <img id="comp_cmd_clpb"
 src="<?php echo $this->getImgURL ( 'edit-copy-32.png' ) ;?>"
 style="position: relative; float: right; right: 5px; visibility: hidden; cursor: pointer;"
 onmouseover="this.style.visibility='visible'"
-onclick="js56816af34b4f1.popupPrompt('<?php _pesc('Compatibility-mode copy');?>','<?php _pesc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)');?>', null,{'<?php _pesc('Close (ESC)');?>':null},js56816af34b4f1.stripHelpLink('comp_cmd_hint'),'textarea');"
+onclick="jsMyBackup.popupPrompt('<?php _pesc('Compatibility-mode copy');?>','<?php _pesc('Copy to clipboard: Ctrl+C, ESC (will strip the HTML tags :-)');?>', null,{'<?php _pesc('Close (ESC)');?>':null},jsMyBackup.stripHelpLink('comp_cmd_hint'),'textarea');"
 title='<?php _pesc('Click to copy to clipboard');?>'>
 </td>
 <td><img
@@ -205,7 +205,7 @@ echoHelp( $help_5 );
 <td><input type="button" name='run_wpmybackup_backup' class="button"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run Backup Now');?>"
 id="btn_run_backup"
-onclick=<?php echo '"js56816af34b4f1.asyncRunBackup(\'run_backup\',\''._esc('Backup').'\',\''.wp_create_nonce_wrapper('run_backup').'\',\''.wp_create_nonce_wrapper('get_progress').'\',\''.wp_create_nonce_wrapper('cleanup_progress').'\',\''.wp_create_nonce_wrapper('abort_job').'\');" ';?>
+onclick=<?php echo '"jsMyBackup.asyncRunBackup(\'run_backup\',\''._esc('Backup').'\',\''.wp_create_nonce_wrapper('run_backup').'\',\''.wp_create_nonce_wrapper('get_progress').'\',\''.wp_create_nonce_wrapper('cleanup_progress').'\',\''.wp_create_nonce_wrapper('abort_job').'\');" ';?>
 title='<?php _pesc('Click to run the backup now. It may take a while..');?>'></td>
 <td><input type="hidden" name="run_backup" value="0"></td>
 <td><div class="spin" id="spin_run"></div></td>

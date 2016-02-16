@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : BackupJobEditor.php $
  * 
- * @id      : BackupJobEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupJobEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -52,7 +52,7 @@ wp_create_nonce_wrapper( 'get_progress' ) . "','" . wp_create_nonce_wrapper( 'cl
 "','" . wp_create_nonce_wrapper( 'abort_job' ) . "');};";
 if ( ! empty( $registered_ciphres ) && isset( $this->settings['encryption'] ) &&
 ! empty( $this->settings['encryption'] ) ) {
-$this->java_scripts[] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js56816af34b4f1.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts[] = 'parent.decrypt_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).setAttribute("action",jsMyBackup.ajaxurl);document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 $this->java_scripts[] = "parent.do_decrypt=function(){var b=document.getElementById('do_decrypt'),e=document.getElementById('decrypt_file');e.onchange=function(){b.className='button-primary';b.style.display='inline-block';b.value='" .
 _esc( 'Decrypt Now' ) .
 "';};if('none'==e.style.display){e.style.display='inline-block';b.style.display='none';}else{parent.decrypt_action('decrypt_file','" .
@@ -278,10 +278,9 @@ _esc(
 'Linux and %s respectively can use one of these two versions of BZip:<br><ul style=\\\'list-style-type:square;list-style-position:inside;\\\'><li>BZIP2 that uses one thread only (thus only one CPU)</li><li>%s - which is a parallell implementation of BZIP; it uses all available CPUs</li></ul>' ), 
 getAnchorE( 'Cygwin', 'http://en.wikipedia.org/wiki/Cygwin' ), 
 getAnchorE( 'PBZIP2', 'http://compression.ca/pbzip2' ) ) . "'";
-$help_3 = "'" .
-_esc( 
-'Number of miliseconds to sleep the CPU between each compression cycle.<br>It throttles the CPU usage so other processes can take advantage of it.<br>To disable this feature set this option to zero.' ) .
-"'";
+$help_3 = "'" . _esc( 'The number of miliseconds to sleep the CPU between each compression cycle.' ) . '<br>' . _esc( 
+'It throttles the CPU usage so other processes can take advantage of it.' ) . '<br>' .
+_esc( 'To disable this feature set this option to zero.' ) . '<br>1 sec = 1000 ms' . "'";
 $help_4 = sprintf( 
 _esc( 
 'Select the way the files are included or not in the backup. The files will be selected and copied into the backup archive depending on what you select here:%s' ), 

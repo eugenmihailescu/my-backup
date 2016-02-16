@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,85 +24,91 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : Xml2Array.php $
  * 
- * @id      : Xml2Array.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : Xml2Array.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-define ( __NAMESPACE__.'\\WEBDAV_TEXT_KEY', '#text' );
+define( __NAMESPACE__.'\\WEBDAV_TEXT_KEY', '#text' );
 class Xml2Array {
 private $_dom;
 private $_cache;
 private $_namespace;
 private function _getNamespace() {
-$dom_array = $this->toArray ();
-if (count ( $dom_array ) > 0 && false !== reset ( $dom_array ) && preg_match ( '/([^:]+):/', key ( $dom_array ), $matches ))
-return $matches [1];
+$dom_array = $this->toArray();
+if ( count( $dom_array ) > 0 && false !== reset( $dom_array ) &&
+preg_match( '/([^:]+):/', key( $dom_array ), $matches ) )
+return $matches[1];
 return false;
 }
-function __construct($xml_string) {
+function __construct( $xml_string = null, $format_output = false, $version = '1.0', $encoding = 'UTF-8' ) {
 $this->_dom = null;
 $this->_cache = null;
-if (is_string ( $xml_string )) {
-$this->dom = new \DOMDocument ();
-$this->dom->loadXml ( $xml_string );
-$this->_cache = (null == $this->dom ? false : $this->_xmlNode2Array ( $this->dom )); 
-$this->_namespace = $this->_getNamespace ();
+if ( is_string( $xml_string ) ) {
+$this->dom = new \DOMDocument( $version, $encoding );
+$this->dom->formatOutput = $format_output;
+$this->dom->loadXml( $xml_string );
+$this->_cache = ( null == $this->dom ? false : $this->_xmlNode2Array( $this->dom ) ); 
+$this->_namespace = $this->_getNamespace();
 }
 }
-function _xmlNode2Array($node) {
-$occurance = array ();
+function _xmlNode2Array( $node ) {
+$occurance = array();
 $result = '';
-if (isset ( $node->childNodes ))
+if ( isset( $node->childNodes ) )
 foreach ( $node->childNodes as $child )
-$occurance [$child->nodeName] = isset ( $occurance [$child->nodeName] ) ? $occurance [$child->nodeName] + 1 : 1;
-if ($node->nodeType == XML_TEXT_NODE)
-$result = html_entity_decode ( htmlentities ( $node->nodeValue, ENT_COMPAT, 'UTF-8' ), ENT_COMPAT, 'ISO-8859-15' );
+$occurance[$child->nodeName] = isset( $occurance[$child->nodeName] ) ? $occurance[$child->nodeName] + 1 : 1;
+if ( $node->nodeType == XML_TEXT_NODE )
+$result = html_entity_decode( 
+htmlentities( $node->nodeValue, ENT_COMPAT, 'UTF-8' ), 
+ENT_COMPAT, 
+'ISO-8859-15' );
 else {
-if ($node->hasChildNodes ()) {
+if ( $node->hasChildNodes() ) {
 $children = $node->childNodes;
-for($i = 0; $i < $children->length; $i ++) {
-$child = $children->item ( $i );
-if (WEBDAV_TEXT_KEY != $child->nodeName) {
-if ($occurance [$child->nodeName] > 1)
-$result [$child->nodeName] [] = $this->_xmlNode2Array ( $child );
+for ( $i = 0; $i < $children->length; $i++ ) {
+$child = $children->item( $i );
+if ( WEBDAV_TEXT_KEY != $child->nodeName ) {
+if ( $occurance[$child->nodeName] > 1 )
+$result[$child->nodeName][] = $this->_xmlNode2Array( $child );
 else
-$result [$child->nodeName] = $this->_xmlNode2Array ( $child );
-} else if (WEBDAV_TEXT_KEY == $child->nodeName) {
-$text = trim ( $this->_xmlNode2Array ( $child ) );
-if (! empty ( $text ))
-$result [$child->nodeName] = $this->_xmlNode2Array ( $child );
+$result[$child->nodeName] = $this->_xmlNode2Array( $child );
+} else 
+if ( WEBDAV_TEXT_KEY == $child->nodeName ) {
+$text = trim( $this->_xmlNode2Array( $child ) );
+if ( ! empty( $text ) )
+$result[$child->nodeName] = $this->_xmlNode2Array( $child );
 }
 }
 }
-if ($node->hasAttributes ()) {
+if ( $node->hasAttributes() ) {
 $attributes = $node->attributes;
-if (! is_null ( $attributes ))
+if ( ! is_null( $attributes ) )
 foreach ( $attributes as $attr )
-$result ["@" . $attr->name] = $attr->value;
+$result["@" . $attr->name] = $attr->value;
 }
 }
 return $result;
 }
 function toArray() {
-if (null == $this->_cache)
-$this->_cache = (null == $this->dom ? false : $this->_xmlNode2Array ( $this->dom ));
+if ( null == $this->_cache )
+$this->_cache = ( null == $this->dom ? false : $this->_xmlNode2Array( $this->dom ) );
 return $this->_cache;
 }
-function getValueByPath($path, $root = null) {
+function getValueByPath( $path, $root = null ) {
 $found = true;
-$path = explode ( ' ', $path ); 
-$dom_array = null == $root ? $this->toArray () : $root;
+$path = explode( ' ', $path ); 
+$dom_array = null == $root ? $this->toArray() : $root;
 foreach ( $path as $path_key ) {
 $key = $this->_namespace . ':' . $path_key;
-if (isset( $dom_array [ $key]))
-$dom_array = $dom_array [$key];
+if ( isset( $dom_array[$key] ) )
+$dom_array = $dom_array[$key];
 else {
 $found = false;
 break;

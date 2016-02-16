@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : help.php $
  * 
- * @id      : help.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : help.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -180,7 +180,7 @@ return ( $quote_enclosed ? '"' : '' ) . "window.jsnspace.popupWindow('" .
 }
 function getPopup( $caption, $msg, $escaped = true ) {
 $escape_char = $escaped ? "\\" : '';
-return "<a class=$escape_char'help$escape_char' onclick=$escape_char'js56816af34b4f1.popupWindow(&quot;" . _esc( 'Help' ) .
+return "<a class=$escape_char'help$escape_char' onclick=$escape_char'jsMyBackup.popupWindow(&quot;" . _esc( 'Help' ) .
 "&quot;,$msg," . DEFAULT_JSPOPUP_WIDTH . ");$escape_char'>$caption</a>";
 }
 function highlight_inner_keys( $s, $array, $escaped = true ) {
@@ -220,7 +220,7 @@ getAnchor( empty( $about_str ) ? _esc( 'here' ) : $about_str, $url, $target, $es
 function readMoreHereE( $url, $about_str = null, $target = '_blank' ) {
 return readMoreHere( $url, $about_str, $target, true );
 }
-function getSpan( $str, $color = null, $font_style = null, $bg_color = null, $escape = false ) {
+function getSpan( $str, $color = null, $font_style = null, $bg_color = null, $escape = false, $id = false ) {
 $style = array();
 ! empty( $color ) && $style[] = "color:$color";
 ! empty( $bg_color ) && $style[] = "background-color:$bg_color";
@@ -229,7 +229,9 @@ $style = array();
 'bold' == $font_style ? 'weight' : 'style', 
 $font_style );
 $style = ! empty( $style ) ? ' style="' . implode( ';', $style ) . '"' : '';
-return escape_quotes( sprintf( "<span%s>$str</span>", empty( $style ) ? '' : $style ), $escape );
+return escape_quotes( 
+sprintf( "<span %s%s>$str</span>", empty( $id ) ? '' : ( 'id="' . $id . '"' ), empty( $style ) ? '' : $style ), 
+$escape );
 }
 function getSpanE( $str, $color = null, $font_style = null, $bg_color = null ) {
 return getSpan( $str, $color, $font_style, $bg_color, true );
@@ -238,7 +240,7 @@ function getExample( $caption, $message, $collapsed = true, $escape = true, $img
 global $container_shape;
 $id = uniqid( 'ex_' );
 $result = "<div class='postbox $container_shape' id='$id' style='padding:10px'><h4 class='hintbox $container_shape' style='border-radius:5px 5px 0 0;'><div style='display:inline-block'><b>$caption</b></div></h4><div class='inside $container_shape' style='padding:10px;border:1px solid #c0c0c0;border-top:none;background-color:#f5f5f5;margin:0;border-radius:0 0 5px 5px;'>$message</div></div>";
-$script = "<script>var el=document.getElementById('$id');js56816af34b4f1.addHeaderToggle(el.getElementsByTagName('h4'),true,'" .
+$script = "<script>var el=document.getElementById('$id');window.jsnspace.addHeaderToggle(el.getElementsByTagName('h4'),true,'" .
 ( empty( $img_path ) ? plugins_url_wrapper( 'img/', IMG_PATH ) : $img_path ) . "');" .
 ( $collapsed ? '' : "el.getElementsByTagName('h4')[0].click();" ) . '</script>';
 $x = $return_array ? '' : $script;

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : backupjob-expert.php $
  * 
- * @id      : backupjob-expert.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -150,13 +150,13 @@ echoHelp( $help_8 );
 <tr>
 <td colspan="2"><input type="button" class="button"
 value="<?php _pesc('Get the encryption password');?>"
-onclick="js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,'<?php
+onclick="jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl,'<?php
 echo http_build_query( 
 array( 'action' => 'encryption_info', 'nonce' => wp_create_nonce_wrapper( 'encryption_info' ) ) );
 ?>',null, null, null, '<?php _esc('Encryption info');?>', false);"> <input
 type="file" class="button" id="decrypt_file" name="decrypt_file[]"
 accept=".enc" multiple="multiple" style="display: none"> <input type="button"
 class="button" id="do_decrypt" value="<?php _pesc('Decrypt file');?>"
-onclick="js56816af34b4f1.do_decrypt();"></td>
+onclick="jsMyBackup.do_decrypt();"></td>
 </tr>
 <?php }?>

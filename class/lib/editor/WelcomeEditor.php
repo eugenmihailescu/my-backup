@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,16 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : WelcomeEditor.php $
  * 
- * @id      : WelcomeEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WelcomeEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+include_once EDITOR_PATH . 'file-functions.php';
 class WelcomeEditor extends AbstractTargetEditor {
 private $_init_error = false;
 private $_addons;
@@ -41,6 +42,8 @@ private $_dropin_dir;
 private $_video_ids;
 private $_js_addon_install;
 private $_nocheck;
+private $_upload_constraint_manual = 'http://php.net/manual/en/ini.core.php';
+private $_upload_constraint_link;
 private function _checkPrerequisites() {
 $chksetup = new CheckSetup( $this->settings );
 $keys = array( CHKSETUP_ENABLED_KEY, CHKSETUP_ENABLED_SETTINGS, CHKSETUP_ENABLED_WRITABLE );
@@ -79,7 +82,7 @@ $addons = array();
 $addonreg = new AddOnsRegister();
 foreach ( $files as $filename ) {
 if ( $addon = $addonreg->validate( $filename ) ) {
-if ( $addonreg->isRegistered( $addon['sku'] ) )
+if ( ! isset( $addon['sku'] ) || $addonreg->isRegistered( $addon['sku'] ) )
 continue;
 $addons[] = basename( $filename );
 }
@@ -90,7 +93,7 @@ private function _getJavaScripts() {
 $this->java_scripts[] = 'parent.php_setup=function(){parent.asyncRunJob(parent.ajaxurl,"' . http_build_query( 
 array( 'action' => 'php_setup', 'nonce' => wp_create_nonce_wrapper( 'php_setup' ) ) ) .
 '","PHP Setup",null, null, 4, null, -1,null,false);}';
-$this->java_scripts[] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).action=js56816af34b4f1.ajaxurl;document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
+$this->java_scripts[] = 'parent.addon_action=function(action,nonce){document.getElementById(parent.globals.ADMIN_FORM).setAttribute("action",jsMyBackup.ajaxurl);document.getElementsByName("action")[0].value=action;document.getElementsByName("nonce")[0].value=nonce;};';
 if ( ! ( $this->_init_error || empty( $this->_addons ) ) ) {
 $this->java_scripts_load[] = $this->_js_addon_install;
 }
@@ -98,6 +101,9 @@ $this->java_scripts_load[] = $this->_js_addon_install;
 protected function initTarget() {
 global $TARGET_NAMES;
 parent::initTarget();
+$this->_upload_constraint_link = array( 
+getAnchor( 'upload_max_filesize', $this->_upload_constraint_manual . '#ini.upload-max-filesize' ), 
+getAnchor( 'post_max_size', $this->_upload_constraint_manual . '#ini.post-max-size' ) );
 $this->_js_addon_install = 'parent.addon_action("addon_install","' . wp_create_nonce_wrapper( 'addon_install' ) .
 '");document.getElementById(parent.globals.ADMIN_FORM).submit();';
 $this->hasCustomFrame = true;
@@ -113,9 +119,24 @@ $this->_video_ids = array( '' );
 $this->_nocheck = isset( $_GET['nocheck'] );
 }
 protected function getEditorTemplate() {
-global $registered_targets, $TARGET_NAMES;
+global $registered_targets, $TARGET_NAMES, $COMPRESSION_NAMES;
 $dropin_dir = str_replace( ROOT_PATH, 'ROOT' . DIRECTORY_SEPARATOR, $this->_dropin_dir ); 
 $this->_nocheck || $setup_issues = $this->_checkPrerequisites();
+is_wp() && $wp_components = array_map( function ( $item ) {
+return basename( $item );
+}, array_keys( getWPSourceDirList( WPMYBACKUP_ROOT ) ) );
+$dashboard_link = getTabAnchorByConstant( 'APP_DASHBOARD' );
+$restore_addon_link = getAnchor( _esc( 'Restore Addon' ), APP_ADDONS_SHOP_URI . 'shop/restore-wizard' );
+$diff_restore_addon_link = getAnchor( 
+_esc( 'Differential backup' ), 
+APP_ADDONS_SHOP_URI . 'shop/differential-backup-support' );
+$inc_restore_addon_link = getAnchor( 
+_esc( 'Incremental backup' ), 
+APP_ADDONS_SHOP_URI . 'shop/incremental-backup-support' );
+$wpmybackup_plugin_link = getAnchor( WPMYBACKUP, 'https://wordpress.org/plugins/wp-mybackup' );
+$arcname_pattern = '[a-z0-9\-\.]';
+$gz_bz2_pre = '<pre>' . implode( '|', array( 'gz', 'bz2' ) ) . '</pre>';
+! defined( __NAMESPACE__.'\\IMPORT_PAGE' ) && define( __NAMESPACE__.'\\IMPORT_PAGE', false );
 require_once $this->getTemplatePath( 'welcome.php' );
 }
 }

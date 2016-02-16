@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : AbstractTarget.php $
  * 
- * @id      : AbstractTarget.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractTarget.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,47 +38,50 @@ namespace MyBackup;
 include_once FUNCTIONS_PATH . 'utils.php';
 class AbstractTarget {
 private $options, $enabled, $path, $age, $size_limit, $params;
-function __construct($target_name, $options, $params = null) {
+function __construct( $target_name, $options, $params = null ) {
 $this->options = $options;
-$this->setPath ( getParam ( $options, $target_name ) );
-$this->age = getParam ( $options, $target_name . "_age" );
-$this->setSizeLimit ( getParam ( $options, $target_name . "_limit" ) );
+$this->setPath( getParam( $options, $target_name ) );
+$this->age = getParam( $options, $target_name . "_age" );
+$this->setSizeLimit( getParam( $options, $target_name . "_limit" ) );
 $key = $target_name . '_enabled';
-$this->enabled =  isset ( $options [$key] )  && strToBool ( $options [$key] ); 
-$this->params = array ();
-if (null != $params)
-$this->setParams ( $params );
+$this->enabled =  isset( $options[$key] )  && strToBool( $options[$key] ); 
+$this->params = array();
+if ( null != $params )
+$this->setParams( $params );
 }
 function isEnabled() {
 return $this->enabled;
 }
-function setEnabled($enabled) {
+function setEnabled( $enabled ) {
 $this->enabled = $enabled;
 }
 function getPath() {
 return $this->path;
 }
-function setPath($path) {
+function setPath( $path ) {
+if ( '\\' == DIRECTORY_SEPARATOR ) {
+$path = str_replace( DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path );
+}
 $this->path = $path;
 }
 function getAge() {
-return intval ( $this->age );
+return intval( $this->age );
 }
 function getSizeLimit() {
 return $this->size_limit;
 }
-function setSizeLimit($size_limit) {
+function setSizeLimit( $size_limit ) {
 $this->size_limit = $size_limit;
 }
 function getParams() {
 return $this->params;
 }
-function setParams($params) {
+function setParams( $params ) {
 foreach ( $params as $param )
-$this->params [$param] = getParam ( $this->options, $param );
+$this->params[$param] = getParam( $this->options, $param );
 }
-function getOption($name) {
-return isset ( $this->options [$name] ) ? $this->options [$name] : null;
+function getOption( $name ) {
+return isset( $this->options[$name] ) ? $this->options[$name] : null;
 }
 function getOptions() {
 return $this->options;

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,17 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : url.php $
  * 
- * @id      : url.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : url.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
+define( __NAMESPACE__.'\\LMGTFY_URL', 'http://lmgtfy.com/?q=' );
 function is_cli() {
 return ( ! ( empty( $_ENV['SHELL'] ) && empty( $_SERVER['argv'] ) ) && empty( $_SERVER["REMOTE_ADDR"] ) );
 }
@@ -84,6 +85,7 @@ realpath( $_SERVER['SCRIPT_FILENAME'] ) );
 function stripUrlParams( $url, $varname ) {
 if ( empty( $varname ) )
 return $url;
+is_string( $varname ) && $varname = array( $varname );
 foreach ( $varname as $item ) {
 $re = '/([?&])' . $item . '(=)*[^&]*(&|$)/';
 while ( $url != ( $new_url = preg_replace( $re, '$1', $url ) ) )
@@ -192,5 +194,8 @@ $self_url = substr( $self_url, 0, strlen( $self_url ) - 1 );
 $lang_code = getSelectedLangCode();
 $query = false !== $lang_code ? '?lang=' . $lang_code : '';
 return sprintf( '%s%s/%s%s', $self_url, $file_relpath, $regaction_php, $query ); 
+}
+function lmgtfy( $string ) {
+return LMGTFY_URL . urlencode( $string );
 }
 ?>

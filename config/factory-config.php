@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : factory-config.php $
  * 
- * @id      : factory-config.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : factory-config.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -53,9 +53,12 @@ $compfilter_pattern = _esc( 'Use this option to filter the archive through %s' )
 $mysql_maint_pattern = _esc( 'Use this option if you want to run the MySQL %s maintenance' );
 $throttle_pattern = _esc( 'Specify the %s upload throttle size in KB' );
 $upload_dest_pattern = _esc( 'Set this option if you want to upload the backup to %s' );
-$factory_options['global'] = array( 'locked_settings' => array( false, '', '' ) );
+$factory_options['global'] = array( 
+'locked_settings' => array( false, '', '', _esc( 'Whether the settings are in read-only mode' ) ), 
+'plugin_ver' => array( '', '', '', _esc( 'Used by plug-in to run-once a code upgrade task' ) ), 
+'db_ver' => array( '', '', '', _esc( 'Used by plug-in to run-once an DB upgrade task' ) ) );
 $factory_options['backup'] = array( 
-'name' => array( '', 'name:', 'n:', _esc( 'The archive name' ) ), 
+'name' => array( '', 'name:', 'n:', _esc( 'The static archive name' ) ), 
 'url' => array( 
 str_replace( 
 DIRECTORY_SEPARATOR, 
@@ -63,7 +66,7 @@ DIRECTORY_SEPARATOR,
 preg_replace( '/http(s*):\/\//', '', is_cli() ? basename( $url ) : $url ) ), 
 'url:', 
 'u:', 
-_esc( 'The domain name used as prefix for backup archive' ) ), 
+_esc( 'The prefix used for a dynamic backup archive name' ) ), 
 'wrkdir' => array( sys_get_temp_dir(), 'wrkdir:', 'w:', _esc( 'Temporary working directory' ) ), 
 'blog_wrkdir' => array( 
 is_multisite_wrapper() ? wp_get_current_blog_id() : '', 
@@ -88,8 +91,12 @@ function_exists( '\\get_bloginfo' ) ? wp_get_admin_email() : '',
 'email:', 
 'm:', 
 _esc( 'The email address used for notification and/or backup2mail' ) ), 
-'relative_path' => array( false, 'relpath', '' ), 
-'wp_core_backup' => array( false, 'wpcorebackup', '' ), 
+'relative_path' => array( true, 'relpath', '', _esc( 'Strip the website root from the archived file name' ) ), 
+'wp_core_backup' => array( 
+false, 
+'wpcorebackup', 
+'', 
+_esc( 'Automatically backup WP plug-ins/themes on WP core upgrade' ) ), 
 'cygwin' => array( 
 CYGWIN_PATH, 
 'cygwin:', 
@@ -101,13 +108,12 @@ _esc( 'The CygWin path that may be used for the external compression toolchain' 
 '', 
 sprintf( _esc( 'Either bzip2|pbzip2. Use PBZip2 instead of BZip2 if available on your local %s' ), PHP_OS ) ), 
 'cpusleep' => array( 
-1000, 
+0, 
 'cpusleep:', 
 '', 
-_esc( 'The number of miliseconds to sleep the CPU between compression cycles' ) ), 
+_esc( 'Number of miliseconds to sleep the CPU between each compression cycle' ) ), 
 'retry' => array( 5, 'retry', '' ), 
 'retrywait' => array( 300, 'retrywait:', '' ), 
-'email_smtp' => array( false, '', '' ), 
 'memory_limit' => array( 
 max( 128, @constant( 'WP_MAX_MEMORY_LIMIT' ) ? round( php_inivalu2int( WP_MAX_MEMORY_LIMIT ) / MB ) : 0 ), 
 'mem_limit:', 
@@ -141,9 +147,9 @@ _esc( 'The vector used by the encryption cipher to encrypt/decrypt the backup' )
 $factory_options['target'] = array( 
 'ssl_ver' => array( 0, '', '' ), 
 'ssl_cainfo' => array( SSL_CACERT_FILE, '', '' ), 
-'ssl_chk_peer' => array( false, '', '', true ), 
-'ssl_chk_host' => array( false, '', '' ), 
-'dwl_throttle' => array( 0, '', '' ), 
+'ssl_chk_peer' => array( false, '', '', _esc( 'Check peers SSL identity' ) ), 
+'ssl_chk_host' => array( false, '', '', _esc( 'Check host SSL identity' ) ), 
+'dwl_throttle' => array( 0, '', '', _esc( 'Download throttling' ) ), 
 'http_proxy' => array( '', 'proxy:', '', _esc( 'The proxy host name/ip used for http communication' ) ), 
 'http_proxy_port' => array( 0, 'proxyport:', '', _esc( 'The proxy port' ) ), 
 'http_proxy_user' => array( '', 'proxyuser:', '', _esc( 'The proxy authentication user, if any' ) ), 
@@ -285,6 +291,13 @@ $factory_options['restore'] = array(
 'downloadforcebly' => array( false, '', '' ), 
 'restore_mybackup' => array( false, '', '' ), 
 'restore_acid' => array( true, '', '' ) );
+$upload_max_chunk_size = min( getUploadLimit(), disk_free_space( sys_get_temp_dir() ) ) / 1024;
+$upload_max_chunk_size -= $upload_max_chunk_size % 1000;
+$factory_options['dashboard'] = array( 
+'restore_upl_chunked' => array( false, '', '' ), 
+'upload_max_chunk_size' => array( $upload_max_chunk_size, '', '' ),  
+'upload_max_parallel_chunks' => array( 10, '', '' ), 
+'upload_send_interval' => array( 20, '', '' ) );
 $factory_options['disk'] = array( 
 'disk_enabled' => array( false, 'disk', '', sprintf( $upload_dest_pattern, 'disk' ), true ), 
 'disk' => array( getUserHomeDir(), 'diskpath:', '', sprintf( $dir_pattern, $local_disk ) ), 
@@ -294,7 +307,7 @@ $factory_options['ftp'] = array(
 'ftp_enabled' => array( false, 'ftp', '', sprintf( $upload_dest_pattern, 'ftp' ), true ), 
 'ftphost' => array( NULL, 'ftphost:', '', sprintf( $host_pattern, 'FTP' ) ), 
 'ftpport' => array( 21, 'ftpport:', '', sprintf( $port_pattern, 'FTP' ) ), 
-'ftp_active_port' => array( '-', 'ftpactiv:', '' ), 
+'ftp_active_port' => array( '-', 'ftpactiv:', '', 'https://curl.haxx.se/libcurl/c/CURLOPT_FTPPORT.html' ), 
 'ftpuser' => array( NULL, 'ftpuser:', '', sprintf( $user_pattern, 'FTP' ) ), 
 'ftppwd' => array( NULL, 'ftppwd:', '', sprintf( $pwd_pattern, 'FTP' ) ), 
 'ftp' => array( '/', 'ftpdir:', '', sprintf( $dir_pattern, 'FTP' ) ), 
@@ -487,12 +500,12 @@ $service = 'test';
 $err_msg = sprintf( 
 _esc( 'Download in browser is troublesome. Expected %s, got %s. %s' ), 
 '`' . $service . '`', 
-'`"+encodeURIComponent(xmlhttp.response)+"`', 
+'`"+encodeURIComponent(xmlhttp.responseText)+"`', 
 readMoreHereE( APP_ADDONS_SHOP_URI . 'faq-mybackup/#q7' ) );
 $span = '<span class=\\"warning-span\\">' . $err_msg . '</span>';
 $java_scripts_load[] = 'parent.asyncGetContent(parent.ajaxurl, "action=test_dwl&service=' . $service .
 '&nonce=' . wp_create_nonce_wrapper( 'test_dwl' ) . '","_dummy_",function(xmlhttp, el){if("' . $service .
-'" != xmlhttp.response){document.getElementById("notification_msg").innerHTML="' . $span . '";}});';
+'" != xmlhttp.responseText){document.getElementById("notification_msg").innerHTML="' . $span . '";}});';
 }
 }
 return array();

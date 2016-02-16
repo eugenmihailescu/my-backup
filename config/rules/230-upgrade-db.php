@@ -28,16 +28,34 @@
  * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
  * @date    : Tue Feb 16 15:27:30 2016 +0100 $
- * @file    : support-expert.php $
+ * @file    : 230-upgrade-db.php $
  * 
- * @id      : support-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 230-upgrade-db.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+global $registered_db_upgrades;
+$db_ver_230 = '2.3.1-dev';
+$registered_db_upgrades[$db_ver_230] = array( 'db_upgrade_230' );
+function db_upgrade_230( $statistics_manager ) {
+global $db_ver_230;
+$errors = array();
+$alter_bigint_cols = function ( $table, $cols ) use(&$statistics_manager ) {
+$col_list = array();
+foreach ( $cols as $col )
+$col_list[] = ' MODIFY COLUMN ' . $col . ' BIGINT';
+if ( false === $statistics_manager->queryData( 'ALTER TABLE ' . $table . implode( ',', $col_list ) ) )
+return sprintf( _esc( 'Error upgrading table %s' ), $table );
+return true;
+};
+if ( true !== ( $e = $alter_bigint_cols( 
+TBL_PREFIX . TBL_FILES, 
+array( METRIC_UNCOMPRESSED, METRIC_SIZE, METRIC_DISK_FREE ) ) ) ) {
+$errors[] = $e;
+}
+if ( true !== ( $e = $alter_bigint_cols( TBL_PREFIX . TBL_JOBS, array( 'job_size' ) ) ) ) {
+$errors[] = $e;
+}
+return empty( $errors ) ? true : $errors;
+}
 ?>
-<tr>
-<td><label for="whitespace_check"><?php echo _esc('Extra-whitespace check');?></label></td>
-<td><input id="whitespace_check" name="whitespace_check" type="number" size="5"
-min="0" value="<?php echo $this->settings['whitespace_check'];?>"><?php echo _esc('min');?><a
-class="help" onclick=<?php echoHelp( $help_whitespace );?>> [?]</a></td>
-</tr>

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : ftp.php $
  * 
- * @id      : ftp.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ftp.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td><label for="ftp_enabled"><?php _pesc('Enabled');?></label></td>
 <td><input type="checkbox" name="ftp_enabled" id="ftp_enabled" value="1"
-onclick='js56816af34b4f1.submitOptions(this,0);'
+onclick='jsMyBackup.submitOptions(this,0);'
 <?php
 echo $this->enabled ? 'checked' : '';
 ?>><input type="hidden" value="0" name="ftp_enabled"></td>
@@ -80,7 +80,7 @@ name="ftppasv" id="ftppasv"
 echo $this->_ftppasv ? 'checked' : '';
 echo $this->enabled_tag;
 if ( $is_curl_ftp )
-echo ' onclick="toggle_passive(this);"';
+echo ' onclick="jsMyBackup.toggle_passive(this);"';
 ?>><input type="hidden" name="ftppasv" value="0"><label for="ftppasv"><?php _pesc('Passive mode');?></label><a
 id="passive_ftp_help" class='help' onclick=<?php
 echoHelp( $help_2 );
@@ -131,7 +131,7 @@ title='<?php _pesc('Click to read this folder now');?>'
 <td><input type="button" name='exec_ftp_cmd' id="btn_remote_exec"
 class="button btn_remote_exec"
 title='<?php _pesc('Execute remote FTP command');?>'
-onclick="<?php echo "js56816af34b4f1.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'js56816af34b4f1.ftpExecCmd(js56816af34b4f1.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
+onclick="<?php echo "jsMyBackup.popupPrompt('"._esc('Exec remote command')."','"._esc('Enter the remote FTP commands (comma-delimited)')."',null,{'"._esc('Execute')."':'jsMyBackup.ftpExecCmd(jsMyBackup.ajaxurl,\'action=ftp_exec&nonce=".wp_create_nonce_wrapper('ftp_exec')."&ftp_cmd=\' + parentNode.parentNode.parentNode.getElementsByTagName(\'INPUT\')[0].value);','"._esc('Cancel')."':null},'(eg. SYST,STAT)');";?>"
 <?php echo $this->enabled_tag; ?>></td>
 </tr>
 </table>

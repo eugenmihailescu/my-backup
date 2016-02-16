@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogsEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -50,15 +50,15 @@ echo "<td><label for='$view_id'>" . ucwords( $log_name ) . " log</label></td>";
 echo '<td>:</td>';
 echo '<td ' . ( $log_exists ? '' : 'colspan="4"' ) . '>' . ( $log_exists ? str_replace( 
 LOG_DIR, 
-'<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="js56816af34b4f1.helpROOT();">ROOT</span>' .
+'<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="jsMyBackup.helpROOT();">ROOT</span>' .
 DIRECTORY_SEPARATOR, 
 $logfile ) : '(log file does not exist)' ) . '</td>';
 if ( $log_exists ) {
-echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='js56816af34b4f1.post(js56816af34b4f1.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" .
+echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='jsMyBackup.post(jsMyBackup.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" .
 ( isWin() ? addslashes( $logfile ) : $logfile ) . "\",nonce:\"" . wp_create_nonce_wrapper( 'dwl_file' ) .
 "\"});' title='Click to read this log file now'></td>";
 printf( 
-"<td><input type='button' name='%s' value='%s' class='button' onclick='js56816af34b4f1.clearLog(\"%s\",\"%s\");' title='%s'></td>", 
+"<td><input type='button' name='%s' value='%s' class='button' onclick='jsMyBackup.clearLog(\"%s\",\"%s\");' title='%s'></td>", 
 $clear_id, 
 _esc( 'Clear' ), 
 $log_type, 
@@ -66,7 +66,7 @@ $log_name,
 sprintf( _esc( 'Click to clear the %s log' ), $log_name ) );
 printf( "<td style='color:#bbb;'>%s</td>", getHumanReadableSize( @filesize( $logfile ) ) );
 echo "<td><input type='button' id='btn_monitor{$this->_index}' title='" .
-sprintf( _esc( 'Spy the %s log' ), $log_name ) . "' onclick='js56816af34b4f1.spy(\"log_read\",\"$log_type\",\"" .
+sprintf( _esc( 'Spy the %s log' ), $log_name ) . "' onclick='jsMyBackup.spy(\"log_read\",\"$log_type\",\"" .
 wp_create_nonce_wrapper( 'log_read' ) . "\",\"" . wp_create_nonce_wrapper( 'get_progress' ) . "\",\"" .
 wp_create_nonce_wrapper( 'clean_progress' ) . "\",\"" . wp_create_nonce_wrapper( 'log_read_abort' ) .
 "\");' class='button btn_monitor' style='display:$spy_shown'></td>";
@@ -93,7 +93,7 @@ $this->java_scripts[] = "parent.plugin_dir='" . addslashes( dirname( realpath( $
 $this->java_scripts[] = "var d = document.getElementById('monitor_job'),
 spy_status = document.getElementById('td_job_status').innerHTML,
 callback = function () {
-js56816af34b4f1.or = function () {
+jsMyBackup.or = function () {
 var status = document.getElementById('td_job_status').innerHTML;
 if (status && status != spy_status) {
 d = d && d.style && d.style.display == 'none' ? 'block' : 'none';
@@ -109,7 +109,7 @@ $this->java_scripts[] = "parent.helpROOT=function(){" .
 getHelpCall( "'This is the site log folder, that is:<br><i>" . normalize_path( LOG_DIR ) . "</i>'", false ) .
 "}";
 $clear_log_click = sprintf( 
-'js56816af34b4f1.post(js56816af34b4f1.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', 
+'jsMyBackup.post(jsMyBackup.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', 
 wp_create_nonce_wrapper( 'clear_log' ) );
 $this->java_scripts[] = "parent.clearLog=function(log_type, log_name){" . sprintf( 
 "parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", 
@@ -125,8 +125,8 @@ parent::initTarget();
 $this->_index = 0;
 $this->_is_running = isJobRunning();
 $this->root = ROOT_PATH;
-$this->_fct_chk_status = "js56816af34b4f1.asyncGetContent(js56816af34b4f1.ajaxurl,'action=chk_status&tab=logs&nonce=" .
-wp_create_nonce_wrapper( 'chk_status' ) . "','td_job_status',js56816af34b4f1.or);";
+$this->_fct_chk_status = "jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl,'action=chk_status&tab=logs&nonce=" .
+wp_create_nonce_wrapper( 'chk_status' ) . "','td_job_status',jsMyBackup.or);";
 $this->inBetweenContent = $this->_getDebugTemplate();
 $this->_getJavaScripts();
 }

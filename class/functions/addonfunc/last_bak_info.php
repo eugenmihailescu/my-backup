@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : last_bak_info.php $
  * 
- * @id      : last_bak_info.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : last_bak_info.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -49,12 +49,12 @@ $job_info = array(
 'id' => 0, 
 'mode' => $unknown, 
 'started_time' => 0, 
-'job_status' => 'JOB_STATUS_FINISHED', 
-'job_state' => 'JOB_STATE_FAILED', 
+'job_status' => $unknown, 
+'job_state' => $unknown, 
 'files' => $unknown, 
 'jobsize' => 0, 
-'operation' => array(), 
-'source_type' => array() );
+'operation' => array( $unknown ), 
+'source_type' => array( $unknown ) );
 }
 $update_url = function ( &$array ) use(&$url ) {
 global $TARGET_NAMES;
@@ -65,6 +65,14 @@ isset( $TARGET_NAMES[$key] ) && $array[$key] = preg_replace(
 getTabAnchor( $key ) );
 }
 };
+$format_date = function ( $date ) {
+$diff = time() - $date;
+if ( $diff < SECDAY )
+return _esc( 'today' ) . ', ' . date( TIME_FORMAT, $date );
+elseif ( $diff < 2 * SECDAY )
+return _esc( 'yesterday' ) . ', ' . date( TIME_FORMAT, $date );
+return date( DATETIME_FORMAT, $date );
+};
 $update_url( $job_info['source_type'] );
 $update_url( $job_info['operation'] );
 $job_info['job_status'] = getJobStatusStr( $job_info['job_status'], $job_info['started_time'] );
@@ -72,7 +80,7 @@ $job_info['job_state'] = getJobStateStr( $job_info['job_state'] );
 $job_info['mode'] = isset( $BACKUP_MODE[$job_info['mode']] ) ? $BACKUP_MODE[$job_info['mode']] : $unknown;
 isset( $job_info['operation'] ) || $job_info['operation'] = array( $unknown );
 $job_info['title'] = sprintf( _esc( 'Last %s backup' ), $job_info['job_state'][0] );
-$job_info['started_time'] = date( DATETIME_FORMAT, $job_info['started_time'] );
+$job_info['started_time'] = ! $job_info['started_time'] ? $unknown : $format_date( $job_info['started_time'] );
 $job_info['jobsize'] = getHumanReadableSize( $job_info['jobsize'] );
 $next_schedule = is_wp() ? wp_next_scheduled( WPCRON_SCHEDULE_HOOK_NAME ) : 'TBD';
 echo json_encode( $job_info, JSON_FORCE_OBJECT );

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : dashboard.php $
  * 
- * @id      : dashboard.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : dashboard.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,9 +38,43 @@ namespace MyBackup;
 <tr>
 <td colspan="3"><span id="job_info_title"
 style="font-size: 1.3em; font-weight: 600"></span></td>
+<td style="width: 100%" rowspan="10">
+<div style="text-align: center; margin-bottom: 10px;">
+<?php
+echo _esc( 'Upload and restore an external/custom backup archive' );
+echo ' (' . preg_replace( 
+'/(href=)([\'"])([^\2]+?)(\2.*>)([^<]+)/', 
+'\1\2\3#wp_full_restore_extern\4' . _esc( 'Read more' ), 
+getTabAnchorByConstant( 'APP_WELCOME' ) ) . ')';
+?>
+</div>
+<div id="drag_error" style="display: none;"></div>
+<div class="restore_drag_container">
+<?php
+$btn = sprintf( 
+'<input style="vertical-align:middle;" type="button" class="button button-choose-file" value="%s" onclick="jsMyBackup.uploader_obj.upload_select_files();">', 
+_esc( 'select' ) );
+$btn .= sprintf( 
+'<input id="select_file_dialog" type="file" style="display:none" multiple="multiple" accept="%s">', 
+'.' . implode( ',.', $COMPRESSION_NAMES ) );
+printf( 
+_esc( 'Drag & drop or %s a %s archive here. %s file size : %s' ), 
+$btn, 
+'.' . implode( '|.', $COMPRESSION_NAMES ), 
+preg_replace( '/(?=)post_max_size/', _esc( 'Max' ), $this->_upload_constraint_link[1] ), 
+getSpan( _esc( 'unknown' ), null, null, null, false, 'upload_max_size' ) );
+?>
+<table class="restore_drag_filelist"></table>
+<div id="upload_restore_toolbar">
+<input id="upload_restore_now"
+style="display: none; margin-left: auto; margin-right: auto" type="button"
+class="button-primary" onclick="<?php echo $on_restore_click1;?>">
+</div>
+</div>
+</td>
 </tr>
 <tr>
-<td colspan="3">
+<td colspan="3" style="vertical-align: top;">
 <table class="<?echo $this->container_shape;?>">
 <tr>
 <td><label><?php _pesc('Date');?></label></td>

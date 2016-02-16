@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : DiskSourceEditor.php $
  * 
- * @id      : DiskSourceEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : DiskSourceEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -76,32 +76,42 @@ $args = array(
 'file_function' => $this->target_item->function_name, 
 'tlid' => $this->target_item->uniq_id, 
 'nonce' => wp_create_nonce_wrapper( 'read_folder' ) );
-$this->java_scripts[] = "parent.refreshFileList=function(sender) {
+ob_start();
+?>
+parent.refreshFileList = function(sender) {
 var file_list = document.getElementById('file_list');
 if (file_list) file_list.className += ' loading';
-if(sender&&null!==parent.isNull(sender)){if(typeof sender==='string')path=sender;else path=0==sender.title.length?sender.innerHTML:sender.title;}else {path='$js_root';}
-document.getElementById('dir').value=path;
-parent.asyncGetContent(parent.ajaxurl,'dir='+path+'&" .
-http_build_query( $args ) . "','file_list');
-parent.refreshDiskSrcInfo(path);
-};parent.refreshFileList();";
+if (sender && null !== parent.isNull(sender)) {
+if (typeof sender === 'string') path = sender;
+else path = 0 == sender.title.length ? sender.innerHTML : sender.title;
+} else {
+path = '<?php echo $js_root;?>';
+}
+if(document.getElementById('dir').value!=path)
+document.getElementById('dir').value = parent.addTrailingSlash(document.getElementById('dir').value,'<?php echo '\\'.DIRECTORY_SEPARATOR;?>')+path ;
+parent.asyncGetContent(parent.ajaxurl, 'dir=' + document.getElementById('dir').value + '&<?php echo http_build_query( $args ) ;?>', 'file_list');
+parent.refreshDiskSrcInfo(document.getElementById('dir').value);
+};
+parent.refreshFileList();
+<?php
+$this->java_scripts['Z'] = ob_get_clean();
 }
 protected function getEditorTemplate() {
 $help_1 = "'" .
 _esc( 
 'Calculates and displays the file/folder size.<br>It may take some time to complete such task so use it with care.<br>Anyway, I will cache the data so that it will load faster next time.<br>If the data is not accurate you should clear the cache.' ) .
 "'";
-$reload_file_list = "js56816af34b4f1.navFilesList(null,0,'" . wp_create_nonce_wrapper( 'auto_save' ) . "');";
-$reload_file_list1 = 'js56816af34b4f1.submitOptions(this,0);';
+$reload_file_list = "jsMyBackup.navFilesList(null,0,'" . wp_create_nonce_wrapper( 'auto_save' ) . "');";
+$reload_file_list1 = 'jsMyBackup.submitOptions(this,0);';
 $show_file_size_toggle = sprintf( 
-"if(this.checked)js56816af34b4f1.popupConfirm('%s','%s',null,{'%s':'$reload_file_list1;js56816af34b4f1.removePopupLast();','%s':'document.getElementById(\'dir_show_size\').checked=false;js56816af34b4f1.removePopupLast();'});else $reload_file_list1", 
+"if(this.checked)jsMyBackup.popupConfirm('%s','%s',null,{'%s':'$reload_file_list1;jsMyBackup.removePopupLast();','%s':'document.getElementById(\'dir_show_size\').checked=false;jsMyBackup.removePopupLast();'});else $reload_file_list1", 
 _esc( 'Warning' ), 
 _esc( 
 'On large folders (i.e. thousands of files) displaying the folder size may take some time. Are you really sure you want to reload the list with this option on?' ), 
 _esc( 'Yes, I`m pretty sure' ), 
 _esc( 'Cancel' ) );
 $clear_cache_click = sprintf( 
-"js56816af34b4f1.popupConfirm('%s','%s',null,{'%s':'document.getElementsByName(\'clear_disk_cache\')[0].value=1;$reload_file_list1;','%s':null});", 
+"jsMyBackup.popupConfirm('%s','%s',null,{'%s':'document.getElementsByName(\'clear_disk_cache\')[0].value=1;$reload_file_list1;','%s':null});", 
 _esc( 'Confirm' ), 
 _esc( 
 'This command will clear the cache that stores the folder(s) size. The cache improves the speed of loading this page when &lt;b&gt;Show file size&lt;/b&gt; option on. The cache, however, will be automatically recreated whenever is needed.&lt;br;&gt;Are you sure you want do that now?' ), 

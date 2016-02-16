@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : globals.php $
  * 
- * @id      : globals.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : globals.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -81,10 +81,12 @@ global $tab_orientation;
 global $tab_position;
 global $transactions;
 global $registered_ciphres;
+global $registered_db_upgrades;
 global $registered_tab_redirects;
-isset ( $java_scripts ) || $java_scripts = array ();
-isset ( $java_scripts_beforeunload ) || $java_scripts_beforeunload = array ();
-isset ( $java_scripts_load ) || $java_scripts_load = array ();
-isset ( $java_scripts_unload ) || $java_scripts_unload = array ();
-isset ( $chart_script ) || $chart_script = array ();
+isset( $java_scripts ) || $java_scripts = array();
+isset( $java_scripts_beforeunload ) || $java_scripts_beforeunload = array();
+isset( $java_scripts_load ) || $java_scripts_load = array();
+isset( $java_scripts_unload ) || $java_scripts_unload = array();
+isset( $chart_script ) || $chart_script = array();
+isset( $registered_db_upgrades ) || $registered_db_upgrades = array();
 ?>

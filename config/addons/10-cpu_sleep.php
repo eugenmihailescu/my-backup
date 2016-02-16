@@ -28,16 +28,22 @@
  * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
  * @date    : Tue Feb 16 15:27:30 2016 +0100 $
- * @file    : support-expert.php $
+ * @file    : 10-cpu_sleep.php $
  * 
- * @id      : support-expert.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 10-cpu_sleep.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+
+define( __NAMESPACE__.'\\CPU_THROTTLING', true );
+function onUpgradeCPUSleep( $settings ) {
+$prev_version = isset( $settings['plugin_ver'] ) ? $settings['plugin_ver'] : '';
+$result = array();
+if ( version_compare( $prev_version, '0.2.3-dev' ) < 0 ) {
+$result['cpusleep'] = 0;
+}
+$result['plugin_ver'] = APP_VERSION_NO;
+return $result;
+}
+register_settings( 'onUpgradeCPUSleep' );
 ?>
-<tr>
-<td><label for="whitespace_check"><?php echo _esc('Extra-whitespace check');?></label></td>
-<td><input id="whitespace_check" name="whitespace_check" type="number" size="5"
-min="0" value="<?php echo $this->settings['whitespace_check'];?>"><?php echo _esc('min');?><a
-class="help" onclick=<?php echoHelp( $help_whitespace );?>> [?]</a></td>
-</tr>

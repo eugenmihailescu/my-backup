@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : config-custom.php $
  * 
- * @id      : config-custom.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-custom.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -46,7 +46,8 @@ define( __NAMESPACE__.'\\BENCHMARK_RANDWORDS_FILE', '/usr/share/dict/words' );
 define( __NAMESPACE__.'\\CYGWIN_PATH', "C:\cygwin\bin\bash.exe" ); 
 define( __NAMESPACE__.'\\PBZIP2', false ); 
 define( __NAMESPACE__.'\\BENCHMARK_FILE_SIZE', 100 ); 
-define( __NAMESPACE__.'\\DATETIME_FORMAT', 'Y-m-d H:i:s' );
+define( __NAMESPACE__.'\\TIME_FORMAT', 'H:i:s' );
+define( __NAMESPACE__.'\\DATETIME_FORMAT', 'Y-m-d ' . TIME_FORMAT );
 define( __NAMESPACE__.'\\MORE_ENTROPY', false ); 
 define( __NAMESPACE__.'\\SYST_USAGE_THRESOLD', 75 ); 
 define( __NAMESPACE__.'\\PROGRESS_LAZYWRITE', true ); 
@@ -66,9 +67,9 @@ $set_db( 'DB_COLLATE', '' );
 }
 define( __NAMESPACE__.'\\SSL_ENFORCE', false ); 
 define( __NAMESPACE__.'\\DEFAULT_BACKUP_LIFESPAN', 5 ); 
-define( __NAMESPACE__.'\\GIT_BRANCH_TYPE', 'hummingbird' ); 
-define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.2-10' ); 
+define( __NAMESPACE__.'\\GIT_BRANCH_TYPE', '' ); 
+define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-3' ); 
 define( __NAMESPACE__.'\\APP_VERSION_TYPE', 'hummingbird build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.2-10 - hummingbird build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_DATE', '2015-12-28' ); 
+define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-3 - hummingbird build' ); 
+define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-02-16' ); 
 ?>

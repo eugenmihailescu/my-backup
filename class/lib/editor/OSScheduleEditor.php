@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2015 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.2-10 $
- * @commit  : dd80d40c9c5cb45f5eda75d6213c678f0618cdf8 $
+ * @version : 0.2.3-3 $
+ * @commit  : 961115f51b7b32dcbd4a8853000e4f8cc9216bdf $
  * @author  : Eugen Mihailescu <eugenmihailescux@gmail.com> $
- * @date    : Mon Dec 28 17:57:55 2015 +0100 $
+ * @date    : Tue Feb 16 15:27:30 2016 +0100 $
  * @file    : OSScheduleEditor.php $
  * 
- * @id      : OSScheduleEditor.php | Mon Dec 28 17:57:55 2015 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
+ * @id      : OSScheduleEditor.php | Tue Feb 16 15:27:30 2016 +0100 | Eugen Mihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -65,7 +65,7 @@ PHP_EOL,
 "</span>" 
 ), ob_get_contents () );
 @ob_end_clean ();
-$this->java_scripts [] = "js56816af34b4f1.globals.help='" . str_replace ( "'", '"', $help ) . "';";
+$this->java_scripts [] = "jsMyBackup.globals.help='" . str_replace ( "'", '"', $help ) . "';";
 ob_start ();
 echo 'parent.globals.root="' . normalize_path ( $this->settings ['dir'] ) . '";';
 echo 'parent.globals.OS_CRON_STR=';
