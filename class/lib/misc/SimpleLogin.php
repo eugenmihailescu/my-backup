@@ -24,21 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-27 $
- * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @version : 0.2.3-30 $
+ * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 10:06:27 2016 +0100 $
+ * @date    : Fri Mar 18 17:18:30 2016 +0100 $
  * @file    : SimpleLogin.php $
  * 
- * @id      : SimpleLogin.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : SimpleLogin.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-define( __NAMESPACE__."\\SIMPLELOGIN_ALLOWED_USERS", "demo,sandbox" ); 
-define( __NAMESPACE__."\\SIMPLELOGIN_ALLOWED_USERS_PWD", "sr2jfh9e!4^O@S,ji!z4ExBkF!C*s" ); 
-define( __NAMESPACE__."\\SIMPLELOGIN_ALLOWED_USERS_EMAIL", "eugenmihailescux@gmail.com," ); 
-define( __NAMESPACE__."\\SIMPLELOGIN_ALLOWED_USERS_SECRETS", "1234567890," ); 
+defined( __NAMESPACE__.'\\SIMPLELOGIN_PWD_FILE' ) || define( __NAMESPACE__.'\\SIMPLELOGIN_PWD_FILE', __DIR__ . DIRECTORY_SEPARATOR . '.simplepwd' );
 define( __NAMESPACE__."\\SIMPLELOGIN_DEFAULT_PASSWORD_ENTROPY", 80 ); 
 define( __NAMESPACE__."\\SIMPLELOGIN_LOGIN_BOX_BORDER", "border: solid 1px #00adee; border-radius: 10px; padding: 10px" );
 define( __NAMESPACE__."\\SIMPLELOGIN_LOG_FILENAME", md5( "SimpleLogin" ) );
@@ -48,7 +45,98 @@ if ( ! defined( __NAMESPACE__."\\SIMPLELOGIN_SESSION_LOGGED" ) )
 define( __NAMESPACE__."\\SIMPLELOGIN_SESSION_LOGGED", 'simple_login_is_logged' ); 
 if ( ! defined( __NAMESPACE__.'\\LOCALE_DEFAULT_CHARSET' ) )
 define( __NAMESPACE__.'\\LOCALE_DEFAULT_CHARSET', 'utf8' );
+class PasswordManager {
+private $_users;
+private $_filename;
+private $_algorithm;
+private function loadFromFile( $filename ) {
+$result = false;
+if ( $fr = fopen( $filename, 'rb' ) ) {
+$result = array();
+while ( $line = fgets( $fr ) )
+if ( ! ( empty( $line ) || preg_match( '/^\s*#/', $line ) ) ) {
+$info = explode( ':', $line );
+$user = $info[0];
+$hash = isset( $info[1] ) ? $info[1] : false;
+$email = isset( $info[2] ) ? $info[2] : false;
+$secret = isset( $info[3] ) ? $info[3] : false;
+$result[$user] = array( 'hash' => $hash, 'email' => $email, 'secret' => $secret );
+}
+fclose( $fr );
+}
+return $result;
+}
+function __construct( $filename = null, $algorithm = PASSWORD_DEFAULT ) {
+if ( version_compare( PHP_VERSION, '5.5.0', '<' ) )
+throw new \Exception( sprintf( _( 'Class %s requires PHP v5.5.0+' ), __CLASS__ ) );
+$this->_algorithm = $algorithm;
+is_file( $filename ) && $this->_users = $this->loadFromFile( $filename );
+$this->_filename = $filename;
+}
+public function addUser( $username, $password, $email = false, $secret = false ) {
+if ( isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _( 'User %s already exists' ), $username ) );
+if ( empty( $password ) )
+throw new \Exception( _( 'Empty password not allowed' ) );
+$pwd_hash = password_hash( $password, $this->_algorithm );
+$secret_hash = password_hash( $secret, $this->_algorithm );
+$this->_users[$username] = array( 'hash' => $pwd_hash, 'secret' => $secret_hash );
+$this->setUserEmail( $username, $email );
+}
+public function delUser( $username ) {
+if ( ! isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _esc( 'User %s does not exists on %s' ), $username, $this->_filename ) );
+unset( $this->_users[$username] );
+$this->saveToFile();
+}
+public function verifyPassword( $username, $password ) {
+if ( ! isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _( 'User %s does not exist' ), $username ) );
+$hash = $this->_users[$username]['hash'];
+return password_verify( $password, $hash );
+}
+public function verifySecret( $username, $secret ) {
+if ( ! isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _( 'User %s does not exist' ), $username ) );
+$hash = $this->_users[$username]['secret'];
+if ( password_verify( $secret, $hash ) )
+return $this->_users[$username]['email'];
+return false;
+}
+public function setUserPassword( $username, $password, $secret = false ) {
+if ( ! isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _( 'User %s does not exist' ), $username ) );
+if ( empty( $password ) )
+throw new \Exception( _( 'Empty password not allowed' ) );
+$pwd_hash = password_hash( $password, $this->_algorithm );
+$secret_hash = password_hash( $secret, $this->_algorithm );
+$this->_users[$username]['hash'] = $pwd_hash;
+$secret && $this->_users[$username]['secret'] = $secret_hash;
+$this->saveToFile();
+}
+public function setUserEmail( $username, $email ) {
+if ( ! isset( $this->_users[$username] ) )
+throw new \Exception( sprintf( _( 'User %s not found' ), $username ) );
+$pattern = "\A[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\z";
+if ( ! preg_match( '/' . $pattern . '/', $email ) )
+throw new \Exception( sprintf( _( 'The email address %s is not valid' ), $email ) );
+$this->_users[$username]['email'] = $email;
+$this->saveToFile();
+}
+public function saveToFile( $filename = null ) {
+empty( $filename ) && $filename = $this->_filename;
+if ( empty( $filename ) )
+throw new \Exception( _esc( 'The filename is invalid' ) );
+array_walk( 
+$this->_users, 
+function ( &$item, $key ) {
+$item = sprintf( '%s:%s:%s:%s', $key, $item['hash'], $item['email'], $item['secret'] );
+} );
+file_put_contents( $filename, implode( PHP_EOL, $this->_users ) );
+}
+}
 class SimpleLogin {
+private $_pwd_manager;
 private $_is_logged;
 private $_force_ssl;
 private $_password_entropy;
@@ -121,12 +209,20 @@ file_put_contents( $this->_log_file, json_encode( $log_data ) );
 }
 return $brute_force;
 }
+private function _passwordEntropy( $password ) {
+$l = strlen( $password );
+$n = 1 + ord( '~' ) - ord( '!' );
+$total = pow( $n, $l );
+$h = $l * log( $n, 2 );
+return $h;
+}
 public function isLogged() {
 if ( $this->_force_ssl && ! $this->isSSL() )
 return false;
 return ( isset( $_SESSION[SIMPLELOGIN_SESSION_LOGGED] ) && true == $_SESSION[SIMPLELOGIN_SESSION_LOGGED] );
 }
 function __construct( $log_path = null, $force_ssl = false ) {
+$this->_pwd_manager = new PasswordManager( SIMPLELOGIN_PWD_FILE );
 $this->onCheckJavaScript = null;
 $this->java_scripts = array();
 if ( empty( $log_path ) )
@@ -144,15 +240,16 @@ $_SESSION[SIMPLELOGIN_SESSION_LOGGED] = $this->_is_logged;
 $this->_login_title = _( 'Login into system' );
 }
 public function loginUser( $username, $password ) {
-$allowed_users = explode( ',', SIMPLELOGIN_ALLOWED_USERS );
-$allowed_users_pwd = explode( ',', SIMPLELOGIN_ALLOWED_USERS_PWD );
-$user_key = array_search( $username, $allowed_users );
-if ( false !== $user_key && $allowed_users_pwd[$user_key] == $password ) {
+$is_logged = false;
+try {
+if ( $this->_pwd_manager->verifyPassword( $username, $password ) ) {
 $is_logged = true;
 $_SESSION[SIMPLELOGIN_SESSION_USERNAME] = $username;
-} else {
+}
+} catch ( \Exception $e ) {
+}
+if ( ! $is_logged ) {
 unset( $_SESSION[SIMPLELOGIN_SESSION_USERNAME] );
-$is_logged = false;
 }
 $_SESSION[SIMPLELOGIN_SESSION_LOGGED] = $is_logged;
 return $is_logged;
@@ -263,7 +360,9 @@ function recovery_pwd(url)
 var username=document.getElementById('username').value,secret=document.getElementById('pwd_recovery').value;
 if(username.length==0 || secret.length==0)
 <?php printf("return jsMyBackup.popupError('%s','<b>%s</b> and <b>%s</b> %s');",_('Error'),_('Username'),_('Secret'),_('must not be empty'));?>
-jsMyBackup.asyncGetContent(url,"action=login_recovery&username="+username+"&secret="+secret);
+BlockUI.block(document.body);
+document.body.style.cursor='wait';
+jsMyBackup.asyncGetContent(url,"action=login_recovery&username="+username+"&secret="+secret,null,function(xhr){BlockUI.unblock(document.body);document.body.style.cursor='initial';});
 }
 function set_login_state(entropy)
 {
@@ -299,19 +398,25 @@ $this->_insertHTMLSection( $section_name, true );
 $this->_insertHTMLSection( $section_name1, true );
 }
 public function recoverUserPassword( $username, $secret ) {
-$allowed_users = explode( ',', SIMPLELOGIN_ALLOWED_USERS );
-$allowed_users_pwd = explode( ',', SIMPLELOGIN_ALLOWED_USERS_PWD );
-$allowed_users_email = explode( ',', SIMPLELOGIN_ALLOWED_USERS_EMAIL );
-$allowed_users_secret = explode( ',', SIMPLELOGIN_ALLOWED_USERS_SECRETS );
-$user_key = array_search( $username, $allowed_users );
-$usersecret_key = array_search( $secret, $allowed_users_secret );
-if ( ! ( false === $user_key || false === $usersecret_key ) ) {
-$email = $allowed_users_email[$user_key];
-$password = $allowed_users_pwd[$user_key];
+$randomPassword = function ( $len ) {
+$result = '';
+for ( $i = 0; $i < $len; $i++ ) {
+$result .= chr( rand( 48, 122 ) );
+}
+return $result;
+};
+if ( $email = $this->_pwd_manager->verifySecret( $username, $secret ) ) {
+$len = 8;
+do {
+$password = $randomPassword( $len++ );
+} while ( $this->_passwordEntropy( $password ) < SIMPLELOGIN_DEFAULT_PASSWORD_ENTROPY );
+$this->_pwd_manager->setUserPassword( $username, $password );
 } else {
 throw new MyException( _( 'Bad username or secret' ) );
 }
-return @mail( $email, _( 'Password recovery' ), sprintf( _( "Your password is: %s" ), $password ) );
+$body = 'You have requested to reset your password.' . PHP_EOL .
+sprintf( _( "Your new randomly generated password is: %s" ), $password );
+return @mail( $email, sprintf( _( '%s password recovery' ), WPMYBACKUP ), $body );
 }
 public function recoverPassword() {
 $empty_fld = null;

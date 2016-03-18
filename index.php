@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-27 $
- * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @version : 0.2.3-30 $
+ * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 10:06:27 2016 +0100 $
+ * @date    : Fri Mar 18 17:18:30 2016 +0100 $
  * @file    : index.php $
  * 
- * @id      : index.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : index.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -43,10 +43,12 @@ exit();
 define( __NAMESPACE__."\\STARTPAGE_LOAD_TIME", microtime( true ) );
 define( __NAMESPACE__."\\INCLUDE_DEBUG_STATUSBAR", true );
 require_once 'config.php';
+define( __NAMESPACE__."\\SIMPLELOGIN_PWD_FILE", CONFIG_PATH . DIRECTORY_SEPARATOR . '.simplepwd' );
 require_once FUNCTIONS_PATH . 'utils.php';
 require_once LOCALE_PATH . 'locale.php';
 require_once FUNCTIONS_PATH . 'settings.php';
 define( __NAMESPACE__."\\YAYUI_HANDLER", true );
+$login_js = array();
 function _do_password_recovery( $login_obj ) {
 try {
 $login_obj->recoverPassword() &&
@@ -111,6 +113,12 @@ echo '<div class="wrap" id="wpmybackup_dashboard">' . PHP_EOL;
 ! defined( __NAMESPACE__."\\ALLOW_ONLY_WP" ) && define( __NAMESPACE__."\\ALLOW_ONLY_WP", false ); 
 if ( ! $is_logged && isset( $_POST ) && isset( $_POST['username'] ) && isset( $_POST['password'] ) ) {
 $is_logged = $login_obj->loginUser( $_POST['username'], $_POST['password'] );
+if ( ! $is_logged ) {
+$login_js[] = sprintf( 
+'jsMyBackup.popupError("%s","%s");', 
+_esc( 'Login failed' ), 
+_esc( 'The username or password does not match.' ) );
+}
 }
 if ( $is_logged && isset( $_POST ) && isset( $_POST['action'] ) && 'logout' == $_POST['action'] ) {
 $login_obj->logout();
@@ -139,13 +147,13 @@ _file_exists( $dashboard_file ) || $dashboard_class = 'Dashboard';
 require_once CLASS_PATH . "$dashboard_class.php";
 $dashboard_class = __NAMESPACE__ . '\\' . $dashboard_class;
 $dashboard = new $dashboard_class();
-$java_scripts = array_merge($java_scripts, $dashboard->getJavaScripts() );
+$java_scripts = array_merge( $java_scripts, $dashboard->getJavaScripts() );
 $footer_banner = $dashboard->getBanner( 'footer_banner' );
 $dashboard->show();
 }
 }
 if ( ! $is_logged ) {
-$login_js = _do_prepare_login_form( $login_obj );
+$login_js = array_merge( $login_js, _do_prepare_login_form( $login_obj ) );
 $java_scripts = array_merge( $java_scripts, $login_js );
 if ( ! empty( $login_js ) )
 echo '<script>' . implode( PHP_EOL, $login_js ) . '</script>';

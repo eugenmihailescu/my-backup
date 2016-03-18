@@ -1,0 +1,13 @@
+#########################################################################################################################
+# Each line stores a `username:password-hash:email:secret-hash` record where:
+# - username: is the user name in clear
+# - password-hash: is the hash string of the password (can be generated with the aid of PHP `password_hash` function)
+# - email: is the email associated with the username
+# - secret-hash: is the hash string of the secret phrase (can be generated with the aid of PHP `password_hash` function)
+#########################################################################################################################
+
+######################################################################
+# The `demo` user has the password and secret set to `demo@mybackup`
+# USE THESE DEMO USER|PASSWORDS ONLY ON A TEST ENVIRONMENT 
+######################################################################
+demo:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.:eugen@cubique.ro:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.
