@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="My-backup : An OS independent backup application">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>My-backup</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/eugenmihailescu/my-backup">View on GitHub</a>
+
+          <h1 id="project_title">My-backup</h1>
+          <h2 id="project_tagline">An OS independent backup application</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/eugenmihailescu/my-backup/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/eugenmihailescu/my-backup/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="mybackup" class="anchor" href="#mybackup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>MyBackup</h1>
+
+<p>Creates, restores, encrypts and schedules your backups (full, incremental, differential) to disk, Dropbox, Google Drive,FTP(s),SCP,SFTP,WebDAV,e-mail</p>
+
+<ul>
+<li>Contributors: eugenmihailescu</li>
+<li>Donate link: <a href="https://www.paypal.com/cgi-bin/webscr?cmd###_s-xclick&amp;hosted_button_idQRVSVFT9AUL7S">https://www.paypal.com/cgi-bin/webscr?cmd###_s-xclick&amp;hosted_button_idQRVSVFT9AUL7S</a>
+</li>
+<li>Requires PHP at least: 5.3</li>
+<li>Tested up to: 7.0</li>
+<li>Stable tag: 0.2.3-27</li>
+<li>License: GPLv3</li>
+<li>License URI: <a href="http://www.gnu.org/licenses/gpl-3.0.txt">http://www.gnu.org/licenses/gpl-3.0.txt</a>
+</li>
+</ul>
+
+<h2>
+<a id="description" class="anchor" href="#description" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Description</h2>
+
+<p><a href="http://mynixworld.info/shop">MyBackup</a> is a multisite plugin that enables blog authors and system administrators to backup and restore their blog and/or system files with ease. It allows you to create a full, differential or incremental backups of both files and your MySQL databases. Furthermore it secures the backup by uploading it to the local disk, Ftp(s), Scp, SFtp, Dropbox, Google Drive, Webdav or sent via SMTP within a single/multiple e-mail messages as attachments.</p>
+
+<p>The backup may be stored uncompressed (as a TAR archive) or compressed as TAR/Zip archives using GZip/BZip/LZF respectively Zip compression. Nonetheless the archive may be encrypted on the fly with an AES (Rijndael) cipher using a 128/192/256 bit key such that its content is protected from the curious eyes (it will take billions years to crack a 256-bit key).</p>
+
+<p>It allows you to restore with ease any backup created by itself or by some other application/plug-in both via an integrated Restore Wizard (PRO addon) and a built-in quick restore feature.  </p>
+
+<p>In order to help you understand how it works and/or diagnose a particular issue it includes enhanced debugging functionalities. The backup and restore jobs, the HTTP communication, the PHP and Ajax calls as well as well as the SMTP and SQL statements, all are logged into separated detailed log files.</p>
+
+<h3>
+<a id="major-features-included-in-mybackup" class="anchor" href="#major-features-included-in-mybackup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Major features included(*) in MyBackup</h3>
+
+<ul>
+<li>Support for open_basedir, safe_mode, disable_functions, max_execution_time, memory_limit PHP directives</li>
+<li>Support for websites hosted by <code>free web hosting</code> providers (where <code>open_basedir</code> and <code>safe_mode</code> are in effect)</li>
+<li>Support for creating full (complete), incremental and differential backups</li>
+<li>Support for splitting a large backup into multiple archive volumes</li>
+<li>Allows you to select <strong>what</strong> components (files,directories,MySQL db and tables) to include, <strong>how</strong> to store and <strong>where</strong> to store the backups</li>
+<li>Allows a complete backup of the system (not only your website files) by giving you access to the whole file system</li>
+<li>Comes with support for backing up any remote MySQL database</li>
+<li>Additionally, allows MySQL backups via the local mysqldump toolchain including custom options support</li>
+<li>Allows the usage of OS compression toolchain (additionally to its default compression toolchain)</li>
+<li>Offers Zip archive support for maximum portability and LZF compression for maximim speed</li>
+<li>Encrypts/decrypts the backup archives using the AES (Rijndael) cipher with a 128/192/256 bit key</li>
+<li>Allows backup execution from command line via a complete CLI interface</li>
+<li>Support for restoring a full, increment or differential backup set created by itself or by some other application/plug-in</li>
+<li>Allows definition of multiple backup and restore jobs via an user-friendly Wizard</li>
+<li>Allows backup schedule at the OS level where the backup job is run via the CLI interface</li>
+<li>MyBackup is known to work on Firefox, Chrome, IE, Opera over IIS/Apache with MySQL v5.0+, PHP 5.3+</li>
+</ul>
+
+<blockquote>
+<p><strong>Premium Support</strong></p>
+
+<p>The users of the free version hosted by github.com are welcome to use our free online support resources such as <a href="http://mynixworld.info/shop/getting-started-with-mybackup/">guides</a>, <a href="http://mynixworld.info/shop/tutorials">tutorials</a>, <a href="http://mynixworld.info/shop/faq-mybackup">FAQ</a>, <a href="http://mynixworld.info/shop/knowledge-base">Knowledge Base</a> and <a href="#">YouTube channel</a> videos. Read more <a href="http://mynixworld.info/shop/get-support/">here</a>.</p>
+
+<p>However, if you need dedicated one-time assistance regarding installation, job definitions, creation or restoration of a backup copy, or if you just need ongoing support, we are here to help you. More about this <a href="http://mynixworld.info/shop/shop/premium-support">here</a>.</p>
+</blockquote>
+
+<h3>
+<a id="other-features-you-will-love" class="anchor" href="#other-features-you-will-love" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Other features you will love</h3>
+
+<ul>
+<li>Allows saving the CPU and networking bandwidth during the backup execution by limiting (throttling) the usage of these resources</li>
+<li>Comes with an enhanced backup history integrated with statistics and charting</li>
+<li>Allows tweaking the networking settings (like proxy, SSL, throttling, network interface, timeout, etc)</li>
+<li>Comes with file explorer support to allow you access any file from the local/remote storage (like local disk, Dropbox, Google, FTP, SSH, WebDav, etc)</li>
+<li>The file explorer allows direct operations on the local and cloud storages such as direct downloads, delete, rename or directory creation</li>
+<li>Keeps the track of what is doing in separate debug log files: backup/restore jobs, HTTP communication, PHP errors/back-traces and Ajax calls, SMTP communication, SQL statements, etc.</li>
+<li>Automatic log archiving and rotation</li>
+</ul>
+
+<blockquote>
+<p><a name></a>(*) Please note that some of these features are not included in the free version. They may be bought and installed separately. See <a href="http://mynixworld.info/shop/comparison">here</a> a comparison between the free and Pro versions. Check also the <a href="http://mynixworld.info/shop/full-features-list/">full feature list</a> or the <a href="http://mynixworld.info/shop/screenshots/">60+ screenshots gallery</a> that reveals the most of these features at work. You can even test a live demo on our <a href="http://sandbox.mynixworld.info/mybackup/">MyBackup Sandbox</a>.</p>
+</blockquote>
+
+<p>MyBackup Pro ###</p>
+
+<p>This plugin comes in two different flavors:</p>
+
+<ul>
+<li>MyBackup Lite - the free edition of this plugin hosted at github.com. This edition should be just fine for the average user.</li>
+<li>
+<p><a href="http://mynixworld.info/shop/product/mybackup-pro/">MyBackup Pro</a> - the premium edition which is hosted by <a href="http://mynixworld.info/shop/">ourselves</a>. It is oriented towards those users who need a more robust and customizable backup application. It takes the advantage of over <a href="http://mynixworld.info/shop/product-category/addons/">20+ add-ons</a> that enhance the free version in all its aspects, from performance to functionality. For a comparison between the two editions please see a <a href="http://mynixworld.info/shop/comparison/">features comparison matrix</a>.</p>
+
+<p>Localization ###</p>
+</li>
+<li><p>English (default) - always included</p></li>
+<li>.pot file (<code>default.po</code>) for translators is also included</li>
+<li>
+<p><em>Want to contribute with your language? <a href="http://mynixworld.info/shop/localization/">Translations are welcome</a></em></p>
+
+<p>Feedback ###</p>
+</li>
+<li><p>I am open for your suggestions and feedback - Thank you for using or trying out one of my plugins!</p></li>
+<li>Drop me a line <a href="http://twitter.com/eugenmihailescu">@eugenmihailescu</a> on Twitter</li>
+<li>Follow me on <a href="http://www.facebook.com/eugenmihailescu">my Facebook page</a>
+</li>
+<li>Or follow me on <a href="http://plus.google.com/+EugenMihailescu">+Eugen Mihailescu</a> on Google Plus ;-)</li>
+</ul>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><a href="http://mynixworld.info/shop/tutorials/#wp_install">Please read our complete installation tutorial</a>.</p>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FAQ</h2>
+
+<p>The answers to the most frequently asked questions can be found at <a href="http://mynixworld.info/shop/faq-mybackup">MyBackup FAQ page</a>.</p>
+
+<h2>
+<a id="upgrade-notice" class="anchor" href="#upgrade-notice" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Upgrade Notice</h2>
+
+<p>Upgrade MyBackup to the latest version to make sure you benefit the latest improvements and bug fixes.</p>
+
+<h2>
+<a id="translations" class="anchor" href="#translations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Translations</h2>
+
+<ul>
+<li>English - default, always included</li>
+</ul>
+
+<p><em>Note:</em> The plugin is localized/translatable by default. Please contribute your language to the plugin to make it even more useful. For translating I recommend the <a href="http://poedit.net/">"PoEdit" application</a>.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">My-backup maintained by <a href="https://github.com/eugenmihailescu">eugenmihailescu</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
