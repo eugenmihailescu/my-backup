@@ -1,13 +1,32 @@
 #########################################################################################################################
+# NOTE : The empty lines or those that starts with a `#` symbol are regarded as comments thus discarded
+#########################################################################################################################
+
+#########################################################################################################################
+#
+# PASSWORD RECORD FORMAT:
+#
 # Each line stores a `username:password-hash:email:secret-hash` record where:
 # - username: is the user name in clear
 # - password-hash: is the hash string of the password (can be generated with the aid of PHP `password_hash` function)
 # - email: is the email associated with the username
 # - secret-hash: is the hash string of the secret phrase (can be generated with the aid of PHP `password_hash` function)
+#
+# [!] Observe that the field separator is the colon, ie. `:` symbol.
+#
 #########################################################################################################################
 
-######################################################################
+#########################################################################################################################
+#
+# NOTE: 
+#
 # The `demo` user has the password and secret set to `demo@mybackup`
+# The default email address is set to `youremail@yourdomain.com`. Set your own password instead.
 # USE THESE DEMO USER|PASSWORDS ONLY ON A TEST ENVIRONMENT 
-######################################################################
-demo:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.:eugen@cubique.ro:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.
+#########################################################################################################################
+
+#####################################################
+# !!! THIS IS A DEMO USER FOR TEST PURPOSE ONLY !!!
+#####################################################
+
+demo:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.:youremail@yourdomain.com:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.
