@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : ActionHandler.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -71,7 +71,8 @@ $klen = array_reduce(
 array_keys( $this->method ), 
 function ( $carry, $item ) {
 return max( $carry, strlen( $item ) );
-} );
+}, 
+'' );
 foreach ( $this->method as $key => $value )
 ! ( empty( $key ) || empty( $value ) ) && 'action' != $key && $log_data .= sprintf( 
 "  %{$klen}s => %s", 
@@ -123,7 +124,7 @@ break;
 }
 if ( ! ( empty( $session_class ) || empty( $storage_class ) || empty( $service ) ) ) {
 $service_auth_file = ROOT_OAUTH_FILE . $service . '.auth';
-if ( ! file_exists( $service_auth_file ) )
+if ( ! _file_exists( $service_auth_file ) )
 return;
 $authInfo = json_decode( file_get_contents( $service_auth_file ), true );
 $session_class = __NAMESPACE__ . '\\' . $session_class;
@@ -152,10 +153,11 @@ return time() - $file['start'] > LONG_RUNNING_JOB_TIMEOUT ? false : $file;
 } );
 return $provider;
 } );
+header( 'Content-Type: application/json;charset=utf-8' );
 die( json_encode( $array ) );
 }
 function cleanup_progress() {
-if ( file_exists( PROGRESS_LOGFILE ) )
+if ( _file_exists( PROGRESS_LOGFILE ) )
 @unlink( PROGRESS_LOGFILE );
 }
 function run_mysql_maint() {
@@ -171,8 +173,14 @@ echo $e->getMessage();
 }
 }
 function chk_status() {
-$result = isJobRunning();
-echo $result[1];
+$status = isJobRunning();
+echo json_encode( 
+array( 
+'status' => $status[0], 
+'message' => stripslashes( $status[1] ), 
+'last_job_id' => $status[2], 
+'nonce' => wp_create_nonce_wrapper( 'chk_status' ) ), 
+JSON_FORCE_OBJECT );
 }
 function ftp_exec() {
 $is_sftp = isset( $this->method['ssh'] );
@@ -187,7 +195,7 @@ $result = $ftp->ftpExecRawCmds( $cmds[0], $cmds[1] );
 foreach ( $cmds[0] as $cmd ) {
 echo getAnchor( 
 getSpanE( $cmd, 'cyan', 'bold' ), 
-lmgtfy (( $is_sftp ? 's' : '' ) . 'ftp rfc '.$cmd.' command' ));
+lmgtfy( ( $is_sftp ? 's' : '' ) . 'ftp rfc ' . $cmd . ' command' ) );
 echo getSpanE( _esc( 'returned the following result:' ), 'yellow' );
 echo '<blockquote>';
 if ( is_array( $result ) && isset( $result[$cmd] ) )
@@ -201,7 +209,7 @@ echo '</blockquote>';
 private function _log_read_validate() {
 isset( $this->method['log_type'] ) && '' != ( $log_type = $this->method['log_type'] ) ||
 die( "Internal error: no log type specified" );
-( ! ( ( $log = getLogfileByType( $log_type ) ) && file_exists( $log ) ) ) &&
+( ! ( ( $log = getLogfileByType( $log_type ) ) && _file_exists( $log ) ) ) &&
 die( sprintf( _esc( "Log file %s not found" ), $log ) );
 return $log;
 }
@@ -265,9 +273,10 @@ if ( $prop == 'action' || $prop == 'nonce' )
 continue;
 $this->settings[$prop] = urldecode( $value ); 
 }
-update_option_wrapper( WPMYBACKUP_OPTION_NAME, $this->settings );
+submit_options( null, $this->settings );
 }
 function php_setup( $return_array = false ) {
+$color_by_value = array( true => 'green', false => 'red' );
 $chksetup = new CheckSetup( $this->settings, ! $return_array );
 $array = $chksetup->getSetup();
 $cpu_info = getCpuInfo();
@@ -324,9 +333,13 @@ _esc(
 'depends on the following PHP extensions or settings:<br>(make sure everything is green otherwise some feature might not work)' ) );
 echo '<table class="check-setup-phpext" style="border-spacing:0px;width:100%">';
 foreach ( $array as $key => $value ) {
-$color = $value[CHKSETUP_ENABLED_KEY] || 'safe_mode' == $key ? 'green' : 'red';
+if ( in_array( $key, array( 'open_basedir', 'disable_functions', 'safe_mode' ) ) )
+$color = $color_by_value[! $value[CHKSETUP_ENABLED_KEY]];
+else
+$color = $color_by_value[$value[CHKSETUP_ENABLED_KEY]];
 echo "<tr class='php_setup_tbl'><td><b>" . strtoupper( $key ) . "</b></td><td>:</td><td style='color:" .
-$color . "'>" . ( $value[CHKSETUP_ENABLED_KEY] ? "enabled" : "disabled" ) . '</td></tr>';
+$color . "'>" . ( $value[CHKSETUP_ENABLED_KEY] ? _esc( "enabled" ) : _esc( "disabled" ) ) .
+'</td></tr>';
 if ( count( $value ) > 1 ) {
 foreach ( $value as $k => $v ) {
 if ( $k == CHKSETUP_ENABLED_KEY || ! isset( $v ) )
@@ -359,7 +372,7 @@ echo '<table class="check-setup-wpplugins"><tr class="php_setup_tbl" style="font
 _esc( 'Name' ) . '</td><td>' . _esc( 'Version' ) . '</td><td>' . _esc( 'Active' ) . '</td></tr>';
 foreach ( $wp_plugins as $plugin )
 echo '<tr><td>' . getAnchor( $plugin['name'], $plugin['uri'] ) . '</td><td>' . $plugin['version'] .
-'</td><td>' . boolToStr( $plugin['active'] ) . '</td></tr>';
+'</td><td>' . boolToStr( $plugin['active'], true ) . '</td></tr>';
 echo '</table>';
 }
 echo '</div><textarea rows="20" cols="80" readonly style="display:none;margin-top:10px"></textarea></div>'; 
@@ -386,7 +399,8 @@ $alerts = $alert_message_obj->getMessagesByKeys(
 array( 'status', 'type' ), 
 array( MESSAGE_ITEM_UNREAD, array( MESSAGE_TYPE_WARNING, MESSAGE_TYPE_ERROR ) ) );
 if ( count( $alerts ) > 0 )
-echo '<span onclick="location.href=\'' . replaceUrlParam( $_SERVER['HTTP_REFERER'], 'tab', 'notification' ) .
+echo '<span onclick="location.href=\'' .
+replaceUrlParam( stripUrlParams( $_SERVER['HTTP_REFERER'], 'installed' ), 'tab', 'notification' ) .
 '\'" class="alert-span" id="notification_msg_span">' .
 sprintf( _esc( 'You have %d unread alert(s)' ), count( $alerts ) ) . '</span>';
 }
@@ -423,7 +437,7 @@ empty( $result ) && $err = _esc( 'The settings are empty. That`s rather odd.' );
 if ( false !== $err )
 return printf( $err . $js );
 $file = addTrailingSlash( $this->settings['wrkdir'] ) . WPMYBACKUP_LOGS . '-settings.' . $this->method['format'];
-is_file( $file ) && unlink( $file );
+_is_file( $file ) && unlink( $file );
 switch ( $this->method['format'] ) {
 case 'xml' :
 $xml = new Array2XML();
@@ -453,7 +467,7 @@ array( ',' . PHP_EOL . '"', '{' . PHP_EOL ),
 $data );
 break;
 }
-file_put_contents( $file, $data ) && file_exists( $file ) &&
+file_put_contents( $file, $data ) && _file_exists( $file ) &&
 redirectFileDownload( $file, 'application/' . $this->method['format'] );
 @unlink( $file );
 }
@@ -482,7 +496,7 @@ require_once FUNCTIONS_PATH . 'download.php';
 downloadFile( urldecode( $this->method['location'] ), $this->method['service'], $this->settings );
 }
 function test_dwl() {
-$_this_ = $this;
+$_this_ = &$this;
 include_once ADDONFUNC_PATH . 'test_dwl.php';
 }
 function mybackup_core_backup() {
@@ -635,12 +649,14 @@ break;
 function clear_log( $log_type = null ) {
 global $java_scripts;
 empty( $log_type ) && isset( $_POST['log_type'] ) && $log_type = $_POST['log_type'];
-if ( ( $log = getLogfileByType( $log_type ) ) && file_exists( $log ) ) {
-@unlink( $log );
+if ( ( $log = getLogfileByType( $log_type ) ) && _file_exists( $log ) ) {
 $java_scripts[] = sprintf( 
 'jsMyBackup.popupWindow("%s","%s");', 
 _esc( 'Notice' ), 
-sprintf( _esc( 'Log file <i>%s</i> deleted successfully!' ), normalize_path( $log ) ) );
+sprintf( 
+_esc( 'Log file <i>%s</i> %s' ), 
+normalize_path( $log ), 
+@unlink( $log ) ? _esc( 'deleted successfully' ) : _esc( 'delete error' ) ) );
 }
 }
 function reset_defaults( $forcebly = false ) {
@@ -657,8 +673,8 @@ _esc( 'I made a backup copy before reseting them (just in case). You may find it
 }
 $default_options = getFixedSettings() + getFactorySettings();
 delete_option_wrapper( WPMYBACKUP_OPTION_NAME );
-update_option_wrapper( WPMYBACKUP_OPTION_NAME, $default_options );
-defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) && file_exists( TARGETLIST_DB_PATH ) && @unlink( TARGETLIST_DB_PATH );
+submit_options( null, $default_options );
+defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) && _file_exists( TARGETLIST_DB_PATH ) && @unlink( TARGETLIST_DB_PATH );
 $java_scripts[] = sprintf( 
 'jsMyBackup.popupWindow("%s","%s",null,null,"#ffb600");', 
 _esc( 'Confirmation' ), 
@@ -683,6 +699,10 @@ echo $error['message'];
 }
 }
 function abort_job() {
+if ( ! isset( $this->method['id'] ) ) {
+_pesc( 'Cannot abort the job due to no job `id` found.' );
+return;
+}
 try {
 $listen_processes = array( PROCESS_BACKUP, PROCESS_GUI_BACKUP, PROCESS_TRANSFER, PROCESS_MYSQL_MAINT );
 defined( __NAMESPACE__.'\\PROCESS_CUI_BACKUP' ) && $listen_processes[] = PROCESS_CUI_BACKUP;
@@ -733,7 +753,7 @@ sprintf(
 _esc( 
 'No save callback function defined. This should never happen.<br>Please %sreport this issue</a>.' ), 
 '<a href="' . getReportIssueURL() . '">' ) );
-} catch ( Exception $e ) {
+} catch ( \Exception $e ) {
 echo $e->getMessage();
 }
 }

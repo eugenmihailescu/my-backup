@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : sys.php $
  * 
- * @id      : sys.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : sys.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -39,7 +39,11 @@ function _usleep( $micro_seconds ) {
 if ( function_exists( '\\usleep' ) && ! ini_get( 'safe_mode' ) )
 usleep( $micro_seconds );
 else
-sleep( $micro_seconds / 1e6 );
+_sleep( $micro_seconds / 1e6 );
+}
+function _sleep( $seconds ) {
+if ( function_exists( '\\sleep' ) && ! ( ini_get( 'safe_mode' ) || function_is_restricted( 'sleep' ) ) )
+sleep( $micro_seconds );
 }
 function isWin() {
 return preg_match( '/^win/i', PHP_OS );
@@ -146,7 +150,8 @@ $result[$cpuid]['cpu_MHz'] = '0';
 } else 		// LINUX
 {
 $processor = null;
-$data = @file( '/proc/cpuinfo' );
+$proc_dir = '/proc/';
+$data = _dir_in_allowed_path( $proc_dir ) ? @file( $proc_dir . 'cpuinfo' ) : false;
 if ( is_array( $data ) )
 foreach ( $data as $d ) {
 if ( 0 == strlen( trim( $d ) ) )
@@ -171,7 +176,8 @@ $keys = array( 'MemTotal', 'MemFree', 'MemAvailable', 'SwapTotal', 'SwapFree' );
 $result = array();
 try {
 if ( ! isWin() ) {
-$data = @file( '/proc/meminfo' );
+$proc_dir = '/proc/';
+$data = _dir_in_allowed_path( $proc_dir ) ? @file( $proc_dir . 'meminfo' ) : false;
 if ( is_array( $data ) )
 foreach ( $data as $d ) {
 if ( 0 == strlen( trim( $d ) ) )
@@ -215,13 +221,14 @@ return floatval( $output[1] );
 }
 function getCpuCount() {
 $count = 0;
-$proc_stat = '/proc/stat';
+$proc_dir = '/proc/';
+$proc_stat = $proc_dir . 'stat';
 if ( isWin() ) {
 if ( $wmi_query = wmiWBemLocatorQuery( "SELECT NumberOfProcessors FROM Win32_ComputerSystem" ) )
 $count = count( $wmi_query );
 } 	
-elseif ( ! strToBool( ini_get( 'safe_mode' ) ) && ! strlen( ini_get( 'open_basedir' ) ) && @file_exists( 
-$proc_stat ) ) {
+elseif ( ! strToBool( ini_get( 'safe_mode' ) ) &&
+( _dir_in_allowed_path( $proc_dir ) ? @_is_file( $proc_stat ) : false ) ) {
 $cpuinfo = @file_get_contents( $proc_stat );
 $count = preg_match_all( '/^cpu\d/m', $cpuinfo );
 }

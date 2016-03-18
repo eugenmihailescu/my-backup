@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : session.php $
  * 
- * @id      : session.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : session.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -47,7 +47,7 @@ $result = session_id() === '' ? FALSE : TRUE;
 return $result;
 }
 function check_is_logged() {
-if ( is_multisite_wrapper() ) {
+if ( IS_MULTISITE ) {
 return; 
 } elseif ( is_wp() )
 return; 
@@ -68,15 +68,22 @@ $session_vars = get_session_varlist();
 if ( ! in_array( $key, $session_vars ) ) {
 $session_vars[] = $key;
 $_SESSION[SESSION_VARLIST_KEY] = $session_vars;
+session_commit();
 }
 }
-function del_session_var( $key ) {
+function del_session_var( $key, $commit = true ) {
 if ( isset( $_SESSION[$key] ) )
 unset( $_SESSION[$key] );
 $session_vars = get_session_varlist();
 if ( false !== ( $key = array_search( $key, $session_vars ) ) ) {
 unset( $session_vars[$key] );
 $_SESSION[SESSION_VARLIST_KEY] = $session_vars;
+$commit && session_commit();
 }
+}
+function unset_session_vars() {
+foreach ( get_session_varlist() as $key )
+del_session_var( $key, false );
+session_commit();
 }
 ?>

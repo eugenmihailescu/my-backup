@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : header.php $
  * 
- * @id      : header.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : header.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -47,7 +47,7 @@ namespace MyBackup;
 <?php
 $styles = array( 'admin', 'admin1' );
 foreach ( $styles as $s )
-if ( file_exists( CSS_PATH . WPMYBACKUP_LOGS . '-' . $s . '.css' ) )
+if ( _file_exists( CSS_PATH . WPMYBACKUP_LOGS . '-' . $s . '.css' ) )
 printf( 
 "<link rel='stylesheet' id='" . WPMYBACKUP_LOGS . "_options_stylesheet-css' href='css/" . WPMYBACKUP_LOGS .
 "-$s.css?ver=%s' type='text/css' media='all'/>", 
@@ -62,7 +62,7 @@ background-color: #d4f2fe;
 </style>
 <?php
 foreach ( array( 'globals', 'admin', 'blockui', 'regex-utils' ) as $js )
-if ( file_exists( JS_PATH . WPMYBACKUP_LOGS . '-' . $js . '.js' ) )
+if ( _file_exists( JS_PATH . WPMYBACKUP_LOGS . '-' . $js . '.js' ) )
 printf( '<script src="js/' . WPMYBACKUP_LOGS . '-' . $js . '.js?ver=%s"></script>', APP_VERSION_NO ) . PHP_EOL;
 include_once INC_PATH . 'head.php';
 ?>

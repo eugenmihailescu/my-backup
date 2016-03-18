@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : WebDAVWebStorage.php $
  * 
- * @id      : WebDAVWebStorage.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : WebDAVWebStorage.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -108,13 +108,13 @@ $obj = new WebDAVParser ( $result );
 $responses = $obj->parse ();
 $result = array ();
 foreach ( $responses as $data ) {
-$is_dir = false !== strpos ( $data->props->content_type, 'directory' );
+$_is_dir = false !== strpos ( $data->props->content_type, 'directory' );
 $parts = explode ( '/', $this->_host );
-if ($is_dir && $data->href == '/' . end ( $parts ) . $path)
+if ($_is_dir && $data->href == '/' . end ( $parts ) . $path)
 continue;
 $result [] = array (
 'name' => $data->href,
-'is_dir' => $is_dir,
+'is_dir' => $_is_dir,
 'size' => $data->props->content_length,
 'mime_type' => $data->props->content_type,
 'time' => strtotime ( $data->props->modified_date ),

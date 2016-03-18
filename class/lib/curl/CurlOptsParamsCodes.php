@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlOptsParamsCodes.php $
  * 
- * @id      : CurlOptsParamsCodes.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlOptsParamsCodes.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-class CurlOptsParamsCodes {
-static $_CURLOPT_PARAMS_CODES_ = array (
+class CurlOptsParamsCodes{
+static $_CURLOPT_PARAMS_CODES_=array(
 0 => 'CURLFTPSSL_NONE',
 0 => 'CURL_IPRESOLVE_WHATEVER',
 0 => 'CURLAUTH_NONE',
@@ -281,17 +281,12 @@ static $_CURLOPT_PARAMS_CODES_ = array (
 33554432 => 'CURLPROTO_GOPHER',
 268435457 => 'CURL_READFUNC_PAUSE',
 268435457 => 'CURL_WRITEFUNC_PAUSE',
-2147483648 => 'CURLAUTH_ONLY' 
-);
+2147483648 => 'CURLAUTH_ONLY');
 static function getCurlOptParamCodeById($mixed) {
-if (! is_array ( $mixed ))
-return self::$_CURLOPT_PARAMS_CODES_ [$mixed];
-else {
-$result = array ();
+if (! is_array ( $mixed )) return self::$_CURLOPT_PARAMS_CODES_ [$mixed];
+else {$result = array ();
 foreach ( $mixed as $key => $value )
-$result [isset ( self::$_CURLOPT_PARAMS_CODES_ [$key] ) ? self::$_CURLOPT_PARAMS_CODES_ [$key] : $key] = $value;
-return $result;
-}
-}
+$result [array_key_exists ( $key, self::$_CURLOPT_PARAMS_CODES_ ) ? self::$_CURLOPT_PARAMS_CODES_ [$key] : $key] = $value;
+return $result;}}
 }
 ?>

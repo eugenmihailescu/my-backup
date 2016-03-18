@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : disksrc-expert.php $
  * 
- * @id      : disksrc-expert.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : disksrc-expert.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -73,3 +73,24 @@ type="checkbox" id="excludelinks" name="excludelinks" value="1"
 type="hidden" id="excludelinks" name="excludelinks" value="0"><a class="help"
 onclick=<?php echoHelp($help_3); ?>> [?]</a></td>
 </tr>
+<?php if(BACKUP_MODE_FULL==$this->settings['mode']){?>
+<tr>
+<td>
+<table style="width: 100%">
+<tr>
+<td><label for=use_cache_preload><?php _pesc('Use a cache preloader');?></label>
+<input type="checkbox" id="use_cache_preload" name="use_cache_preload"
+value="1"
+<?php echo strToBool($this->settings["use_cache_preload"])?'checked':'';?>>
+<input type="hidden" id="use_cache_preload" name="use_cache_preload"
+value="0"> <a class="help" onclick=<?php echoHelp($help_5); ?>> [?]</a></td>
+<td><label for="cache_preload_age"><?php _pesc('Cache preloader age');?></label></td>
+<td><input type="number" id="cache_preload_age" name="cache_preload_age"
+value="<?php echo $this->settings['cache_preload_age'];?>" min="60"
+max="1440"><?php echo ' '._pesc('min');?><a class="help"
+onclick=<?php echoHelp($help_6); ?>> [?]</a></td>
+</tr>
+</table>
+</td>
+</tr>
+<?php }?>

@@ -24,18 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : test_dwl.php $
  * 
- * @id      : test_dwl.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : test_dwl.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-$tmpname = tempnam( $_this_->settings['wrkdir'], $_this_->method['service'] . '_' );
+$dir = _dir_in_allowed_path( $_this_->settings['wrkdir'] ) ? $_this_->settings['wrkdir'] : __DIR__;
+$tmpname = tempnam( $dir, $_this_->method['service'] . '_' );
 file_put_contents( $tmpname, $_this_->method['service'] );
 $_this_->method['location'] = $tmpname;
 $_this_->dwl_file();

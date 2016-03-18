@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : options.php $
  * 
- * @id      : options.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : options.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -141,7 +141,7 @@ return addArrays( $short_args, $long_args );
 }
 function load_local_option() {
 $result = array();
-if ( file_exists( LOCAL_OPTION_DB_PATH ) )
+if ( _file_exists( LOCAL_OPTION_DB_PATH ) )
 $result = json_decode( file_get_contents( LOCAL_OPTION_DB_PATH ), true );
 if ( ! is_array( $result ) )
 throw new MyException( sprintf( _esc( 'File "%s" is corrupted.' ), LOCAL_OPTION_DB_PATH ) );
@@ -161,7 +161,7 @@ $db[$key] = $new_value;
 else
 $db[$option] = $new_value;
 $dir = _dirname( LOCAL_OPTION_DB_PATH );
-is_dir( $dir ) || mkdir( $dir );
+_is_dir( $dir ) || mkdir( $dir );
 return true === file_put_contents( LOCAL_OPTION_DB_PATH, json_encode( $db ) );
 }
 function delete_option_local_db( $option ) {
@@ -214,11 +214,12 @@ break;
 return $changed;
 }
 function beforeCommitOptions( &$old_settings, &$new_settings ) {
-global $java_scripts;
-$triggers = array( '_reset_SSL_cache', '_update_wp_debug', '_update_backup_schedule' );
+$java_scripts = array();
+$triggers = array( '_reset_SSL_cache', '_update_wp_debug', '_update_backup_schedule', '_cache_source_files' );
 foreach ( $triggers as $callback )
 _is_callable( $callback ) &&
 $java_scripts = array_merge( $java_scripts, _call_user_func( $callback, $old_settings, $new_settings ) );
+return $java_scripts;
 }
 function _reset_SSL_cache( $old_settings, $new_settings ) {
 $reset_cert_cache = array( 
@@ -253,9 +254,11 @@ del_session_var( $cache_key );
 }
 return array();
 }
-function _update_backup_schedule( $old_settings, $new_settings ) {
+function _update_backup_schedule( $old_settings, $new_settings, $cron_hook = null ) {
 $js_script = array();
 if ( is_wp() ) {
+if ( empty( $cron_hook ) )
+return $js_script;
 $settings_trigger = array( 'schedule_wp_cron', 'schedule_enabled', 'schedule_grp', 'schedule_wp_cron_time' );
 $wpcron_force_changed = settings_changed( 'schedule_wpcron_force', $old_settings, $new_settings );
 $wpcron_alt_changed = settings_changed( 'schedule_wpcron_alt', $old_settings, $new_settings );
@@ -265,6 +268,7 @@ $cron_type = get_param( 'schedule_grp', $old_settings, $new_settings, 'os_cron' 
 $cron_schedule = get_param( 'schedule_wp_cron', $old_settings, $new_settings, 'os_cron' );
 $schedule_wpcron_force = get_param( 'schedule_wpcron_force', $old_settings, $new_settings, false );
 $schedule_wpcron_alt = get_param( 'schedule_wpcron_alt', $old_settings, $new_settings, false );
+$result = false;
 try {
 $wp_config_update = array();
 $wpcron_force_changed && $wp_config_update['DISABLE_WP_CRON'] = boolToStr( ! $schedule_wpcron_force );
@@ -274,14 +278,16 @@ $js_script[] = update_wp_config( $wp_config_update );
 $_logfile = new LogFile( JOBS_LOGFILE, $new_settings );
 $is_activated = 'os_cron' != $cron_type &&
 strToBool( get_param( 'schedule_enabled', $old_settings, $new_settings, false ) );
-if ( $is_activated || false !== wp_next_scheduled( WPCRON_SCHEDULE_HOOK_NAME ) )
+if ( $is_activated || false !== wp_next_scheduled( $cron_hook ) )
 $result = change_schedule( 
 $_logfile, 
 $cron_schedule, 
 $is_activated, 
+$cron_hook, 
 isset( $new_settings['schedule_wp_cron_time'] ) &&
 ! empty( $new_settings['schedule_wp_cron_time'] ) ? strtotime( 
-$new_settings['schedule_wp_cron_time'] ) : null );
+$new_settings['schedule_wp_cron_time'] ) : null, 
+true );
 } catch ( MyException $e ) {
 $result = sprintf( "parent.popupError('%s','%s');", _esc( 'Error' ), $e->getMessage() );
 }
@@ -301,6 +307,50 @@ $wp_debug_constants = array( 'WP_DEBUG', 'WP_DEBUG_LOG', 'WP_DEBUG_DISPLAY', 'SC
 foreach ( $wp_debug_constants as $constant )
 ! defined( $constant ) && define( $constant, true );
 }
+}
+return $result;
+}
+function _cache_source_files( $old_settings, $new_settings ) {
+$result = array();
+$cache_file = LOG_PREFIX . '-srcfiles.cache';
+$unlink_cache = function ( $array ) {
+foreach ( $array as $filename ) {
+_is_file( $filename ) && @unlink( $filename );
+}
+};
+$use_cache_preloader = isset( $new_settings['use_cache_preload'] ) && strToBool( 
+$new_settings['use_cache_preload'] );
+$use_cache_preloader = $use_cache_preloader || ( ! isset( $new_settings['use_cache_preload'] ) &&
+isset( $old_settings['use_cache_preload'] ) && strToBool( $old_settings['use_cache_preload'] ) );
+if ( ! ( $use_cache_preloader && BACKUP_MODE_FULL == $old_settings['mode'] ) ) {
+if ( _is_file( $cache_file ) ) {
+if ( $cache_data = json_decode( file_get_contents( $cache_file ), true ) ) {
+isset( $cache_data['filename'] ) && $unlink_cache( array_keys( $cache_data['filename'] ) );
+}
+@unlink( $cache_file );
+}
+return $result;
+}
+$keys = array( 
+'dir' => null, 
+'nocompress' => null, 
+'excludedirs' => null, 
+'excludeext' => null, 
+'excludefiles' => null, 
+'excludelinks' => null, 
+'use_cache_preload' => null, 
+'cache_preload_age' => null );
+$changed = array_diff_assoc( 
+array_intersect_key( $old_settings, $keys ), 
+array_intersect_key( $new_settings, $keys ) );
+if ( ! empty( $changed ) ) {
+if ( _is_file( $cache_file ) && $cache_data = json_decode( file_get_contents( $cache_file ), true ) ) {
+if ( $cache_data['done'] || $cache_data['running'] ) {
+isset( $cache_data['filename'] ) && $unlink_cache( array_keys( $cache_data['filename'] ) );
+}
+}
+$cache_data = array( 'timestamp' => time(), 'done' => false, 'running' => false ); 
+file_put_contents( $cache_file, json_encode( $cache_data ) ); 
 }
 return $result;
 }

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : job-history-functions.php $
  * 
- * @id      : job-history-functions.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : job-history-functions.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -40,7 +40,7 @@ global $BACKUP_MODE;
 echo "<input type='hidden' id='history_provider_nonce' value='" . wp_create_nonce_wrapper( 'abort_job' ) . "'>";
 $html_rows = '<table class="files history">';
 $html_rows .= sprintf( 
-'<th>%s</th><th>Id</th><th>%s</th><th>%s</th><th>%s<br>(x)</th><th>%s<br>(MiB)</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s<br>(sec)</th>', 
+'<th>%s</th><th>Id</th><th>%s</th><th>%s</th><th>%s<br>(x)</th><th>%s<br>(MiB)</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s</th><th>%s<br>(sec)</th><th>%s</th>', 
 _esc( 'Type' ), 
 _esc( 'Mode' ), 
 _esc( 'Compressed' ), 
@@ -52,7 +52,8 @@ _esc( 'Status' ),
 _esc( 'State' ), 
 _esc( 'Start time' ), 
 _esc( 'End time' ), 
-_esc( 'Duration' ) );
+_esc( 'Duration' ), 
+_esc( 'Action' ) );
 if ( $content ) {
 $stat_mngr = getJobsStatManager( $settings );
 $filter = array();
@@ -92,31 +93,31 @@ TBL_PREFIX . TBL_STATS . ' WHERE jobs_id=' . TBL_PREFIX . TBL_JOBS .
 '.id AND error IS NOT NULL) as errors FROM ' . TBL_PREFIX . TBL_JOBS . ' ' . $filter . ' ORDER BY id DESC';
 $sql .= ! $content || 0 !== $limit ? ' LIMIT ' . ( 0 !== $limit ? $limit : 1 ) : '';
 $sql .= ';';
-$rst = $stat_mngr->queryData( $sql );
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 $i = 0;
 while ( $row = $stat_mngr->fetchArray( $rst ) ) {
-$onclick = "
-jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", null );";
-$onclick .= "
-jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'd' );";
-$onclick .= "
-jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'sysinfo' );";
+$onclick = "jsMyBackup.select_job_item(this);";
+$onclick .= "jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", null );";
+$onclick .= "jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'd' );";
+$onclick .= "jsMyBackup.asyncGetMediaInfo ( " . $row['id'] . ", 'sysinfo' );";
 $events = array( 'onclick="' . $onclick . '"' );
 $bg = '';
+$can_delete = false;
 switch ( $row['job_status'] ) {
 case JOB_STATUS_RUNNING :
 if ( time() - $row['started_time'] > LONG_RUNNING_JOB_TIMEOUT ) {
-$status = 'suspect';
+$status = _esc( 'suspect' );
 $bg = 'rgba(255,0,0,0.25)';
 $events[] = "oncontextmenu='jsMyBackup.onHistoryListContextMenu(event);'";
+$can_delete = true;
 } else
 $bg = '#FFC';
 break;
 case JOB_STATUS_ABORTED :
-$status = 'aborted';
+$status = _esc( 'aborted' );
 break;
 case JOB_STATUS_FINISHED :
-$status = 'done';
+$status = _esc( 'done' );
 break;
 case JOB_STATUS_SUSPENDED :
 $status = "<a class='help' onclick=" . getHelpCall( 
@@ -127,47 +128,89 @@ date( DATETIME_FORMAT, $row['finish_time'] ) ) . "'" ) . ">" . _esc( 'suspended'
 $bg = 'rgba(255,0,0,0.25)';
 break;
 default :
-$status = 'unknown';
+$status = _esc( 'unknown' );
 $events[] = "oncontextmenu='jsMyBackup.onHistoryListContextMenu(event);'";
+$can_delete = true;
 break;
 }
-$style = empty( $bg ) ? '' : 'style="background-color:' . $bg . ';"';
+$get_icon_style = function ( $id ) {
 $icon = array( JOB_BACKUP => 'backup.png' );
 defined( __NAMESPACE__.'\\JOB_RESTORE' ) && $icon[JOB_RESTORE] = 'restore.png';
+$icon['remove'] = 'user-trash.png';
+$icon['view'] = 'edit-find.png';
+if ( ! isset( $icon[$id] ) )
+return '';
+return 'style="background-image:url(' . plugins_url_wrapper( 'img/' . $icon[$id], IMG_PATH ) .
+');background-repeat:no-repeat;background-position:center;" ';
+};
+$style = empty( $bg ) ? '' : 'style="background-color:' . $bg . ';"';
 $html_rows .= '<tr ' . $style . ' ' . implode( ' ', $events ) . '>';
+$action = '';
+$onclick = '';
+if ( $can_delete )
+$onclick = sprintf( 
+'var c=jsMyBackup.popupConfirm(\'%s\',\'%s\',null,{\'%s\':\'jsMyBackup.delHistory(%s);jsMyBackup.removePopupLast();\',\'%s\':null});', 
+_esc( 'Confirm' ), 
+_esc( 'Are you sure you want to permanently remove this entry from job history?' ), 
+_esc( 'Yes, I`m damn sure' ), 
+$row['id'], 
+_esc( 'Cancel' ) );
+elseif ( JOB_BACKUP == $row['job_type'] )
+$action = sprintf( 
+'<input type="button" class="button" value="%s"%s onclick="%s">', 
+_esc( 'Restore' ), 
+defined( __NAMESPACE__.'\\APP_RESTORE' ) && JOB_STATUS_FINISHED == $row['job_status'] &&
+in_array( $row['job_state'], array( JOB_STATE_COMPLETED, JOB_STATE_PARTIAL ) ) ? '' : ' disabled', 
+'jsMyBackup.restoreJob(' . $row['id'] . ');' );
 $cols = array( 
 'job_type' => $row['job_type'], 
 'id' => $row['id'], 
 'mode' => $BACKUP_MODE[$row['mode']][0], 
-( 0 !== $row['compression_type'] ? 'yes' : 'no' ), 
+( 0 !== $row['compression_type'] ? _esc( 'yes' ) : _esc( 'no' ) ), 
 round( $row['ratio'], 2 ), 
 round( $row['job_size'] / MB, 2 ), 
 $row['volumes_count'], 
 $row['files_count'], 
 $status, 
-( JOB_STATE_COMPLETED == $row['job_state'] ? 'completed' : ( JOB_STATE_PARTIAL == $row['job_state'] ? 'partial' : 'failed' ) ), 
+( JOB_STATE_COMPLETED == $row['job_state'] ? 'completed' : ( JOB_STATE_PARTIAL == $row['job_state'] ? _esc( 
+'partial' ) : _esc( 'failed' ) ) ), 
 empty( $row['started_time'] ) ? '' : date( DATETIME_FORMAT, $row['started_time'] ), 
 empty( $row['finish_time'] ) ? '' : date( DATETIME_FORMAT, $row['finish_time'] ), 
 $row['duration'], 
+'action' => array( 'action' => $action, 'click' => $onclick ), 
 'errors' => $row['errors'] );
 foreach ( $cols as $col_name => $value ) {
 $td_title = null;
-$style = $col_name === 'id' && $row['errors'] > 0 ? 'style="color:red"' : ( $col_name === 'job_type' ? 'style="background-image:url(' .
-plugins_url_wrapper( 'img/' . $icon[$value], IMG_PATH ) .
-');background-repeat:no-repeat;background-position:center;"' : '' );
+$style = '';
+if ( 'id' === $col_name && $row['errors'] > 0 )
+$style = 'style="color:red"';
+elseif ( 'job_type' === $col_name )
+$style = $get_icon_style( $value );
+elseif ( 'action' === $col_name ) {
+if ( $can_delete )
+$style = $get_icon_style( 'remove' );
+elseif ( JOB_BACKUP != $row['job_type'] || JOB_STATUS_FINISHED != $row['job_status'] )
+$style = $get_icon_style( 'view' );
+}
 if ( $col_name !== 'errors' ) {
-if ( $col_name === 'job_type' ) {
-$td_title = $value == JOB_BACKUP ? 'backup' : ( defined( __NAMESPACE__.'\\JOB_RESTORE' ) && $value == JOB_RESTORE ? 'restore' : '' );
+if ( 'job_type' === $col_name ) {
+$td_title = $value == JOB_BACKUP ? 'backup' : ( defined( __NAMESPACE__.'\\JOB_RESTORE' ) &&
+$value == JOB_RESTORE ? 'restore' : '' );
 $value = '&nbsp;';
 }
-$html_rows .= '<td ' . $style . ( ! empty( $td_title ) ? 'title="' . $td_title . '"' : '' ) . '>' .
-$value . '</td>';
+$html_rows .= '<td ' . $style . ( ! empty( $td_title ) ? 'title="' . $td_title . '"' : '' );
+if ( 'action' === $col_name ) {
+empty( $value['click'] ) || $html_rows .= ' onclick="' . $value['click'] . '"';
+$value = $value[$col_name];
+}
+$html_rows .= '>' . $value . '</td>';
 }
 }
 $html_rows .= '</tr>';
 $i++;
 }
 $stat_mngr->freeResult( $rst );
+}
 if ( 0 == $i ) {
 if ( false !== $job_id )
 if ( $job_id > 0 )
@@ -180,7 +223,7 @@ else
 $msg = _esc( "This was a non-backup job (eg. benchmark). I don't keep history of such things :-(" );
 else
 $msg = _esc( "No item found :-(" );
-$html_rows .= "<tr><td colspan='12'>$msg</td></tr>";
+$html_rows .= "<tr><td colspan='14'>$msg</td></tr>";
 }
 }
 $html_rows .= '</table>';
@@ -193,11 +236,12 @@ return echoJobMedia( $params, $settings );
 if ( ! isset( $params['id'] ) )
 return;
 $stat_mngr = getJobsStatManager( $settings );
-$sql = 'SELECT id,mode,result_code,compression_type,compression_level,toolchain,bzip_ver,cpu_sleep,ratio,job_size,volumes_count,files_count,job_status,job_state,started_time,finish_time,duration,avg_speed,avg_cpu,peak_cpu,peak_disk,peak_mem,unique_id FROM ' .
+$sql = 'SELECT id,job_type,mode,result_code,compression_type,compression_level,toolchain,bzip_ver,cpu_sleep,ratio,job_size,volumes_count,files_count,job_status,job_state,started_time,finish_time,duration,avg_speed,avg_cpu,peak_cpu,peak_disk,peak_mem,unique_id FROM ' .
 TBL_PREFIX . TBL_JOBS . ' where id=' . $params['id'];
-$rst = $stat_mngr->queryData( $sql );
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 $row = $stat_mngr->fetchArray( $rst );
 $stat_mngr->freeResult( $rst );
+}
 if ( false == $row )
 return;
 $job_status_array = getJobStatusStr( $row['job_status'], $row['started_time'] );
@@ -236,11 +280,25 @@ getAnchorE( '', 'http://blog.scoutapp.com/articles/2009/07/31/understanding-load
 $help_1 = "'" . $help_1 . sprintf( 
 _esc( '%s: on Windows this info may not reflect the reality.' ), 
 '<br><b>' . _esc( 'Note' ) . '</b>' ) . "'";
+if ( JOB_BACKUP == $row['job_type'] ) {
+$job_type = _esc( 'backup' );
+$job_op = _esc( 'transfered' );
+} elseif ( defined( __NAMESPACE__.'\\JOB_RESTORE' ) && JOB_RESTORE == $row['job_type'] ) {
+$job_type = _esc( 'restore' );
+$job_op = _esc( 'restored' );
+} else {
+$job_type = _esc( 'unknown-job' );
+$job_op = _esc( 'unknown-op' );
+}
 $help_2 = "'" . sprintf( 
 _esc( 
-"%s means that the backup has been successfuly copied to at<br>least one media target but not to all scheduled media targets.<br>%s means that the backup has not been copied to any media." ), 
+"%s means that the %s has been successfuly %s to/from at<br>least one media target but not to/from all scheduled media targets.<br>%s means that the %s has not been %s to/from any media." ), 
 getSpanE( _esc( 'Partial' ), 'FF8000' ), 
-getSpanE( _esc( 'Failed' ), 'red' ) ) . "'";
+$job_type, 
+$job_op, 
+getSpanE( _esc( 'Failed' ), 'red' ), 
+$job_type, 
+$job_op ) . "'";
 $help_3 = "'" . _esc( 'The log files were stored within an isolated branch at:<blockquote>' ) .
 str_replace( ROOT_PATH, "<a class=\\'help\\'>ROOT</a>/", LOGS_PATH ) . $row['unique_id'] . "</blockquote>'";
 ?>
@@ -356,21 +414,30 @@ onclick=<?php echoHelp ( $help_1 ); ?>>[?]</a></td>
 function echoJobMediaFiles( $params, $settings = null ) {
 function getTargetNameByOperationId( $operation ) {
 $result = '';
+$operation *= 2;
 switch ( $operation ) {
 case OPER_SEND_DISK :
 case OPER_SENT_DISK :
+case OPER_GET_DISK :
+case OPER_GOT_DISK :
 $result = 'Disk';
 break;
 case OPER_SEND_FTP :
 case OPER_SENT_FTP :
+case OPER_GET_FTP :
+case OPER_GOT_FTP :
 $result = 'Ftp';
 break;
 case OPER_SEND_DROPBOX :
 case OPER_SENT_DROPBOX :
+case OPER_GET_DROPBOX :
+case OPER_GOT_DROPBOX :
 $result = 'Dropbox';
 break;
 case OPER_SEND_GOOGLE :
 case OPER_SENT_GOOGLE :
+case OPER_GET_GOOGLE :
+case OPER_GOT_GOOGLE :
 $result = 'Google';
 break;
 case OPER_SEND_EMAIL :
@@ -379,10 +446,14 @@ $result = 'Mail';
 break;
 case OPER_SEND_WEBDAV :
 case OPER_SENT_WEBDAV :
+case OPER_GET_WEBDAV :
+case OPER_GOT_WEBDAV :
 $result = 'WebDAV';
 break;
 case OPER_SEND_SSH :
 case OPER_SENT_SSH :
+case OPER_GET_SSH :
+case OPER_GOT_SSH :
 $result = 'SSH';
 break;
 default :
@@ -408,14 +479,13 @@ $stat_tbl . '.script_mem_usage AS transfer_mem_usage,A.source_type,A.source_path
 $sources_tbl . '.source_type,' . $sources_tbl . '.path as source_path  FROM ' . $stat_tbl . ' INNER JOIN ' .
 $files_tbl . ' ON ' . $stat_tbl . '.files_id = ' . $files_tbl . '.id LEFT OUTER JOIN ' . $sources_tbl . ' ON ' .
 $files_tbl . '.sources_id=' . $sources_tbl . '.id WHERE ' . $stat_tbl . '.jobs_id=' . $params['id'] .
-' and action=' . METRIC_ACTION_COMPRESS . ')A ON ' . $stat_mngr->basename( $files_tbl . '.filename', false ) .
-'=' . $stat_mngr->basename( 'A.filename', false ) . ' WHERE ' . $stat_tbl . '.jobs_id=' . $params['id'] .
-' AND ' . $stat_tbl . '.action=' . METRIC_ACTION_TRANSFER . ' AND ' .
-sqlFloor( $stat_tbl . '.operation/2', $stat_mngr->isSQLite() ) . '=' . $params['media_info'] . ';';
-$sql_err = 'SELECT id,error FROM ' . $stat_tbl . ' WHERE jobs_id=' . $params['id'] . ' AND action=%d AND ' .
+' AND action IN (' . METRIC_ACTION_COMPRESS . ',' . METRIC_ACTION_UNCOMPRESS . '))A ON ' .
+$stat_mngr->basename( $files_tbl . '.filename', false ) . '=' . $stat_mngr->basename( 'A.filename', false ) .
+' WHERE ' . $stat_tbl . '.jobs_id=' . $params['id'] . ' AND ' . $stat_tbl . '.action=' . METRIC_ACTION_TRANSFER .
+' AND ' . sqlFloor( $stat_tbl . '.operation/2', $stat_mngr->isSQLite() ) . '=' . $params['media_info'] . ';';
+$sql_err = 'SELECT id,error FROM ' . $stat_tbl . ' WHERE jobs_id=' . $params['id'] . ' AND action IN (%s) AND ' .
 sqlFloor( 'operation/2', $stat_mngr->isSQLite() ) . ' =' . $params['media_info'] .
 ' AND files_id=%d AND error IS NOT NULL;';
-$rst = $stat_mngr->queryData( $sql );
 $html_rows = sprintf( 
 '<table class="files history"><tr><th rowspan="2">%s ' . getTargetNameByOperationId( $params['media_info'] ) .
 '</th><th colspan="3">%s (MB)</th><th colspan="4">%s</th><th colspan="4">%s</th></tr>', 
@@ -433,23 +503,29 @@ _esc( 'Error' ),
 _esc( 'Time' ), 
 _esc( 'Error' ) );
 $err_style = 'style="color:red;font-weight:bold;"';
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 while ( $row = $stat_mngr->fetchArray( $rst ) ) {
 $compress_errs = array();
 $transfer_errs = array();
-$rst1 = $stat_mngr->queryData( sprintf( $sql_err, METRIC_ACTION_COMPRESS, $row['files_id'] ) );
+if ( $rst1 = $stat_mngr->queryData( 
+sprintf( $sql_err, METRIC_ACTION_COMPRESS . ',' . METRIC_ACTION_UNCOMPRESS, $row['files_id'] ) ) ) {
 while ( $row1 = $stat_mngr->fetchArray( $rst1 ) )
 $compress_errs[$row1['id']] = $row1['error'];
 $stat_mngr->freeResult( $rst1 );
-$rst2 = $stat_mngr->queryData( sprintf( $sql_err, METRIC_ACTION_TRANSFER, $row['files_id'] ) );
+}
+if ( $rst2 = $stat_mngr->queryData( sprintf( $sql_err, METRIC_ACTION_TRANSFER, $row['files_id'] ) ) ) {
 while ( $row2 = $stat_mngr->fetchArray( $rst2 ) )
 $transfer_errs[$row2['id']] = $row2['error'];
 $stat_mngr->freeResult( $rst2 );
+}
 $errs_combined = $compress_errs + $transfer_errs;
 $compress_err_style = count( $compress_errs ) > 0 ? $err_style : '';
 $transfer_err_style = count( $transfer_errs ) > 0 ? $err_style : '';
 $compress_speed = $row['compress_time'] > 0 ? round( $row['uncompressed'] / $row['compress_time'] / MB, 2 ) : 'inf';
 $transfer_speed = $row['transfer_time'] > 0 ? round( $row['filesize'] / $row['transfer_time'] / MB, 2 ) : 'inf';
-$source_type = ( in_array( $row['source_type'], array( SRCFILE_SOURCE, WP_SOURCE ) ) ? 'file' : ( MYSQL_SOURCE ==
+$source_types = array( SRCFILE_SOURCE );
+defined( __NAMESPACE__.'\\WP_SOURCE' ) && $source_types[] = WP_SOURCE;
+$source_type = ( in_array( $row['source_type'], $source_types ) ? 'file' : ( MYSQL_SOURCE ==
 $row['source_type'] ? 'MySQL database' : 'unknown' ) );
 if ( MYSQL_SOURCE == $row['source_type'] ) {
 $array = json_decode( str_replace( '""', '"', $row['source_path'] ), true );
@@ -477,19 +553,20 @@ $filename = ( ! empty( $row['checksum'] ) ? '<img style="vertical-align:middle" 
 plugins_url_wrapper( 'img/key.png', IMG_PATH ) . '" onclick=' . getHelpCall( "'$checksum'" ) . '> ' : '' ) . getspan( 
 ( ! empty( $row['filename'] ) ? $row['path'] . ( $c == '\\' || $c == '/' ? '' : '/' ) : '' ), 
 '#1E8CBE' ) . basename( $row['filename'] );
-$html_rows .= '<tr><td style="text-align:left">' . $filename . '</td><td>' .
+$html_rows .= '<tr><td style="text-align:left">' . shorten_path( $filename ) . '</td><td>' .
 round( $row['uncompressed'] / MB, 2 ) . '</td><td>' . round( $row['filesize'] / MB, 2 ) . '</td><td>' .
 round( $row['ratio'], 2 ) . '</td><td>' . $row['compress_time'] . '</td><td>' . $compress_speed .
 '</td><td>' . round( $row['compress_mem_usage'] / MB, 2 ) . '</td><td ' . $compress_err_style . '>' .
-count( $compress_errs ) . '</td><td>' . $row['transfer_time'] . '</td><td>' . $transfer_speed . '</td><td>' .
-round( $row['transfer_mem_usage'] / MB, 2 ) . '</td><td ' . $transfer_err_style . '>' .
+count( $compress_errs ) . '</td><td>' . $row['transfer_time'] . '</td><td>' . $transfer_speed .
+'</td><td>' . round( $row['transfer_mem_usage'] / MB, 2 ) . '</td><td ' . $transfer_err_style . '>' .
 count( $transfer_errs ) . '</td></tr>';
 foreach ( $errs_combined as $id => $msg )
-$html_rows .= '<tr><td colspan="12"><table><tr><td>(' . $id . ')</td><td style="text-align:left;color:red;">' .
-$msg . '</td></tr></table></td></tr>';
+$html_rows .= '<tr><td colspan="12"><table><tr><td>(' . $id .
+')</td><td style="text-align:left;color:red;">' . $msg . '</td></tr></table></td></tr>';
 }
 $html_rows .= '</table>';
 $stat_mngr->freeResult( $rst );
+}
 echo $html_rows;
 }
 function echoJobMedia( $params, $settings = null ) {
@@ -512,6 +589,18 @@ $media[OPER_SEND_GOOGLE] = $media[OPER_SENT_GOOGLE];
 $media[OPER_SEND_EMAIL] = $media[OPER_SENT_EMAIL];
 $media[OPER_SEND_WEBDAV] = $media[OPER_SENT_WEBDAV];
 $media[OPER_SEND_SSH] = $media[OPER_SENT_SSH];
+$media[OPER_GET_DISK] = $media[OPER_SENT_DISK];
+$media[OPER_GOT_DISK] = $media[OPER_SENT_DISK];
+$media[OPER_GET_FTP] = $media[OPER_SENT_FTP];
+$media[OPER_GOT_FTP] = $media[OPER_SENT_FTP];
+$media[OPER_GET_DROPBOX] = $media[OPER_SENT_DROPBOX];
+$media[OPER_GOT_DROPBOX] = $media[OPER_SENT_DROPBOX];
+$media[OPER_GET_GOOGLE] = $media[OPER_SENT_GOOGLE];
+$media[OPER_GOT_GOOGLE] = $media[OPER_SENT_GOOGLE];
+$media[OPER_GET_WEBDAV] = $media[OPER_SENT_WEBDAV];
+$media[OPER_GOT_WEBDAV] = $media[OPER_SENT_WEBDAV];
+$media[OPER_GET_SSH] = $media[OPER_SENT_SSH];
+$media[OPER_GOT_SSH] = $media[OPER_SENT_SSH];
 $stat_mngr = getJobsStatManager( $settings );
 $stat_tbl = TBL_PREFIX . TBL_STATS;
 $sql = 'SELECT c.operation*2 AS operation, Sum(files_count) AS files_count, Sum(errors_count) AS errors_count FROM ( SELECT ' .
@@ -521,10 +610,10 @@ $stat_tbl . '.files_id) AS files_count, ( SELECT count(*) FROM ' . $stat_tbl . '
 $params['id'] . ' AND a.operation=' . $stat_tbl . '.operation AND a.files_id=' . $stat_tbl .
 '.files_id AND a.error IS NOT NULL) AS errors_count FROM ' . $stat_tbl . ' WHERE jobs_id=' . $params['id'] .
 ' AND action=' . METRIC_ACTION_TRANSFER . ')c GROUP BY c.operation;';
-$rst = $stat_mngr->queryData( $sql );
 $html_media_row = '<th>' . _esc( 'Media name' ) . '</th>';
 $html_count_row = '<th>' . _esc( 'Files' ) . '</th>';
 $media_count = 0;
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 while ( $row = $stat_mngr->fetchArray( $rst ) ) {
 if ( $row['operation'] < 0 )
 continue;
@@ -533,8 +622,8 @@ $onclick = "jsMyBackup.asyncGetMediaInfo(" . $params['id'] . "," . $row['operati
 $onclick .= "document.getElementById('folder_info').style.display='inline-block';";
 } else
 $onclick = '';
-if ( null !== $row['operation'] && isset( $media[intval( $row['operation'] )] ) )
-$html_media_row .= '<th>' . $media[intval( $row['operation'] )][1] . '</th>';
+if ( null !== $row['operation'] && isset( $media[$row['operation']] ) )
+$html_media_row .= '<th>' . $media[$row['operation']][1] . '</th>';
 $style = 'style="color:' .
 ( $row['errors_count'] > 0 ? ( ( $row['errors_count'] >= $row['files_count'] ? 'red' : '#FF8000' ) ) : 'green' ) .
 '"';
@@ -547,6 +636,7 @@ $html_rows .= '<tr>' . $html_media_row . '</tr>';
 $html_rows .= '<tr id="no-hover">' . $html_count_row . '</tr>';
 $html_rows .= '</table>';
 $stat_mngr->freeResult( $rst );
+}
 echo $html_rows;
 }
 function echoJobSysinfo( $params, $settings = null ) {
@@ -561,13 +651,14 @@ $tbl_sysinfo = TBL_PREFIX . TBL_SYSINFO;
 $tbl_sysinfo_cpu = TBL_PREFIX . TBL_SYSCPU;
 $tbl_sysinfo_mem = TBL_PREFIX . TBL_SYSMEM;
 $tbl_jobs = TBL_PREFIX . TBL_JOBS;
-$rst = $stat_mngr->queryData( 
+if ( $rst = $stat_mngr->queryData( 
 'select ' . $tbl_sysinfo . '.os,' . $tbl_sysinfo . '.php_ver,' . $tbl_sysinfo . '.server_ver from ' .
 $tbl_sysinfo . ' inner join ' . $tbl_jobs . ' on ' . $tbl_sysinfo . '.timestamp<=' . $tbl_jobs .
 '.finish_time where ' . $tbl_jobs . '.id=' . $params['id'] . ' order by ' . $tbl_sysinfo .
-'.id desc limit 1;' );
+'.id desc limit 1;' ) ) {
 $row = $stat_mngr->fetchArray( $rst );
 $stat_mngr->freeResult( $rst );
+}
 ?>
 <table id='job_sysinfo' class="files history">
 <tr>
@@ -590,7 +681,7 @@ $tbl_sysinfo_cpu . '.vendor_id,' . $tbl_sysinfo_cpu . '.model_name,' . $tbl_sysi
 $tbl_sysinfo_cpu . '.core_id from ' . $tbl_sysinfo_cpu . ' where jobs_id=' . $params['id'] . ' order by ' .
 $tbl_sysinfo_cpu . '.id desc,' . $tbl_sysinfo_cpu .
 '.cpu_MHz desc limit 16)A group by core_id order by core_id;';
-$rst = $stat_mngr->queryData( $sql );
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 while ( $row = $stat_mngr->fetchArray( $rst ) ) {
 if ( isset( $cpus[$row['core_id']] ) )
 continue;
@@ -601,6 +692,7 @@ $cpus[$row['core_id']] = array(
 'max_speed' => $row['max_speed'] );
 }
 $stat_mngr->freeResult( $rst );
+}
 $html_rows = '<tr><th colspan="3" style="border-color:#fff;background-color:#f4ce2d;color:#000">%s</th></tr>';
 if ( count( $cpus ) > 0 ) {
 $html_rows = sprintf( $html_rows, $cpus[0]['model'] );
@@ -618,21 +710,24 @@ $html_rows = sprintf( $html_rows, _esc( 'CPU info not available' ) );
 echo $html_rows;
 $sql = 'select MemTotal,MemFree,MemAvailable,SwapTotal,SwapFree from ' . $tbl_sysinfo_mem . ' where jobs_id=' .
 $params['id'] . ';';
-$rst = $stat_mngr->queryData( $sql );
+if ( $rst = $stat_mngr->queryData( $sql ) ) {
 $row = $stat_mngr->fetchArray( $rst );
 $stat_mngr->freeResult( $rst );
-$html_rows = sprintf( 
+}
+$html_rows = '';
+isset( $row['MemTotal'] ) && $html_rows .= sprintf( 
 '<tr><th colspan="3" style="border-color:#fff;background-color:#f4ce2d;color:#000">%s ' .
 getHumanReadableSize( $row['MemTotal'] ) . ' RAM</th></tr>', 
 _esc( 'System RAM' ) );
-$html_rows .= '<tr><th>' . _esc( 'Free' ) . '</th><td>' . getHumanReadableSize( $row['MemFree'] ) .
-"</td><td rowspan='4'><a class='help' onclick=" . getHelpCall( $help_1 ) . ">[?]</a></td></tr>";
-$html_rows .= '<tr><th>' . _esc( 'Available' ) . '</th><td>' . getHumanReadableSize( $row['MemAvailable'] ) .
-'</td></tr>';
-$html_rows .= '<tr><th>' . _esc( 'Total swap' ) . '</th><td>' . getHumanReadableSize( $row['SwapTotal'] ) .
-'</td></tr>';
-$html_rows .= '<tr><th>' . _esc( 'Free swap' ) . '</th><td>' . getHumanReadableSize( $row['SwapFree'] ) .
-'</td></tr>';
+isset( $row['MemFree'] ) && $html_rows .= '<tr><th>' . _esc( 'Free' ) . '</th><td>' .
+getHumanReadableSize( $row['MemFree'] ) . "</td><td rowspan='4'><a class='help' onclick=" .
+getHelpCall( $help_1 ) . ">[?]</a></td></tr>";
+isset( $row['MemAvailable'] ) && $html_rows .= '<tr><th>' . _esc( 'Available' ) . '</th><td>' .
+getHumanReadableSize( $row['MemAvailable'] ) . '</td></tr>';
+isset( $row['SwapTotal'] ) && $html_rows .= '<tr><th>' . _esc( 'Total swap' ) . '</th><td>' .
+getHumanReadableSize( $row['SwapTotal'] ) . '</td></tr>';
+isset( $row['SwapFree'] ) && $html_rows .= '<tr><th>' . _esc( 'Free swap' ) . '</th><td>' .
+getHumanReadableSize( $row['SwapFree'] ) . '</td></tr>';
 echo $html_rows;
 ?>	
 </table>
@@ -650,12 +745,32 @@ if ( $stat_mngr->isSQLite() )
 echo '<br>' . _esc( 'Try do it manually by removing that file.' );
 }
 }
+function deleteJobHistory( $settings, $job_id ) {
+$stat_mngr = getJobsStatManager( $settings );
+$sql_stmts = array( 
+'DELETE FROM ' . TBL_PREFIX . TBL_JOBS . ' where id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_SOURCES . ' where jobs_id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_FILES . ' where jobs_id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_PATHS . ' where jobs_id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_STATS . ' where jobs_id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_SYSCPU . ' where jobs_id=' . $job_id, 
+'DELETE FROM ' . TBL_PREFIX . TBL_SYSMEM . ' where jobs_id=' . $job_id );
+$result = true;
+foreach ( $sql_stmts as $sql )
+$result &= $stat_mngr->queryData( $sql );
+$response = array( 'success' => false !== $result );
+if ( ! $result ) {
+$last_err = error_get_last();
+$response['message'] = $last_err['message'];
+}
+echo json_encode( $response, JSON_FORCE_OBJECT );
+}
 function echoHistoryJobLog( $params) {
 global $COMPRESSION_NAMES;
 $job_log_content = null;
 $job_id = intval( $params['id'] );
 $log_file = OUTPUT_LOGFILE;
-if ( $job_id > 0 && ! file_exists( $log_file ) ) {
+if ( $job_id > 0 && ! _file_exists( $log_file ) ) {
 printf( 
 '<red>%s:</red><pre>%s</pre>', 
 _esc( 'Strange enough but the log file cannot be found at its path' ), 
@@ -665,7 +780,7 @@ return false;
 if ( 0 == $job_id ) {
 $log_file = dirname( $log_file ) . DIRECTORY_SEPARATOR . $params['id'] . DIRECTORY_SEPARATOR .
 basename( $log_file ) . '.' . $COMPRESSION_NAMES[GZ];
-if ( file_exists( $log_file ) )
+if ( _file_exists( $log_file ) )
 $job_log_content = implode( gzfile( $log_file ) );
 } else {
 $found = false;
@@ -717,9 +832,9 @@ $job_log_content );
 dumpVar( "<div class='cui-console'>" . trim( $job_log_content ) . '</div>', true ); 
 } else
 printf( 
-"<yellow>%s</yellow>.<br>%s<blockquote>%s</blockquote>", 
+"<yellow>%s</yellow>.<br>%s<blockquote>%s</blockquote>or download the `Full log` (see the `Logs` tab).", 
 sprintf( _esc( 'Strange enough the log file does not contain the section for job# %s' ), $job_id ), 
 _esc( 'If you are in doubt then please check the log file at :' ), 
-$log_file );
+shorten_path( $log_file ) );
 }
 ?>

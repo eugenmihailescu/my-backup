@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : StatisticsManager.php $
  * 
- * @id      : StatisticsManager.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : StatisticsManager.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -85,6 +85,7 @@ define( __NAMESPACE__."\\TBL_KEYS", "keys" );
 define( __NAMESPACE__."\\TBL_SYSINFO", "sysinfo" );
 define( __NAMESPACE__."\\TBL_SYSCPU", "sysinfo_cpu" );
 define( __NAMESPACE__."\\TBL_SYSMEM", "sysinfo_mem" );
+define( __NAMESPACE__."\\STAT_TBL_COUNT", 9 );
 define( __NAMESPACE__.'\\STATISTICS_DEBUG_LOG_MAXROWS', 10 );
 class StatisticsManager {
 private $_settings;
@@ -98,12 +99,14 @@ public function escape( $string ) {
 if ( $this->isSQLite() )
 return $this->_db->escapeString( $string );
 else
-return\mysql_real_escape_string( $string, $this->_db );
+return $this->_db->escape_sql_string( $string );
 }
 private function _tableExists( $name ) {
-$rst = $this->_sqlExec( "SHOW TABLES LIKE '" . $name . "'" );
+$result = false;
+if ( $rst = $this->_sqlExec( "SHOW TABLES LIKE '" . $name . "'" ) ) {
 $result = $this->fetchArray( $rst );
 $this->freeResult( $rst );
+}
 return is_array( $result ) && count( $result );
 }
 public function _sqlExec( $query, $noresult = false, $single_row = false ) {
@@ -115,7 +118,12 @@ throw new MyException( 'Invalid SQL statement (empty).' );
 $stats_debug_on = defined( __NAMESPACE__.'\\STATISTICS_DEBUG' ) && STATISTICS_DEBUG && defined( __NAMESPACE__.'\\STATISTICS_DEBUG_LOG' );
 if ( $stats_debug_on && strlen( $query ) < MB ) {
 $this->_logfile->writeLog( str_repeat( '-', 80 ) . PHP_EOL );
-$this->_logfile->writeLog( sprintf( '[%s] %s' . PHP_EOL, date( DATETIME_FORMAT ), $query ) );
+$this->_logfile->writeLog( 
+sprintf( 
+'[%s] %s : %s' . PHP_EOL, 
+date( DATETIME_FORMAT ), 
+$this->isSQLite() ? '' : $this->_db->get_extension(), 
+$query ) );
 $this->_logfile->writeLog( str_repeat( '-', 80 ) . PHP_EOL );
 }
 $result = null;
@@ -128,15 +136,16 @@ else
 $rst = @$this->_db->query( $query );
 $result = $rst;
 } else {
-$rst = @\mysql_query( $query, $this->_db );
-if ( false === $result )
-throw new MyException( \mysql_error(), \mysql_errno() );
+if ( $rst = $this->_db->query( $query ) ) {
 if ( $single_row )
 $result = $this->fetchArray( $rst );
 else
 $result = $rst;
+} else {
+throw new MySQLErrorException( $this->_db );
 }
-if ( $stats_debug_on ) {
+}
+if ( $stats_debug_on && MySQLWrapper::MYSQLPDO_EXT != ( $this->isSQLite() ? '' : $this->_db->get_extension() ) ) {
 $result_array = array();
 if ( is_resource( $rst ) || is_object( $rst ) ) {
 $single_row && $this->seek( $rst, 0 ); 
@@ -145,7 +154,7 @@ if ( STATISTICS_DEBUG_LOG_MAXROWS == count( $result_array ) ) {
 $result_array[] = sprintf( 
 _esc( 'Result is limited to max %d rows (out of %s)' ), 
 STATISTICS_DEBUG_LOG_MAXROWS, 
-$this->isSQLite() ? '?' : mysql_affected_rows( $this->_db ) );
+$this->isSQLite() ? '?' : $this->_db->get_affected_rows( $rst ) );
 break;
 } else
 $result_array = $result_array + $data;
@@ -180,7 +189,7 @@ return $rst;
 if ( $this->_is_sqlite )
 return $this->_db->lastInsertRowID();
 else
-return \mysql_insert_id( $this->_db );
+return $this->_db->get_insert_id();
 }
 private function _convertArgs( &$array ) {
 $result = array();
@@ -227,7 +236,7 @@ break;
 }
 return $result;
 }
-private function _createTable( $tbl_name, $field_defs ) {
+private function _createTable( $tbl_name, $field_defs, $overwrite = false ) {
 if ( ! ( is_array( $field_defs ) && count( $field_defs ) > 0 ) )
 return false;
 $col_list = array();
@@ -243,7 +252,11 @@ $col_type = $col_type[0];
 }
 $col_list[] = '`' . $col_name . '` ' . $this->_getSQLColType( $col_type ) . ' ' . $col_ctr;
 }
-$sql = 'CREATE TABLE ' . TBL_PREFIX . $tbl_name . '(id INTEGER NOT NULL ' .
+if ( $overwrite ) {
+$sql = 'DROP TABLE IF EXISTS ' . TBL_PREFIX . $tbl_name;
+$this->_sqlExec( $sql, true );
+}
+$sql = 'CREATE TABLE IF NOT EXISTS ' . TBL_PREFIX . $tbl_name . '(id INTEGER NOT NULL ' .
 ( $this->_is_sqlite ? 'PRIMARY KEY' : 'AUTO_INCREMENT' ) . ',' . implode( ',', $col_list ) .
 ( $this->_is_sqlite ? '' : ',PRIMARY KEY(id)' ) . ');';
 $this->_sqlExec( $sql, true );
@@ -361,6 +374,14 @@ $this->_createTable( TBL_FILES, $field_defs );
 }
 private function _createSysinfoCpuTbl() {
 $cpu = getCpuInfo();
+empty( $cpu ) && $cpu = array( 
+array( 
+'vendor_id' => '', 
+'model name' => '', 
+'stepping' => '', 
+'cpu_MHz' => '', 
+'stepping' => '', 
+'core_id' => '' ) );
 if ( is_array( $cpu ) && count( $cpu ) > 0 ) {
 $cpu = array_keys( $cpu[0] );
 $this->_createSysInfoArrayTbl( TBL_SYSCPU, $cpu );
@@ -368,6 +389,12 @@ $this->_createSysInfoArrayTbl( TBL_SYSCPU, $cpu );
 }
 private function _createSysinfoMemTbl() {
 $mem = getSystemMemoryInfo();
+empty( $mem ) && $mem = array( 
+'MemTotal' => 0, 
+'MemFree' => 0, 
+'MemAvailable' => 0, 
+'SwapTotal' => 0, 
+'SwapFree' => 0 );
 if ( is_array( $mem ) && count( $mem ) > 0 ) {
 $mem = array_keys( $mem );
 $this->_createSysInfoArrayTbl( TBL_SYSMEM, $mem );
@@ -390,37 +417,37 @@ return null;
 if ( is_string( $params ) ) {
 $this->_is_sqlite = true;
 $filename = $params;
-$db_exists = file_exists( $filename );
+$db_exists = _file_exists( $filename );
 $overwrite = $overwrite || ( $db_exists && filesize( $filename ) === 0 );
 if ( $overwrite && $db_exists )
 unlink( $filename );
 $this->_db = new \SQLite3( $filename );
 $this->_sql_open_quote = '[';
 $this->_sql_close_quote = ']';
+$sql = sprintf( 'SELECT name FROM sqlite_master WHERE type="table" AND name LIKE "%s%%"', TBL_PREFIX );
+if ( $rst = $this->_sqlExec( $sql ) ) {
+$row = $rst->fetchArray();
+$db_exists = count( $row[0] );
+$this->freeResult( $rst );
+}
 } else {
 $this->_is_sqlite = false;
 if ( ! is_array( $params ) )
 return null;
-$host = $params['host'];
-$port = $params['port'];
-$db_name = $params['db_name'];
-$user = $params['user'];
-$passwrod = $params['pwd'];
-$this->_db = \mysql_pconnect( "$host:$port", $user, $passwrod );
-if ( false == $this->_db )
-throw new MyException( \mysql_error(), \mysql_errno() );
-if ( ! \mysql_select_db( $db_name ) )
-throw new MyException( \mysql_error(), \mysql_errno() );
-$rst = $this->_sqlExec( "SHOW TABLES FROM `$db_name` LIKE '" . TBL_PREFIX . "%';" );
-$db_exists = \mysql_num_rows( $rst ) > 0;
-$this->freeResult( $rst );
+$db_exists = false;
 $this->_sql_open_quote = '`';
 $this->_sql_close_quote = '`';
-if ( null == $this->_db )
-throw new MyException( \mysql_error(), \mysql_errno() );
+$this->_db = new MySQLWrapper( $this->_settings );
+$this->_db->is_wp = is_wp();
+if ( ! $this->_db->connect() )
+throw new MySQLErrorExceptio( $this->_db );
+$sql = sprintf( "SHOW TABLES FROM `%s` LIKE '%s%%';", $params['db_name'], TBL_PREFIX );
+if ( $rst = $this->_sqlExec( $sql ) ) {
+$db_exists = STAT_TBL_COUNT == $this->_db->get_rows_count( $rst );
+$this->freeResult( $rst );
 }
-if ( ! $db_exists )
-$this->_createDbTables();
+}
+$db_exists || $this->_createDbTables();
 return $this->_db;
 }
 public function upgrade_db() {
@@ -448,29 +475,31 @@ throw new MyException( 'Cannot insert into table ' . $tbl_name . '. The array of
 $columns = $this->_sql_open_quote .
 implode( $this->_sql_close_quote . ',' . $this->_sql_open_quote, array_keys( $array ) ) .
 $this->_sql_close_quote;
-$_this_ = $this;
+$_this_ = &$this;
 array_walk( $array, function ( &$item ) use(&$_this_ ) {
 $item = $_this_->escape( $item );
 } );
-$values = '"' . implode( '","', array_values( $array ) ) . '"';
+$values = '\'' . implode( '\',\'', array_values( $array ) ) . '\'';
 $select = 'INSERT INTO ' . TBL_PREFIX . $tbl_name . ' (' . $columns . ') ';
-if ( ! $unique )
 $sql = 'VALUES (' . $values . ');';
-else {
+if ( $unique ) {
 $values = '';
 $unique_cond = '';
 foreach ( $array as $key => $value ) {
-$values .= '"' . $value . '" AS ' . $key . ',';
+$values .= '\'' . $value . '\' AS ' . $key . ',';
 if ( 'timestamp' == $key )
 continue;
 else
-$unique_cond .= $this->_sql_open_quote . $key . $this->_sql_close_quote . '="' . $value . '" AND ';
+$unique_cond .= $this->_sql_open_quote . $key . $this->_sql_close_quote . '=\'' . $value . '\' AND ';
 }
-$values = substr( $values, 0, strlen( $values ) - 1 );
+$values = substr( $values, 0, strlen( $values ) - 1 ); 
 if ( strlen( $unique_cond ) > 0 )
-$unique_cond = substr( $unique_cond, 0, strlen( $unique_cond ) - 4 );
-$sql = 'SELECT subqry.* FROM (SELECT' . $values . ')subqry WHERE NOT EXISTS(SELECT id from ' . TBL_PREFIX .
-$tbl_name . ( strlen( $unique_cond ) > 0 ? ' WHERE ' . $unique_cond : '' ) . ');';
+$unique_cond = substr( $unique_cond, 0, strlen( $unique_cond ) - 4 ); 
+$record_exists_sql = 'SELECT id from ' . TBL_PREFIX . $tbl_name .
+( strlen( $unique_cond ) > 0 ? ' WHERE ' . $unique_cond : '' ) . ' order by id desc LIMIT 1';
+$record_exists = $this->_sqlExec( $record_exists_sql, false, true );
+if ( is_array( $record_exists ) && count( $record_exists ) )
+return $record_exists['id'];
 }
 $this->_sqlExec( $select . $sql, true );
 return $this->_lastInsertRowID( $unique, $tbl_name );
@@ -555,7 +584,8 @@ function __destruct() {
 if ( $this->_is_sqlite )
 $this->_db->close();
 else
-mysql_close( $this->_db );
+$this->_db->disconnect();
+$this->_db = null;
 }
 public function onNewJobStarts( $job_type, $mode, $keys = null, $timestamp = null ) {
 global $_branch_id_;
@@ -588,7 +618,7 @@ $sql = 'UPDATE ' . TBL_PREFIX . TBL_JOBS . ' SET ';
 if ( ! empty( $params ) )
 foreach ( $params as $key => $value )
 $sql .= $key . '="' . $value . '",';
-$duration = ! empty( $params ) && isset( $params['duration'] ) ? $params['duration'] : ( ( $this->_is_sqlite ? 'strftime(\'%s\',\'now\')' : 'now()' ) .
+$duration = ! empty( $params ) && isset( $params['duration'] ) ? $params['duration'] : ( ( $this->_is_sqlite ? 'strftime(\'%s\',\'now\')' : 'unix_timestamp()' ) .
 '-started_time' );
 $sql .= ( ! empty( $rst1['uncompressed'] ) ? 'job_size=' . $rst1['uncompressed'] . ',' : '' ) .
 ( ! empty( $rst1['uncompressed'] ) ? 'avg_speed=' . $rst1['uncompressed'] . '/' . $duration . ',' : '' ) .
@@ -609,7 +639,7 @@ return $this->_sqlExec( $sql, false );
 }
 public function flushData() {
 if ( $this->_is_sqlite ) {
-if ( file_exists( $this->_connection_params ) )
+if ( _file_exists( $this->_connection_params ) )
 $result = @unlink( $this->_connection_params );
 } else {
 $tables = array( 
@@ -636,7 +666,7 @@ return false;
 if ( $this->_is_sqlite )
 return $rst->fetchArray( $mode );
 else {
-return mysql_fetch_array( $rst, $mode );
+return $this->_db->fetch_array( $rst, $mode );
 }
 }
 public function freeResult( &$rst ) {
@@ -645,7 +675,7 @@ return false;
 if ( $this->_is_sqlite )
 return $rst->finalize();
 else
-return \mysql_free_result( $rst );
+return $this->_db->free_result( $rst );
 }
 public function isSQLite() {
 return $this->_is_sqlite;
@@ -657,8 +687,7 @@ public function seek( &$rst, $offset = 0 ) {
 if ( $this->_is_sqlite )
 return $rst->reset();
 else {
-if ( \mysql_affected_rows( $this->_db ) )
-return \mysql_data_seek( $rst, $offset );
+return $this->_db->seek_row( $rst, $offset );
 }
 return false;
 }

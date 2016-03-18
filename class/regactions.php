@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : regactions.php $
  * 
- * @id      : regactions.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : regactions.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -49,12 +49,15 @@ $settings = loadSettings();
 if ( ! defined( __NAMESPACE__.'\\DO_NOT_AFTER_SETTINGS' ) || ! DO_NOT_AFTER_SETTINGS )
 afterSettingsLoad( $settings, true ); 
 require_once CONFIG_PATH . 'default-target-tabs.php';
+include_once CONFIG_PATH . 'ajax-actions.php';
 if ( isset( $_POST['tlid'] ) && defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) ) {
+$class = __NAMESPACE__ . 'TargetListEditor';
 $target_list = new TargetCollection( TARGETLIST_DB_PATH );
 if ( false !== ( $target_item = $target_list->getTargetItem( $_POST['tlid'] ) ) )
 $settings = $target_item->targetSettings; 
-elseif (( isset( $_SESSION['id'] ) && $_SESSION['id'] == $_POST['tlid'] ) ||
-isset( $_SESSION['edit_step'] ) && isset( $_SESSION['edit_step']['step_data'] ) ) {
+elseif (( isset( $_SESSION['id'] ) && $_SESSION['id'] == $_POST['tlid'] ) || isset( $_SESSION['edit_step'] ) &&
+isset( $_SESSION['edit_step']['sender'] ) && $class == $_SESSION['edit_step']['sender'] &&
+isset( $_SESSION['edit_step']['step_data'] ) ) {
 $array = json_decode( str_replace( '\"', '"', $_SESSION['edit_step']['step_data'] ), true );
 is_array( $array ) && $settings = array_merge( $settings, $array );
 }
@@ -70,66 +73,7 @@ if ( ! key_exists( $action, $actions ) )
 $actions[$action] = $callback;
 }
 }
-$ajax_actions = array( 
-'flushhist', 
-'get_chart', 
-'get_progress', 
-'cleanup_progress', 
-'run_mysql_maint', 
-'run_backup', 
-'run_parallel_backup', 
-'run_restore', 
-'wp_restore', 
-'compression_benchmark', 
-'chk_status', 
-'support_sender_send', 
-'support_sender_validate', 
-'support_sender_info', 
-'ftp_exec', 
-'log_read', 
-'log_read_abort', 
-'read_folder', 
-'read_folder_info', 
-'auto_save', 
-'php_setup', 
-'chk_lic', 
-'del_file', 
-'rst_file', 
-'ren_file', 
-'del_dir', 
-'del_oauth', 
-'mk_dir', 
-'abort_job', 
-'read_alert', 
-'print_debug_sample', 
-'enable_target', 
-'save_target_desc', 
-'search_rest_file', 
-'set_wpcron_schedule', 
-'get_wpcron_schedule', 
-'encryption_info', 
-'gen_encrypt_keys', 
-'export_settings', 
-'import_settings', 
-'feat_table', 
-'feat_lic', 
-'eula', 
-'redir_checkout', 
-'check_vat', 
-'braintree_proxy', 
-'addon_install', 
-'addon_uninstall', 
-'addon_disable', 
-'decrypt_file', 
-'check_update', 
-'update_info', 
-'install_update', 
-'test_dwl', 
-'mybackup_core_backup', 
-'last_bak_info', 
-'wp_restore_job', 
-'upload_restore_file' );
-foreach ( $ajax_actions as $ajax_action ) {
+foreach ( get_valid_ajax_actions() as $ajax_action ) {
 add_action( WP_AJAX_ACTION_PREFIX . $ajax_action, array( $ajax_request, AJAX_DISPATCH_FUNCTION ) );
 }
 add_action( 'admin_init', array( $ajax_request, WP_MYBACKUP_ACTION_PREFIX . 'do_action' ) );

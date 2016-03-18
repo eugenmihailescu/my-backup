@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : AbstractTargetEditor.php $
  * 
- * @id      : AbstractTargetEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : AbstractTargetEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -66,18 +66,40 @@ protected $infoBannerRoot;
 protected $inBetweenContent; 
 protected $customTitle; 
 public $hasPasswordField; 
+private function _outputException( $e, $return = false ) {
+ob_start();
+debug_print_backtrace();
+$trace = ob_get_clean();
+$output = sprintf( '<div class="hintbox redcaption %s">%s</div>', $this->container_shape, $e->getMessage() );
+$output .= sprintf( 
+'<div style="margin:10px;white-space: pre-line;" class="%s"><div style="background-color:#FFB600;color:white;display:inline;padding:5px;">%s</div><div style="padding:10px;border:1px dashed #CCC;border-radius:5px;">%s</div>', 
+$this->container_shape, 
+_esc( 'Debug trace:' ), 
+$trace );
+$return || print ( $output ) ;
+if ( $return )
+return $output;
+}
 private function _getEditorTemplate() {
 ob_start();
+try {
 $this->getEditorTemplate();
-$result = ob_get_contents();
+$result = ob_get_clean();
+} catch ( \Exception $e ) {
 ob_end_clean();
+$result = $this->_outputException( $e, true );
+}
 return $result;
 }
 private function _showExpertEditor() {
 ob_start();
+try {
 $this->getExpertEditorTemplate();
-$expert_rows = ob_get_contents();
+$expert_rows = ob_get_clean();
+} catch ( \Exception $e ) {
 ob_end_clean();
+$expert_rows = $this->_outputException( $e, true );
+}
 if ( ! empty( $expert_rows ) )
 echo $this->insertEditorTemplate( 
 _esc( 'Expert settings' ), 
@@ -115,7 +137,7 @@ $this->hasInfoBannerJS = false;
 $this->infoBannerRoot = $this->root;
 $this->_childInit = true;
 }
-protected function getImgURL( $filename ) {
+public function getImgURL( $filename ) {
 return plugins_url_wrapper( 'img/' . $filename, IMG_PATH );
 }
 protected function onGenerateEditorContent() {
@@ -127,7 +149,7 @@ $path = null == $path ? $rel_path : $path;
 if ( DIRECTORY_SEPARATOR != substr( $path, - 1 ) )
 $path .= DIRECTORY_SEPARATOR;
 $filename = $path . $template_file;
-if ( file_exists( $filename ) )
+if ( _file_exists( $filename ) )
 return $filename;
 if ( $quiet )
 return false;
@@ -161,8 +183,7 @@ echo '<table name="' . strtolower( get_class( $this ) ) . '"' . TARGET_TABLE_STY
 '</table>' . PHP_EOL;
 if ( $close_divs )
 echo '</div>' . PHP_EOL . '</div>' . PHP_EOL;
-$result = ob_get_contents();
-ob_end_clean();
+$result = ob_get_clean();
 return $result;
 }
 protected function getRefreshFolderJS() {
@@ -170,7 +191,7 @@ return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElem
 }
 function __construct( $target_item ) {
 if ( null == $target_item )
-throw new MyException( sprintf( _esc( 'Invalid item_id supplied in %s constructor' ), get_class( $this ) ) );
+throw new \Exception( sprintf( _esc( 'Invalid item_id supplied in %s constructor' ), get_class( $this ) ) );
 global $container_shape, $registered_targets;
 $this->target_item = $target_item;
 $this->java_scripts = array();
@@ -188,7 +209,7 @@ $this->container_shape = $container_shape;
 $this->registered_targets = $registered_targets;
 try {
 $this->initTarget();
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 echo getSpanE( $e->getMessage(), 'red', 'bold' );
 }
 }
@@ -249,7 +270,11 @@ echo $editor_template;
 $skip = $this->hideEditorContent();
 if ( ! $skip ) {
 require_once 'target-content-functions.php';
+try {
 $this->onGenerateEditorContent();
+} catch ( MyException $e ) {
+echo sprintf( '<div class="%s">%s</div>', $this->container_shape, $e->getMessage() );
+}
 }
 if ( $this->hasInfoBanner ) {
 echo '<br>' . PHP_EOL;

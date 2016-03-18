@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : sys-tools.php $
  * 
- * @id      : sys-tools.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : sys-tools.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,19 +38,31 @@ namespace MyBackup;
 function getTarExclusionPattern( $root_dir, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null ) {
 $pattern = ' ';
 $inerquot = "'";
-if ( is_array( $exclude_files ) )
+if ( is_array( $exclude_files ) ) {
+$items = array();
 foreach ( $exclude_files as $f )
 if ( null == $exclude_dirs ||
-( is_array( $exclude_dirs ) && ! empty( $f ) && ! array_search( dirname( $f ), $exclude_dirs ) ) )
-$pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, $f, $inerquot );
-if ( is_array( $exclude_ext ) )
+( is_array( $exclude_dirs ) && ! empty( $f ) && ! array_search( dirname( $f ), $exclude_dirs ) ) ) {
+$items[] = $f;
+}
+empty( $items ) || $pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, gcdArrayGlob( $items ), $inerquot );
+}
+if ( is_array( $exclude_ext ) ) {
+$items = array();
 foreach ( $exclude_ext as $e )
-if ( ! empty( $e ) )
-$pattern .= sprintf( "--exclude=%s*.%s%s ", $inerquot, $e, $inerquot );
-if ( is_array( $exclude_dirs ) )
+if ( ! empty( $e ) ) {
+$items[] = $e;
+}
+empty( $items ) || $pattern .= sprintf( "--exclude=%s*.%s%s ", $inerquot, gcdArrayGlob( $items ), $inerquot );
+}
+if ( is_array( $exclude_dirs ) ) {
+$items = array();
 foreach ( $exclude_dirs as $d )
-if ( ! empty( $d ) && false !== strpos( $d, $root_dir ) )
-$pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, delTrailingSlash( $d ), $inerquot );
+if ( ! empty( $d ) && false !== strpos( $d, $root_dir ) ) {
+$items[] = delTrailingSlash( $d );
+}
+empty( $items ) || $pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, gcdArrayGlob( $items ), $inerquot );
+}
 return $pattern;
 }
 function escapeCygwinPath( $str ) {
@@ -113,7 +125,7 @@ $cmd = "tar";
 if ( $vol_size >= 1 )
 $cmd .= " -ML " . $vol_size;
 $excl_pattern = getTarExclusionPattern( 
-is_dir( $src_filename ) ? $src_filename : dirname( $src_filename ), 
+_is_dir( $src_filename ) ? $src_filename : dirname( $src_filename ), 
 $exclude_files, 
 $exclude_dirs, 
 $exclude_ext );
@@ -130,8 +142,8 @@ $cmd .= " -fq" . ( BZ2 == $method ? 'k' : '' ) . " " .
 ( $vol_size >= 1 ? ">\$f." . $COMPRESSION_NAMES[$method] . ";done" : ( $redirect ) );
 }
 $cmd = str_replace( "%arcname%", NONE != $method ? '-' : $arc, $cmd );
-if ( $vol_size >= 1 && ( file_exists( $src_filename ) || is_dir( $src_filename ) ) ) {
-$fs = is_file( $src_filename ) ? filesize( $src_filename ) : getDirSize( $src_filename );
+if ( $vol_size >= 1 && ( _file_exists( $src_filename ) || _is_dir( $src_filename ) ) ) {
+$fs = _is_file( $src_filename ) ? filesize( $src_filename ) : getDirSize( $src_filename );
 $vol_count = ceil( $fs / ( $vol_size * 1024 ) );
 if ( $vol_count > 1 )
 $cmd = "printf 'n " . $arc_filename . "-%d.tar\\n' {1.." . ( $vol_count - 1 ) . "} | " . $cmd;
@@ -163,7 +175,7 @@ global $COMPRESSION_NAMES;
 $result = false;
 if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) ) {
 $arc = createTarNZipFilename( $dst_filename, $method );
-if ( file_exists( $arc ) )
+if ( _file_exists( $arc ) )
 unlink( $arc );
 $cmd = getTarNZipCmd( 
 $src_filename, 
@@ -180,11 +192,11 @@ $io = @popen( $cmd, 'r' );
 if ( $io ) {
 while ( ( fgets( $io, 4096 ) ) !== false )
 ; 
-$result = file_exists( $arc );
+$result = _file_exists( $arc );
 pclose( $io );
 }
 }
-if ( $remove_source && file_exists( $src_filename ) && ! is_dir( $src_filename ) )
+if ( $remove_source && _file_exists( $src_filename ) && ! _is_dir( $src_filename ) )
 unlink( $src_filename );
 if ( $result )
 if ( 0 < $vol_size ) {
@@ -217,7 +229,7 @@ $bzip_version = null,
 $cygwin = null ) {
 $src_file = tempnam( 
 addTrailingSlash( 
-empty( $workdir ) || ! file_exists( $workdir ) ? ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() ) : $workdir ), 
+empty( $workdir ) || ! _file_exists( $workdir ) ? ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir() ) : $workdir ), 
 'tmp_' );
 $result = false;
 if ( file_put_contents( $src_file, str_repeat( "0", 100 ) ) )

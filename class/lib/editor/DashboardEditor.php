@@ -24,101 +24,97 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : DashboardEditor.php $
  * 
- * @id      : DashboardEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : DashboardEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class DashboardEditor extends AbstractTargetEditor {
+private $_last_job;
+private $_enabled_targets;
 private $_stat_manager;
-private $_upload_constraint_manual = 'http://php.net/manual/en/ini.core.php';
+private $_upload_constraint_manual;
 private $_upload_constraint_link;
 private $_restore_upl_chunked;
 private function _getJavaScripts() {
 global $PROGRESS_PROVIDER;
+$this->java_scripts[] = 'parent.enabled_backup_targets=[' . implode( ',', $this->_enabled_targets ) . '];';
+$action_1 = 'wp_jobs_stats';
+if ( ! _dir_in_allowed_path( $this->settings['wrkdir'] ) )
+$disk_free = PHP_INT_MAX;
+else
+$disk_free = _disk_free_space( $this->settings['wrkdir'] ? $this->settings['wrkdir'] : _sys_get_temp_dir() );
+$upload_max_size = min( getUploadLimit(), $disk_free );
+$this->_restore_upl_chunked && $upload_max_size = $disk_free;
 $this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );
 $this->java_scripts[] = "parent.asyncGetJobLog=function(id){parent.asyncGetContent(parent.ajaxurl, 'action=read_folder&log=1&sender=history&nonce=" .
 wp_create_nonce_wrapper( 'read_folder' ) . "&id=' + id);};";
 ob_start();
 ?>
-parent.update_job_info=function(xmlhttp){
-var job_status;
+parent.stat_info={};
+parent.update_stat_element=function(sufix,param,index,fgindex,bgindex,is_array){
+parent.update_element(sufix,param,index,fgindex,bgindex,is_array,'stat_info');
+};
+parent.update_wp_jobs_stats=function(xmlhttp){
 try{
-job_status=JSON.parse(xmlhttp.responseText);
+parent.stat_info=JSON.parse(xmlhttp.responseText);
+if(!parent.isNull(xmlhttp.has_cookie,false)){
+var expire=<?php echo time();?>-parent.stat_info.timestamp;
+parent.setCookie('<?php echo $action_1;?>',xmlhttp.responseText,expire>1?expire+'s':'3600s');
+}
 }catch(e){
-job_status={title:e.message};
+parent.stat_info={title:e.message};
+console.log(xmlhttp);
 }
-var array = function(obj) {
-var i,result=[];
-for(i in obj)
-if(obj.hasOwnProperty(i))result.push(obj[i]);
-return result;
-};
-var update=function(sufix,param,index,cindex,is_array){
-index=null!==parent.isNull(index,null)?index:-1;
-cindex=null!==parent.isNull(cindex,null)?cindex:-1;
-is_array=null!==parent.isNull(is_array,null)?is_array:false;
-var e=document.getElementById('job_info_'+sufix),data='?',color='';
-if(e){
-if(job_status.hasOwnProperty(param)){
-data=job_status[param];
-if(cindex>-1)color=data.hasOwnProperty(cindex)?data[cindex]:'';
-if(index>-1)data=data.hasOwnProperty(index)?data[index]:data;
-}
-if(''!=color)e.style.color=color;
-e.innerHTML=is_array?array(data).join(', '):data;
-}
-};
-update('title','title');
-update('start','started_time');
-update('status','job_status',0,1);
-update('state','job_state',0,1);
-update('mode','mode');
-update('size','jobsize');
-update('source','source_type',null,null,true);
-update('location','operation',null,null,true);
-parent.last_job_id=job_status.hasOwnProperty('id')?job_status.id:0;
-parent.last_job=job_status;
-if(e=document.getElementById('btn_view_log')){
-if(parent.last_job_id)
-e.value=e.value.replace(/(\s#\d+)/,'')+' #'+parent.last_job_id;
-e.disabled=!parent.last_job_id;
-}
-if(e=document.getElementById('btn_restore_backup'))
-{
-if(parent.last_job_id)
-e.value=e.value.replace(/(\s#\d+)/,'')+' #'+parent.last_job_id;
-e.disabled=!parent.last_job_id;			
-}
+parent.update_stat_element('title','title');
+parent.update_stat_element('bak_done','backup_count');
+parent.update_stat_element('rst_done','restoration_count');
+parent.update_stat_element('files_count','files_count');
+parent.update_stat_element('ratio','ratio');
+parent.update_stat_element('files_size','file_size');
+parent.update_stat_element('data_size','data_size');
 };
 <?php
 $this->java_scripts[] = ob_get_clean();
-$this->java_scripts[] = 'parent.last_job_id=0;';
+$this->java_scripts[] = 'parent.last_bak_job_id=0;parent.last_rst_job_id=0';
 $this->java_scripts[] = 'parent.wp_restore_components={};';
-$disk_free = disk_free_space( $this->settings['wrkdir'] ? $this->settings['wrkdir'] : sys_get_temp_dir() );
-$upload_max_size = min( getUploadLimit(), $disk_free );
-$this->_restore_upl_chunked && $upload_max_size = $disk_free;
 $this->java_scripts[] = 'parent.upload_max_size=' . $upload_max_size . ';';
 $this->java_scripts[] = 'document.getElementById("upload_max_size").innerHTML=parent.getHumanReadableSize(parent.upload_max_size);';
-$action = 'last_bak_info';
-if ( $this->is_wp ) {
 ob_start();
 ?>
-parent.get_last_jobinfo=function(){
-parent.asyncGetContent(parent.ajaxurl,'action=%s&nonce=%s&url='+window.location,'__dummy__',parent.update_job_info);
+parent.onJobDone = function(xhr, job_id) {
+parent.onJobAbnormalExit(xhr, job_id,'<?php echo wp_create_nonce_wrapper( 'job_abnormal_exit' );?>','<?php echo wp_create_nonce_wrapper( 'wp_jobs_stats' );?>');
+parent.get_last_jobinfo(true);
 };
-parent.get_last_jobinfo();
 <?php
-$this->java_scripts['Z'] = sprintf( ob_get_clean(), $action, wp_create_nonce_wrapper( $action ) );
+$this->java_scripts[] = ob_get_clean();
+if ( $this->is_wp ) {
+ob_start();
+echo $this->_last_job['js'];
+?>
+parent.get_wp_jobs_stats=function(nocache){
+nocache=parent.isNull(nocache,false);
+if(!nocache)
+{
+var cookie=parent.getCookie('<?php echo $action_1;?>');
+if(cookie){
+return parent.update_wp_jobs_stats({responseText:cookie,has_cookie:true});
+}
+}
+parent.asyncGetContent(parent.ajaxurl,'action=<?php echo $action_1;?>&nonce=<?php echo  wp_create_nonce_wrapper( $action_1 );?>&'+(nocache?'nocache=1&':'')+'url='+encodeURIComponent(window.location),parent.dummy,parent.update_wp_jobs_stats);
+};
+parent.get_wp_jobs_stats();
+<?php
+$this->java_scripts['Z'] = ob_get_clean();
 $restore_action = 'wp_restore';
 $title = _esc( 'WP Restore' );
 $on_restore_click = sprintf( 
-"jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'job_id='+jsMyBackup.last_job_id+'&wp_components='+jsMyBackup.get_selected_wp_components()+'&filter='+jsMyBackup.wp_restore_filter)", 
+"parent.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'job_id='+jsMyBackup.last_bak_job_id+'&wp_components='+parent.get_selected_wp_components()+'&filter='+parent.wp_restore_filter,function(xhr){parent.get_wp_jobs_stats(true);parent.onJobDone(xhr,'\\\\d+');})", 
 $restore_action, 
 $title, 
 wp_create_nonce_wrapper( $restore_action ), 
@@ -127,7 +123,7 @@ wp_create_nonce_wrapper( 'cleanup_progress' ),
 wp_create_nonce_wrapper( 'abort_job' ) );
 $this->java_scripts[] = 'parent.run_wp_restore=function(){' . $on_restore_click . ';};';
 $on_restore_click1 = sprintf( 
-"jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'dropin=1',function(){parent.uploader_obj.upload_refresh_files('%s');})", 
+"jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,'dropin=1',function(xhr){parent.uploader_obj.upload_refresh_files('%s');parent.get_wp_jobs_stats(true);parent.onJobDone(xhr,'\\\\d+');})", 
 $restore_action, 
 $title, 
 wp_create_nonce_wrapper( $restore_action ), 
@@ -136,7 +132,7 @@ wp_create_nonce_wrapper( 'cleanup_progress' ),
 wp_create_nonce_wrapper( 'abort_job' ), 
 wp_create_nonce_wrapper( 'upload_restore_file' ) );
 $this->java_scripts[] = 'parent.run_wp_restore1=function(){' . $on_restore_click1 . ';};';
-$tmp_dir = isset( $_this_->settings['wrkdir'] ) && ! empty( $_this_->settings['wrkdir'] ) ? $_this_->settings['wrkdir'] : sys_get_temp_dir();
+$tmp_dir = isset( $this->settings['wrkdir'] ) && ! empty( $this->settings['wrkdir'] ) ? $this->settings['wrkdir'] : _sys_get_temp_dir();
 $tmp_dir = addTrailingSlash( $tmp_dir );
 $dropin_dir = $tmp_dir . addTrailingSlash( DROPIN_RESTORE );
 ob_start();
@@ -179,14 +175,23 @@ c[0].onchange();
 $this->java_scripts[] = ob_get_clean();
 $script = "parent.get_wp_restore_components_html = function() {";
 $script .= "var result = '';";
-$script .= "if (parent.last_job.hasOwnProperty('source_type')) {";
-$script .= "var i,j,id;";
+$script .= "if (parent.last_job[" . JOB_BACKUP . "].hasOwnProperty('source_type')) {";
+$script .= "var i,j,id,job_issue=false;";
+$script .= sprintf( 
+'if(2!=parent.last_job[%d].job_status[2])job_issue="%s";else if(2==parent.last_job[%d].job_state[2])job_issue="%s";', 
+JOB_BACKUP, 
+_esc( 'not finished successfully' ), 
+JOB_BACKUP, 
+_esc( 'failed' ) );
+$script .= sprintf( 
+"if(false!=job_issue)result+=\"<div class='redcaption' style='text-align:center;padding:5px;'>%s</div>\";", 
+sprintf( _esc( "This job was %s and therefore its restoration is not recommended." ), '"+job_issue+"' ) );
 $script .= "result += '<ol style=\"list-style-type: none\">';";
-$script .= "if(parent.last_job.hasOwnProperty('operation')){";
+$script .= "if(parent.last_job[" . JOB_BACKUP . "].hasOwnProperty('operation')){";
 $script .= "var o='<option value=\"\">" . _esc( 'Any available' ) . "</option>',m;";
-$script .= "for(i in parent.last_job.operation)";
-$script .= "if(parent.last_job.operation.hasOwnProperty(i)){";
-$script .= "m=parent.last_job.operation[i].match(/>([^<]+)/);";
+$script .= "for(i in parent.last_job[" . JOB_BACKUP . "].operation)";
+$script .= "if(parent.last_job[" . JOB_BACKUP . "].operation.hasOwnProperty(i)){";
+$script .= "m=parent.last_job[" . JOB_BACKUP . "].operation[i].match(/>([^<]+)/);";
 $script .= "if(null!=m)m=m[1];else m=parent.backup_sources[i];";
 $script .= "o+='<option value=\"'+i+'\">'+m+'</option>';";
 $script .= "}";
@@ -195,17 +200,22 @@ $script .= "result+='<label for=\"wp_restore_source_filter\">" . _esc( 'Filter b
 $script .= "result += '<select id=\"wp_restore_source_filter\" onchange=\"jsMyBackup.wp_restore_filter_items(this);\">'+o+'</select>';";
 $script .= "result+='</li>';";
 $script .= "}";
-$script .= "for (i in parent.last_job.source_type)";
-$script .= "if (parent.last_job.source_type.hasOwnProperty(i)) {";
+$script .= "for (i in parent.last_job[" . JOB_BACKUP . "].source_type)";
+$script .= "if (parent.last_job[" . JOB_BACKUP . "].source_type.hasOwnProperty(i)) {";
 $script .= "id = 'source_type_' + i.replace('-', '$');";
-$script .= "result += '<li><input type=\"checkbox\" id=\"' + id + '\" onchange=\"var el=this.parentNode.getElementsByTagName(&quot;input&quot;);for(var i=0;i<el.length;i+=1)if(el[i].id!=this.id){el[i].checked=this.checked;el[i].onchange();}\"><label for=\"' + id + '\">' + parent.last_job.source_type[i].replace(/.*>([^<]*)<.*/, '$1') + '</label>';";
-$script .= "if (parent.last_job.hasOwnProperty('files') && parent.last_job.files.hasOwnProperty(i)) {";
+$script .= "result += '<li><input type=\"checkbox\" id=\"' + id + '\" onchange=\"var el=this.parentNode.getElementsByTagName(&quot;input&quot;);for(var i=0;i<el.length;i+=1)if(el[i].id!=this.id){el[i].checked=this.checked;el[i].onchange();}\"><label for=\"' + id + '\">' + parent.last_job[" .
+JOB_BACKUP . "].source_type[i].replace(/.*>([^<]*)<.*/, '$1') + '</label>';";
+$script .= "if (parent.last_job[" . JOB_BACKUP . "].hasOwnProperty('files') && parent.last_job[" . JOB_BACKUP .
+"].files.hasOwnProperty(i)) {";
 $script .= "result += '<ol style=\"list-style-type: none\">';";
-$script .= "for (j in parent.last_job.files[i])";
-$script .= "if (parent.last_job.files[i].hasOwnProperty(j))";
-$script .= "result += '<li class=\"wp_restore_input wp_restore_input'+parent.last_job.files[i][j][2]+'\"><input type=\"checkbox\" id=\"'+j+'\" onchange=\"jsMyBackup.set_wp_restore_components(id,this.checked);\"><label '+(" .
-DISK_TARGET .
-"==parent.last_job.files[i][j][2]?'class=\"highlight-label\"':'')+' for=\"'+j+'\">' + parent.last_job.files[i][j][0].replace(/.*[\\\/](.*)/, '$1') + '</label><span>('+parent.last_job.files[i][j][1]+')</span></li>';";
+$script .= "for (j in parent.last_job[" . JOB_BACKUP . "].files[i])";
+$script .= "if (parent.last_job[" . JOB_BACKUP . "].files[i].hasOwnProperty(j))";
+$script .= "result += '<li class=\"wp_restore_input wp_restore_input'+parent.last_job[" . JOB_BACKUP .
+"].files[i][j][2]+'\"><input type=\"checkbox\" id=\"'+j+'\" onchange=\"jsMyBackup.set_wp_restore_components(id,this.checked);\" data-type=\"'+i+'\"><label '+(" .
+DISK_TARGET . "==parent.last_job[" . JOB_BACKUP .
+"].files[i][j][2]?'class=\"highlight-label\"':'')+' for=\"'+j+'\">' + parent.last_job[" . JOB_BACKUP .
+"].files[i][j][0].replace(/.*[\\\/](.*)/, '$1') + '</label><span>('+parent.last_job[" . JOB_BACKUP .
+"].files[i][j][1]+')</span></li>';";
 $script .= "result += '</ol>';";
 $script .= "}";
 $script .= "result += '</li>';";
@@ -258,10 +268,18 @@ $this->java_scripts[] = ob_get_clean();
 }
 protected function initTarget() {
 parent::initTarget();
+global $BACKUP_TARGETS;
+$this->_enabled_targets = array();
+foreach ( $BACKUP_TARGETS as $target => $opt )
+strToBool( getParam( $this->settings, $opt . '_enabled', 0 ) ) && $this->_enabled_targets[] = $target;
+$this->_upload_constraint_manual = PHP_MANUAL_URL . 'ini.core.php';
 $this->_upload_constraint_link = array( 
 getAnchor( 'upload_max_filesize', $this->_upload_constraint_manual . '#ini.upload-max-filesize' ), 
 getAnchor( 'post_max_size', $this->_upload_constraint_manual . '#ini.post-max-size' ) );
 $this->_restore_upl_chunked = strToBool( $this->settings['restore_upl_chunked'] );
+$container_shape = $this->container_shape;
+include_once $this->getTemplatePath( 'dashboard-job-info.php' );
+$this->_last_job = array( 'html' => $last_job_html, 'js' => $last_job_js );
 $this->_getJavaScripts();
 $this->_stat_manager = getJobsStatManager( $this->settings );
 }
@@ -269,7 +287,9 @@ protected function getEditorTemplate() {
 global $COMPRESSION_NAMES;
 $backup_action = 'run_backup';
 $on_backup_click = sprintf( 
-"jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,null,jsMyBackup.get_last_jobinfo);", 
+"if(!jsMyBackup.enabled_backup_targets.length)return jsMyBackup.popupError('%s','%s');jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,null,jsMyBackup.onJobDone);", 
+_esc( 'Error' ), 
+sprintf( _esc( 'You have not selected any %s option.' ), getTabAnchorE( APP_TABBED_TARGETS ) ), 
 $backup_action, 
 _esc( 'Backup' ), 
 wp_create_nonce_wrapper( $backup_action ), 
@@ -289,19 +309,19 @@ _esc( 'Press %s to start restoring the chosen WP components or %s to abort this 
 '<strong>' . $cancel_btn . '</strong>' );
 $html .= '</div>';
 $on_restore_click = sprintf( 
-"jsMyBackup.wp_restore_components={};jsMyBackup.wp_restore_filter='';jsMyBackup.popupConfirm('%s','%s'+jsMyBackup.get_wp_restore_components_html(),null,{'%s':'jsMyBackup.removePopupLast();jsMyBackup.run_wp_restore();','%s':null},null);", 
+"jsMyBackup.wp_restore_components={};jsMyBackup.wp_restore_filter='';jsMyBackup.popupConfirm('%s','%s'+jsMyBackup.get_wp_restore_components_html()+jsMyBackup.restore_alert,null,{'%s':'jsMyBackup.removePopupLast();jsMyBackup.run_wp_restore();','%s':null},%d);", 
 _esc( 'WP Restore' ), 
 htmlspecialchars( $html ), 
 $restore_btn, 
-$cancel_btn );
+$cancel_btn, 
+DEFAULT_JSPOPUP_WIDTH + 100 );
 $on_restore_click1 = 'jsMyBackup.run_wp_restore1();';
 } elseif ( defined( __NAMESPACE__.'\\JOB_RESTORE' ) ) {
 $on_restore_click = '';
 $on_restore_click1 = '';
 }
-$on_viewlog_click = 'jsMyBackup.asyncGetJobLog(jsMyBackup.last_job_id);';
-$next_schedule = $this->is_wp ? wp_next_scheduled( WPCRON_SCHEDULE_HOOK_NAME ) : 'TBD';
-$next_schedule = empty( $next_schedule ) ? _esc( 'undefined' ) : date( DATETIME_FORMAT, $next_schedule );
+$on_viewlog_click = 'jsMyBackup.asyncGetJobLog(jsMyBackup.last_bak_job_id);';
+$container_shape = $this->container_shape;
 require_once $this->getTemplatePath( 'dashboard.php' );
 }
 protected function getExpertEditorTemplate() {

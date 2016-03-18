@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : WelcomeEditor.php $
  * 
- * @id      : WelcomeEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : WelcomeEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -42,25 +42,27 @@ private $_dropin_dir;
 private $_video_ids;
 private $_js_addon_install;
 private $_nocheck;
-private $_upload_constraint_manual = 'http://php.net/manual/en/ini.core.php';
+private $_upload_constraint_manual;
 private $_upload_constraint_link;
 private function _checkPrerequisites() {
 $chksetup = new CheckSetup( $this->settings );
 $keys = array( CHKSETUP_ENABLED_KEY, CHKSETUP_ENABLED_SETTINGS, CHKSETUP_ENABLED_WRITABLE );
 $setup_issues = array();
-foreach ( $chksetup->getSetup() as $extension => $ext_info ) {
+$array = $chksetup->getSetup();
+foreach ( $array as $extension => $ext_info ) {
 $ok = true;
 foreach ( $keys as $key ) {
 $ok = $ok && ( ! isset( $ext_info[$key] ) || strToBool( $ext_info[$key] ) );
 }
-if ( $ok || ( 'safe_mode' == $extension && ! $ext_info[CHKSETUP_ENABLED_KEY] ) )
+if ( $ok || ( in_array( $extension, array( 'open_basedir', 'disable_functions', 'safe_mode' ) ) &&
+! $ext_info[CHKSETUP_ENABLED_KEY] ) )
 continue;
 $setup_issues[$extension] = $ext_info;
 }
 return $setup_issues;
 }
 private function _initFileList( $filename ) {
-if ( file_exists( $filename ) )
+if ( _file_exists( $filename ) )
 return false;
 $known_ext = array( 'php', 'css', 'js', 'png', 'jpg', 'gif', 'ico', 'pem', 'fix', 'txt', 'po', 'mo' );
 $filelist = array();
@@ -74,7 +76,7 @@ private function _getDropInAddons() {
 if ( ! defined( __NAMESPACE__.'\\APP_ADDONDROPIN' ) )
 return false;
 $files = false;
-if ( is_dir( $this->_dropin_dir ) )
+if ( _is_dir( $this->_dropin_dir ) )
 $files = getFileListByPattern( $this->_dropin_dir, '/\.tar\.bz2$/', true, false, false, 2 );
 if ( empty( $files ) )
 return false;
@@ -101,6 +103,7 @@ $this->java_scripts_load[] = $this->_js_addon_install;
 protected function initTarget() {
 global $TARGET_NAMES;
 parent::initTarget();
+$this->_upload_constraint_manual = PHP_MANUAL_URL . 'ini.core.php';
 $this->_upload_constraint_link = array( 
 getAnchor( 'upload_max_filesize', $this->_upload_constraint_manual . '#ini.upload-max-filesize' ), 
 getAnchor( 'post_max_size', $this->_upload_constraint_manual . '#ini.post-max-size' ) );
@@ -120,23 +123,42 @@ $this->_nocheck = isset( $_GET['nocheck'] );
 }
 protected function getEditorTemplate() {
 global $registered_targets, $TARGET_NAMES, $COMPRESSION_NAMES;
-$dropin_dir = str_replace( ROOT_PATH, 'ROOT' . DIRECTORY_SEPARATOR, $this->_dropin_dir ); 
+$dropin_dir = shorten_path( $this->_dropin_dir ); 
 $this->_nocheck || $setup_issues = $this->_checkPrerequisites();
 is_wp() && $wp_components = array_map( function ( $item ) {
 return basename( $item );
 }, array_keys( getWPSourceDirList( WPMYBACKUP_ROOT ) ) );
-$dashboard_link = getTabAnchorByConstant( 'APP_DASHBOARD' );
-$restore_addon_link = getAnchor( _esc( 'Restore Addon' ), APP_ADDONS_SHOP_URI . 'shop/restore-wizard' );
-$diff_restore_addon_link = getAnchor( 
-_esc( 'Differential backup' ), 
-APP_ADDONS_SHOP_URI . 'shop/differential-backup-support' );
-$inc_restore_addon_link = getAnchor( 
-_esc( 'Incremental backup' ), 
-APP_ADDONS_SHOP_URI . 'shop/incremental-backup-support' );
-$wpmybackup_plugin_link = getAnchor( WPMYBACKUP, APP_PLUGIN_URI );
-$arcname_pattern = '[a-z0-9\-\.]';
-$gz_bz2_pre = '<pre>' . implode( '|', array( 'gz', 'bz2' ) ) . '</pre>';
 ! defined( __NAMESPACE__.'\\IMPORT_PAGE' ) && define( __NAMESPACE__.'\\IMPORT_PAGE', false );
+$dashboard_link = getTabAnchorByConstant( 'APP_DASHBOARD' );
+$_addons = $this->_addons;
+$_nocheck = $this->_nocheck;
+$getImgURL = function ( $filename ) {
+return plugins_url_wrapper( 'img/' . $filename, IMG_PATH );
+};
+$getTabAnchor = function ( 
+$tab, 
+$query = null, 
+$target = null, 
+$escape = false, 
+$array = null, 
+$remove_query = null, 
+$referer = false ) {
+return getTabAnchor( $tab, $query, $target, $escape, $array, $remove_query, $referer );
+};
+$getTabAnchorByConstant = function ( $constant, $query = null, $target = null, $escape = false ) {
+return getTabAnchorByConstant( $constant, $query, $target, $escape );
+};
+$getHumanReadableSize = function ( $size, $precision = 2, $return_what = 0 ) {
+return getHumanReadableSize( $size, $precision, $return_what );
+};
+$getUploadLimit = function () {
+return getUploadLimit();
+};
+$_init_error = $this->_init_error;
+$_video_ids = $this->_video_ids;
+$_upload_constraint_link = $this->_upload_constraint_link;
+$is_wp = $this->is_wp;
+$on_plugin = true;
 require_once $this->getTemplatePath( 'welcome.php' );
 }
 }

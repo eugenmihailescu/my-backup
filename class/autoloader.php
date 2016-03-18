@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : autoloader.php $
  * 
- * @id      : autoloader.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : autoloader.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 
@@ -84,7 +84,10 @@ $classes_path_668264596 = array (
 'MyException' => LIB_PATH . 'MyException.php',
 'MyFtpWrapper' => CURL_PATH . 'MyFtpWrapper.php',
 'MySQLBackupHandler' => CLASS_PATH . 'MySQLBackupHandler.php',
+'MySQLErrorException' => MISC_PATH . 'MySQLWrapper.php',
+'MySQLException' => MISC_PATH . 'MySQLWrapper.php',
 'MySQLSourceEditor' => EDITOR_PATH . 'MySQLSourceEditor.php',
+'MySQLWrapper' => MISC_PATH . 'MySQLWrapper.php',
 'NonceLib' => MISC_PATH . 'NonceLib.php',
 'NotificationEditor' => EDITOR_PATH . 'NotificationEditor.php',
 'OAuthTargetEditor' => EDITOR_PATH . 'OAuthTargetEditor.php',

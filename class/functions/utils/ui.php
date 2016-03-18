@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : ui.php $
  * 
- * @id      : ui.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : ui.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -59,13 +59,18 @@ if ( ! isset( $_branch_id_ ) )
 return $filename;
 return dirname( $filename ) . DIRECTORY_SEPARATOR . $_branch_id_ . DIRECTORY_SEPARATOR . basename( $filename );
 }
-function getTabLink( $tab ) {
-if ( false !== strpos( $_SERVER['QUERY_STRING'], 'tab=' ) )
-$href = preg_replace( '/(\btab=[^&]*)/', 'tab=' . $tab, $_SERVER['QUERY_STRING'] );
+function getTabLink( $tab, $referer = false ) {
+$string = $referer && isset( $_SERVER['HTTP_REFERER'] ) ? $_SERVER['HTTP_REFERER'] : $_SERVER['QUERY_STRING'];
+if ( false !== strpos( $string, 'tab=' ) )
+$href = preg_replace( '/(\btab=[^&]*)/', 'tab=' . $tab, $string );
 else
-$href = ( strlen( $_SERVER['QUERY_STRING'] ) > 0 ? $_SERVER['QUERY_STRING'] . '&' : '' ) . 'tab=' . $tab;
-return ( isset( $_SERVER['REQUEST_URI'] ) ? preg_replace( '/([^?]+).*/', '$1', $_SERVER['REQUEST_URI'] ) : $_SERVER['PHP_SELF'] ) .
+$href = ( ! empty( $string ) ? $string . '&' : '' ) . 'tab=' . $tab;
+if ( $referer ) {
+return $href;
+}
+$href = ( isset( $_SERVER['REQUEST_URI'] ) ? preg_replace( '/([^?]+).*/', '$1', $_SERVER['REQUEST_URI'] ) : $_SERVER['PHP_SELF'] ) .
 '?' . $href;
+return false === strpos( $href, 'http' ) ? delTrailingSlash( selfURL( true ), '/' ) . $href : $href;
 }
 function getTabAnchorByConstant( $constant, $query = null, $target = null, $escape = false ) {
 global $forward_compatible_targets, $registered_forward_map;
@@ -78,7 +83,7 @@ $query,
 $escape, 
 @constant( $nconstant ) ? null : $forward_compatible_targets );
 }
-function getTabAnchor( $tab, $query = null, $target = null, $escape = false, $array = null, $remove_query = null ) {
+function getTabAnchor( $tab, $query = null, $target = null, $escape = false, $array = null, $remove_query = null, $referer = false ) {
 if ( isset( $tab ) ) {
 global $registered_targets, $TARGET_NAMES;
 $func = 'getAnchor' . ( $escape ? 'E' : '' );
@@ -87,7 +92,7 @@ $title = isset( $tabs[$tab] ) && isset( $tabs[$tab]['title'] ) ? $tabs[$tab]['ti
 if ( is_array( $array ) )
 $link = ( isset( $tabs[$tab] ) && isset( $tabs[$tab]['link'] ) ? $tabs[$tab]['link'] : '#' );
 else
-$link = getTabLink( $TARGET_NAMES[$tab] ) . ( empty( $query ) ? '' : $query );
+$link = getTabLink( $TARGET_NAMES[$tab], $referer ) . ( empty( $query ) ? '' : $query );
 if ( $remove_query )
 $link = stripUrlParams( $link, $remove_query );
 is_array( $array ) && empty( $target ) && $target = '_blank'; 
@@ -143,7 +148,7 @@ $child_tabs_path = '';
 $tab_folder = ROOT_PATH . "$child_tabs_path";
 $tab_file = $tab_folder . ( empty( $tab_filename ) ? ( empty( $active_tab ) ? '*' : $active_tab ) : $tab_filename ) .
 "$tab_sufix.php";
-if ( file_exists( $tab_file ) ) {
+if ( _file_exists( $tab_file ) ) {
 echo PHP_EOL;
 return $child_tabs_path . $active_tab . $tab_sufix . ".php";
 }

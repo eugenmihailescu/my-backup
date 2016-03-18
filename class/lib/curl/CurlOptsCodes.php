@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlOptsCodes.php $
  * 
- * @id      : CurlOptsCodes.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlOptsCodes.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-class CurlOptsCodes {
-static $_CURLOPT_CODES_ = array (
+class CurlOptsCodes{
+static $_CURLOPT_CODES_=array(
 1 => 'CURLOPT_SAFE_UPLOAD',
 3 => 'CURLOPT_PORT',
 13 => 'CURLOPT_TIMEOUT',
@@ -211,17 +211,12 @@ static $_CURLOPT_CODES_ = array (
 20079 => 'CURLOPT_HEADERFUNCTION',
 20200 => 'CURLOPT_FNMATCH_FUNCTION',
 30145 => 'CURLOPT_MAX_SEND_SPEED_LARGE',
-30146 => 'CURLOPT_MAX_RECV_SPEED_LARGE' 
-);
+30146 => 'CURLOPT_MAX_RECV_SPEED_LARGE');
 static function getCurlOptCodeById($mixed) {
-if (! is_array ( $mixed ))
-return self::$_CURLOPT_CODES_ [$mixed];
-else {
-$result = array ();
+if (! is_array ( $mixed )) return self::$_CURLOPT_CODES_ [$mixed];
+else {$result = array ();
 foreach ( $mixed as $key => $value )
-$result [isset ( self::$_CURLOPT_CODES_ [$key] ) ? self::$_CURLOPT_CODES_ [$key] : $key] = $value;
-return $result;
-}
-}
+$result [array_key_exists ( $key, self::$_CURLOPT_CODES_ ) ? self::$_CURLOPT_CODES_ [$key] : $key] = $value;
+return $result;}}
 }
 ?>

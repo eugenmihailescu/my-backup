@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : mysql.php $
  * 
- * @id      : mysql.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : mysql.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -72,12 +72,13 @@ onclick=<?php echoHelp($help_1); ?>>[?]</a>
 </td>
 <td><input type="button" name='dwl_mysql_script' class="button"
 id="btn_dwl_script"
-value=<?php echo '"&nbsp;&nbsp;&nbsp;'._esc('Download').' '.($mysqldump?_esc('db dump'):($mysql_format.' '._esc('file'))).'"';?>
+value=<?php echo '"&nbsp;&nbsp;&nbsp;'._esc('Download').' '.($mysqldump?_esc('db dump'):($mysql_format.' '._esc('file'))).'" ';?>
 onclick=<?php
 echo '"jsMyBackup.post(jsMyBackup.ajaxurl,{action:\'dwl_sql_script\',nonce:\'' .
 wp_create_nonce_wrapper( 'dwl_sql_script' ) . '\',tables: jsMyBackup.mysql_table_selected, name:\'' .
 ( isset( $this->settings['name'] ) && ! empty( $this->settings['name'] ) ? $this->settings['name'] : $this->settings['url'] ) .
 '\',type:' . $this->settings['compression_type'] . ',level:' . $this->settings['compression_level'] . '});"';
+echo ' ';
 ?>
 title='<?php _pesc('Click to download the MySQL script now');?>'
 <?php echo $this->enabled_tag; ?>><a class='help'

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CheckSetup.php $
  * 
- * @id      : CheckSetup.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CheckSetup.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -50,7 +50,9 @@ private $_result;
 private $_hints;
 private $_return_hints;
 private $_loaded_extensions;
+private $_is_wp;
 function __construct( $settings, $return_hints = true ) {
+$this->_is_wp = is_wp();
 $this->_hints = array( 
 'bz2' => _esc( 'Used for compressing files with BZ2 filter' ), 
 'zlib' => _esc( 'Used for compressing files with GZip filter' ), 
@@ -58,8 +60,19 @@ $this->_hints = array(
 'lzf' => _esc( 'Used for compressing files with LZF filter' ), 
 'rar' => _esc( 'Used for compressing files with RAR filter' ), 
 'curl' => _esc( 'Used for transfering files via HTTP (eg: Google, Dropbox, Ftp)' ), 
-'mysql' => _esc( 'Used for backuping MySQL database and/or to store settings' ), 
-'sqlite3' => _esc( 'Used for storing settings and/or app statistics' ), 
+'mysql' => sprintf( 
+_esc( 
+'Used for backuping MySQL database and/or to store the %s settings. Use MySQLi|PDO_MySQL whenever possible.' ), 
+WPMYBACKUP ), 
+'sqlite3' => sprintf( _esc( 'Used for storing the %s settings and/or app statistics' ), WPMYBACKUP ), 
+'mysqli' => sprintf( 
+_esc( 
+'Used for backuping MySQL database and/or to store the %s settings. Use this instead MySQL whenever possible.' ), 
+WPMYBACKUP ), 
+'pdo_mysql' => sprintf( 
+_esc( 
+'Used for backuping MySQL database and/or to store the %s settings. Use this instead MySQL whenever possible.' ), 
+WPMYBACKUP ), 
 'ftp' => _esc( 'Used for backuping your files to FTP media' ), 
 'date' => _esc( 'Used for manipulating date/time info' ), 
 'openssl' => _esc( 'Used for data encryption and SSL transfer (eg: Google, Dropbox)' ), 
@@ -79,10 +92,14 @@ $this->_hints = array(
 'wrkdir' => _esc( 'The path used for creating temporary files' ), 
 'safe_mode' => _esc( 
 'This option attempts to solve the shared-server security problem.<br>When this is <b>enabled</b> make sure the PHP has read/write permission to <b>WRKDIR-PATH</b>' ), 
+'open_basedir' => _esc( 
+'Limit the files that can be accessed by PHP to the specified directory-tree, including the file itself.' ), 
+'disable_functions' => _esc( 
+'This directive allows you to disable certain functions for security reasons.<br>Check if there are alerts about disabled functions required by this software.' ), 
 'extra_whitespace' => sprintf( 
 _esc( 
 'This option checks if while downloading a file in browser the file gets prepended with some undesired extra whitespaces. %s' ), 
-readMoreHere( APP_ADDONS_SHOP_URI . 'faq-mybackup/#q7' ) ) );
+readMoreHere( APP_PLUGIN_FAQ_URI . '#q7' ) ) );
 if ( isWin() ) {
 $this->_hints['com_dotnet'] = _esc( 'Used for getting the host system resource usage' );
 $this->_hints['cygwin'] = _esc( 'Allow to run Linux compression utilities on Windows' );
@@ -118,27 +135,24 @@ _esc( '(optimized for %s)' ),
 0 == $lzf_optimized_for ? _esc( 'compression' ) : _esc( 'speed' ) ) : '' );
 }
 private function _checkMySql() {
-$this->_checkExtension( 'mysql' );
-if ( $this->_result['mysql'][CHKSETUP_ENABLED_KEY] ) {
-$this->_result['mysql']['mysqldump'] = 'yes';
-$mysql_host = isNull( $this->_settings, 'mysql_host', DB_HOST );
-$mysql_port = isNull( $this->_settings, 'mysql_port', 3306 );
-$mysql_user = isNull( $this->_settings, 'mysql_user', DB_USER );
-$mysql_pwd = isNull( $this->_settings, 'mysql_pwd', DB_PASSWORD );
-$mysql_db = isNull( $this->_settings, 'mysql_db', DB_NAME );
-$mysql_charset = isNull( $this->_settings, 'mysql_charset', DB_CHARSET );
+$extensions = array( 'mysql', 'mysqli', 'pdo_mysql' );
+$mysql_params = $this->_settings;
+foreach ( $extensions as $ext ) {
 try {
-$link = @\mysql_connect( $mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pwd );
-$err = false === $link;
-if ( ! $err ) {
-! empty( $mysql_charset ) && $err = ! @\mysql_set_charset( $mysql_charset, $link );
-! ( $err || empty( $mysql_db ) ) && $err = ! @\mysql_select_db( $mysql_db, $link );
+$this->_checkExtension( $ext );
+if ( $this->_result[$ext][CHKSETUP_ENABLED_KEY] ) {
+$mysql_params['mysql_ext'] = $ext;
+$obj = new MySQLWrapper( $mysql_params );
+$obj->is_wp = $this->_is_wp;
+$link = @$obj->connect();
+$this->_result[$ext][CHKSETUP_ENABLED_SETTINGS] = false !== $link;
+$this->_result[$ext]['mysqldump'] = boolToStr( false !== $link );
+$link && @$obj->disconnect();
+$obj = null;
 }
-( false === $link ) || @\mysql_close( $link );
-} catch ( MyException $e ) {
-$err = true;
+} catch ( \Exception $e ) {
+$this->_result[$ext][CHKSETUP_ENABLED_SETTINGS] = false;
 }
-$this->_result['mysql'][CHKSETUP_ENABLED_SETTINGS] = ! $err;
 }
 }
 private function _checkMail() {
@@ -148,65 +162,49 @@ $this->_nest_level++;
 $name = 'email';
 $mail = $this->_settings[$name];
 $mail = empty( $mail ) ? MAIL_TEST_ACCOUNT : $mail;
-$body = '<style>.chkmailtbl tr:first-child{background-color:#00adee;color:white;font-weight:bold;height:2em;}.chkmail{border-bottom:1px solid #c0c0c0;}' .
-PHP_EOL;
-$body .= '.chkmail{border-bottom:1px solid #c0c0c0;color:#00adee;}' . PHP_EOL;
-$body .= '.chkmailtbl{border:1px solid #c0c0c0;background-color:#fafafa;}' . PHP_EOL;
-$body .= '.chkmailtbl td{padding:0px 5px;}' . PHP_EOL;
-$body .= '.chkmailtbl tr:first-child{background-color:#00adee;color:white;font-weight:bold;height:2em;}' .
-PHP_EOL;
-$body .= '.chkmailtbl td:nth-child(2),td:nth-child(3){text-align:center;}';
-$body .= '.chkmailtbl td:nth-child(3){color:green;}';
-$body .= '</style>' . PHP_EOL;
-$body .= '<table class="chkmailtbl"><tr><th>PHP extension</th><th>Version</th><th>Enabled</th></tr>';
+$body = '<table style="font-size: 12px; color: #000; border: 1px solid #00adee; border-radius: 3px; background-color: #fafafa; border: 1px solid #c0c0c0; table-layout: fixed; width: 100%; word-break: break-all;">';
+$body .= '<tr style="background-color: #00adee; color: white; font-weight: bold; height: 2em;">';
+$body .= '<th style="text-align: center">' . _esc( 'PHP extension' ) . '</th>';
+$body .= '<th style="text-align: center">' . _esc( 'Version' ) . '</th>';
+$body .= '<th style="text-align: center">' . _esc( 'Enabled' ) . '</th>';
+$body .= '</tr>';
 foreach ( $this->getSetup() as $ext => $extnfo ) {
 $body .= sprintf( 
-'<tr><td><b>%s</b></td><td>%s</td><td%s>%s</td></tr>', 
+'<tr><td><b>%s</b></td><td style="text-align:center">%s</td><td style="text-align:center;color:%s">%s</td></tr>', 
 strtoupper( $ext ), 
 isset( $extnfo['version'] ) ? $extnfo['version'] : '', 
-! $extnfo['enabled'] ? ' style="color:red"' : '', 
+! $extnfo['enabled'] ? ':red' : 'green', 
 $extnfo['enabled'] ? _esc( 'yes' ) : _esc( 'no' ) );
 $s = array();
 foreach ( $extnfo as $key => $value )
 if ( ! in_array( $key, array( 'version', 'enabled', 'hint' ) ) )
 $s[] = sprintf( '%s = %s', $key, $value );
 $body .= sprintf( 
-'<tr><td colspan="3"%s>%s</td></tr>', 
-empty( $s ) ? ' class="chkmail"' : '', 
+'<tr><td colspan="3" style="%s">%s</td></tr>', 
+empty( $s ) ? 'border-bottom: 1px solid #c0c0c0' : '', 
 $extnfo['hint'] );
 ! empty( $s ) && $body .= sprintf( 
-'<tr><td colspan="3" class="chkmail">%s</td></tr>', 
+'<tr><td colspan="3" style="border-bottom:1px solid #c0c0c0;color:#00adee">%s</td></tr>', 
 implode( ' ; ', $s ) );
 }
 $body .= '</table>';
 $body = '<p>' . _esc( 
 sprintf( 
-'This message (triggered by %s) confirms that your web server mail support is enabled.<br>Below is a list of the installed PHP extensions (raw format)', 
+_esc( 
+'This is a message generated automatically by %s (triggered by %s @ %s). It confirms that your web server mail support is enabled.<br>Below is a list of the installed PHP extensions (raw format)' ), 
+WPMYBACKUP, 
+selfURL( true ), 
 getClientIP() ) ) . '</p>' . PHP_EOL . $body;
-$native_backend = ! strToBool( $this->_settings['backup2mail_smtp'] );
-$backend = $this->_settings['backup2mail_backend'];
-$smtp_debug = defined( __NAMESPACE__.'\\SMTP_DEBUG' ) && SMTP_DEBUG;
-$backend_params = array( 'debug' => $smtp_debug, 'auth' => strToBool( $this->_settings['backup2mail_auth'] ) );
-foreach ( array( 
-'host' => 'backup2mail_host', 
-'port' => 'backup2mail_port', 
-'username' => 'backup2mail_user', 
-'password' => 'backup2mail_pwd', 
-'timeout' => 'request_timeout' ) as $key => $value )
-$backend_params[$key] = $this->_settings[$value];
 try {
-$hasMail = sendMail( 
+$hasMail = sendHtmlFormattedMail( 
 $mail, 
 $mail, 
-WPMYBACKUP . ' setup check', 
+sprintf( _esc( '%s setup check' ), WPMYBACKUP ), 
 $body, 
 null, 
-null, 
 3, 
-$native_backend ? null : $backend, 
-$backend_params, 
-$smtp_debug );
-} catch ( MyException $e ) {
+$this->_settings );
+} catch ( \Exception $e ) {
 $hasMail = false;
 }
 $this->_result[$name] = array();
@@ -222,7 +220,7 @@ try {
 $ftp = getFtpObject( $this->_settings );
 $ftp->ftpExecRawCmds( 'SYST' );
 $err = false;
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 $err = true;
 }
 $this->_result['ftp'][CHKSETUP_ENABLED_SETTINGS] = ! $err;
@@ -231,7 +229,7 @@ $this->_result['ftp'][CHKSETUP_ENABLED_SETTINGS] = ! $err;
 private function _checkCygWin() {
 $pname = 'cygwin';
 $this->_result[$pname] = array( 
-CHKSETUP_ENABLED_KEY => file_exists( CYGWIN_PATH ), 
+CHKSETUP_ENABLED_KEY => _file_exists( CYGWIN_PATH ), 
 CHKSETUP_ENABLED_PATH => CYGWIN_PATH, 
 CHKSETUP_ENABLED_HINT => $this->_hints[$pname] );
 }
@@ -261,10 +259,10 @@ $key = $prop_name . '-path';
 $this->_result[$key] = array( CHKSETUP_ENABLED_KEY => isset( $this->_settings[$prop_name] ) );
 if ( isset( $this->_settings[$prop_name] ) ) {
 $this->_result[$key][CHKSETUP_ENABLED_PATH] = $this->_settings[$prop_name];
-$this->_result[$key][CHKSETUP_ENABLED_WRITABLE] = is_writable( $this->_settings[$prop_name] );
+$this->_result[$key][CHKSETUP_ENABLED_WRITABLE] = @is_writable( $this->_settings[$prop_name] );
 $this->_result[$key][CHKSETUP_ENABLED_HINT] = $this->_hints[$prop_name];
 $this->_result[$key][CHKSETUP_ENABLED_VALUE] = getHumanReadableSize( 
-file_exists( $this->_settings[$prop_name] ) ? @disk_free_space( $this->_settings[$prop_name] ) : 0 );
+@_file_exists( $this->_settings[$prop_name] ) ? @_disk_free_space( $this->_settings[$prop_name] ) : 0 );
 }
 }
 private function _checkPath() {
@@ -312,9 +310,25 @@ private function _checkSafeMode() {
 $pname = 'safe_mode';
 $val = ini_get( $pname );
 $this->_result[$pname] = array( 
-CHKSETUP_ENABLED_KEY => ! empty( $val ) && strToBool( $val ), 
+CHKSETUP_ENABLED_KEY => strToBool( $val ), 
 CHKSETUP_ENABLED_HINT => $this->_hints[$pname], 
-CHKSETUP_ENABLED_SETTINGS => empty( $val ) || ! strToBool( $val ) );
+CHKSETUP_ENABLED_SETTINGS => ! strToBool( $val ) );
+}
+private function _checkOpenBaseDir() {
+$pname = 'open_basedir';
+$val = ini_get( $pname );
+$this->_result[$pname] = array( 
+CHKSETUP_ENABLED_KEY => ! empty( $val ), 
+CHKSETUP_ENABLED_HINT => $this->_hints[$pname], 
+CHKSETUP_ENABLED_VALUE => $val );
+}
+private function _checkRestrictedFunctions() {
+$pname = 'disable_functions';
+$val = get_restricted_functions();
+$this->_result[$pname] = array( 
+CHKSETUP_ENABLED_KEY => ! empty( $val ), 
+CHKSETUP_ENABLED_HINT => $this->_hints[$pname], 
+CHKSETUP_ENABLED_VALUE => implode( ',', $val ) );
 }
 private function _checkDownloadWhiteSpace() {
 $curl_wrapper = new CurlWrapper();
@@ -324,7 +338,11 @@ $action = 'test_dwl';
 $service = 'test';
 $params = array( 'action' => $action, 'service' => $service, 'nonce' => create_nonce( $action ) );
 $url = getAsyncRunURL(); 
+try {
 $response = $curl_wrapper->curlPOST( $url, null, http_build_query( $params ) );
+} catch ( \Exception $e ) {
+$response = $e->getMessage();
+}
 $pname = 'extra_whitespace';
 $this->_result[$pname] = array( 
 CHKSETUP_ENABLED_KEY => ! empty( $response ), 
@@ -342,6 +360,8 @@ $this->_checkPHPMemLimit();
 $this->_checkPHPUploadLimit();
 $this->_checkPHPPostMaxSize();
 $this->_checkSafeMode();
+$this->_checkOpenBaseDir();
+$this->_checkRestrictedFunctions();
 $this->_checkExtensions( 
 array( 
 'curl', 

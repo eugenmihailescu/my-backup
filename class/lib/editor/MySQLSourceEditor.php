@@ -24,17 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : MySQLSourceEditor.php $
  * 
- * @id      : MySQLSourceEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : MySQLSourceEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class MySQLSourceEditor extends AbstractTargetEditor {
+private $_mysql_obj;
 private $_db_list;
 private $_mysql_host;
 private $_mysql_port;
@@ -42,39 +43,23 @@ private $_mysql_user;
 private $_mysql_pwd;
 private $_mysql_db;
 private $_mysql_charset;
-private $_link = false;
 private $_db_prefix;
 private $_db_prefixes;
-function __destruct() {
-closeMySQLConnection( $this->_link );
-}
-private function _get_mysql_param( $param_name ) {
-return getMySQLparam( $param_name, $this->settings );
-}
 private function _initMySQL() {
-$this->_link = createMySQLConnection( $this->settings );
-if ( ! $this->hideEditorContent() ) {
-$this->_db_list[] = '';
-try {
-if ( false !== $this->_link ) {
-$res = @\mysql_query( 'SHOW DATABASES;', $this->_link );
-if ( false !== $res )
-while ( $row = \mysql_fetch_assoc( $res ) )
-if ( 'information_schema' != $row['Database'] && 'performance_schema' != $row['Database'] &&
-'mysql' != $row['Database'] )
-$this->_db_list[] = $row['Database'];
+$this->_mysql_obj = new MySQLWrapper( $this->settings );
+$link = $this->_mysql_obj->connect();
+if ( ! $this->is_wp && $link ) {
+$this->_db_list = $this->_mysql_obj->get_database_names();
+array_unshift( $this->_db_list, '' );
+return true;
 }
-} catch ( MyException $err ) {
-echo $err->getMessage();
-}
-}
-return false !== $this->_link;
+return false;
 }
 private function _getTablesHtml() {
 $settings = $this->settings;
 if ( ! ( $tables = getMySQLTableNamesFromPattern( 
 implode( '.+|', $this->_db_prefixes ) . '.+', 
-true, 
+$this->_mysql_obj, 
 $settings, 
 true ) ) )
 return '';
@@ -224,7 +209,7 @@ $this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );
 }
 protected function initTarget() {
 parent::initTarget();
-$this->_db_list = array();
+$this->_db_list = array( '' );
 $this->hasInfoBanner = defined( __NAMESPACE__.'\\FILE_EXPLORER' );
 $this->hasPasswordField = ! $this->is_wp;
 $this->_db_prefix = wp_get_db_prefix();
@@ -232,13 +217,13 @@ $this->_db_prefixes = array();
 foreach ( wp_get_user_blogs_prefixes() as $blog_id => $blog_db_prefix )
 preg_match( '/^' . $this->_db_prefix . '/', $blog_db_prefix ) &&
 $this->_db_prefixes[$blog_id] = $blog_db_prefix;
-$this->_mysql_host = $this->_get_mysql_param( 'mysql_host' );
-$this->_mysql_port = $this->_get_mysql_param( 'mysql_port' );
-$this->_mysql_user = $this->_get_mysql_param( 'mysql_user' );
-$this->_mysql_pwd = $this->_get_mysql_param( 'mysql_pwd' );
-$this->_mysql_db = $this->_get_mysql_param( 'mysql_db' );
-$this->_mysql_charset = $this->_get_mysql_param( 'mysql_charset' );
 $this->_initMySQL();
+$this->_mysql_host = $this->_mysql_obj->get_param( 'mysql_host' );
+$this->_mysql_port = $this->_mysql_obj->get_param( 'mysql_port' );
+$this->_mysql_user = $this->_mysql_obj->get_param( 'mysql_user' );
+$this->_mysql_pwd = $this->_mysql_obj->get_param( 'mysql_pwd' );
+$this->_mysql_db = $this->_mysql_obj->get_param( 'mysql_db' );
+$this->_mysql_charset = $this->_mysql_obj->get_param( 'mysql_charset' );
 $this->_getExpertJavaScript();
 }
 protected function getEditorTemplate() {
@@ -276,7 +261,7 @@ _esc(
 $help_4 .= ' ' . sprintf( 
 _esc( 
 'With other words, if you download a file that is compressed/packed in an archive and you cannot extract its content then for sure you encounter the problem mentioned earlier. To fix this you could try to spot the plugin that causes the problem by disabling each of them one at a time then retrying downloading the .sql file (I know, it sucks!).' ) .
-' ' . readMoreHereE( 'http://mynixworld.info/shop/faq-mybackup#q7' ) . '.' );
+' ' . readMoreHereE( APP_PLUGIN_FAQ_URI . '#q7' ) . '.' );
 $example = _esc( 
 '# On Unix like systems it can be fixed with the aid of tools like <b>hexdump</b> and <b>dd</b>:' ) .
 '<pre>f=[file-to-fix]<br>hexdump -C -n64 $f # ' . _esc( '$f should not start with whitespaces' ) . '<br>n=[' .
@@ -286,6 +271,18 @@ $help_4 .= getExample(
 _esc( 'Fix it yourself' ), 
 preg_replace( '/(#.*?)(<\/?(pre|br)>)/m', '<span style="color:#008B8B">$1</span>$2', $example ), 
 false ) . "'";
+$help_5 = "'" . sprintf( 
+_esc( 'The MySQL server host name or IP address.' ) . '<br><br>' .
+_esc( 'If your host uses Unix sockets or pipes then it should be provided like:%s%s' ), 
+'<p style=&quot;font-weight:bold&quot;>[host-or-ip]:[/path-to-host-socket-or-pipe]</p>', 
+getExample( 
+_esc( 'Example' ), 
+sprintf( 
+'localhost %s<br>128.0.90.174 %s<br>' . 'example.tld:/var/run/mysqld/mysqld.sock %s', 
+getSpanE( '# connect to local MySQL server', '#008B8B' ), 
+getSpanE( '# connect to a remote MySQL server', '#008B8B' ), 
+getSpanE( '# connect to example.tld via Unix socket', '#008B8B' ) ), 
+false ) ) . "'";
 $mysql_format = $this->settings['mysql_format'];
 $mysqldump = strToBool( $this->settings['mysqldump'] );
 $prefix_label = empty( $this->_db_prefix ) || count( $this->_db_prefixes ) > 1 ? '[*]' : $this->_db_prefix;
@@ -341,6 +338,10 @@ sprintf(
 _esc( 'By default <b>mysqldump</b> is run with the following options (so don`t override them):%s' ), 
 '<ul><li>' . implode( '</li><li>', $mysqldump_opts ) . '</li></ul>' ), 
 false ) . _esc( 'For a complete list of the available options please see the mysqldump documentation.' ) . "'";
+$help_8 = sprintf( 
+_esc( 
+'Select the PHP extension used to communicate with the MySQL database.<br>Starting with PHP 5.5.0 the MySQL extension is deprecated. The MySQLi or PDO MySQL is recommended instead. If unsure then select `%s` (MySQLi > PDO > MySQL).' ), 
+_esc( 'best available' ) );
 $enabled = strToBool( $this->settings['mysql_maint'] );
 $disabled = $enabled && $this->enabled ? '' : ' disabled ';
 $mysql_maint_opts = array( 
@@ -362,6 +363,13 @@ $rows .= '<td><label for="' . $opt_name . '">' . $opt_desc . '</label><a class="
 getHelpCall( $opt_help ) . '> [?]</a></td>';
 $rows .= '</tr>';
 }
+$mysql_ext_options = sprintf( '<option value="">%s</option>', _esc( 'best available' ) );
+foreach ( array( 'mysql', 'mysqli', 'pdo_mysql' ) as $mysql_ext )
+extension_loaded( $mysql_ext ) && $mysql_ext_options .= sprintf( 
+'<option value="%s"%s>%s</option>', 
+$mysql_ext, 
+$mysql_ext == $this->settings['mysql_ext'] ? ' selected="selected"' : '', 
+$mysql_ext );
 require_once $this->getTemplatePath( 'mysql-expert.php' );
 }
 protected function hideEditorContent() {

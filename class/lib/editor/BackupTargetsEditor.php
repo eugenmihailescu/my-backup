@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : BackupTargetsEditor.php $
  * 
- * @id      : BackupTargetsEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : BackupTargetsEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -51,7 +51,7 @@ foreach ( $REGISTERED_BACKUP_TABS as $target_type => $target_name )
 $tabs [$target_name] = $registered_targets [$target_type] ['title'];
 $tab_keys = array_keys ( $tabs );
 $group = getSelectedTabGrp ( $tab_keys [0] );
-echo '<div id="tab-container1" class="tab-container horizontal hrounded-top"><ul id="navlist1" style="width: 100%; padding-left: 20px; float: none">';
+echo '<div id="tab-container1" class="tab-container horizontal hrounded-top"><ul id="navlist1" style="width: 100%; padding-left: 20px; float: none" onclick="jsMyBackup.block_ui();">';
 foreach ( $tabs as $tab => $name ) {
 $class = ($tab == $group) ? ' active' : '';
 $href = $tab_link . '&gr=' . $tab;

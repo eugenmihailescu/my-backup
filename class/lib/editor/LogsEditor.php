@@ -24,27 +24,31 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : LogsEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class LogsEditor extends AbstractTargetEditor {
 private $_is_running;
-private $_fct_chk_status;
 private $_index;
 private function _getLogfileRow( $log_type, $log_name ) {
 ob_start();
 $spy_shown = $this->_is_running[0] ? 'block' : 'none';
 $logfile = getLogfileByType( $log_type );
-$log_exists = is_file( $logfile );
+$log_exists = _is_file( $logfile );
 $view_id = 'view_' . $log_type . '_log';
 $clear_id = 'clear_' . $log_type . '_log';
+$help_1 = "'" . sprintf( 
+_esc( 
+'The log file does not seem to exist. Make sure the log option is enabled by checking the appropiate box within the `%s` on %s tab.' ), 
+_esc( 'Expert settings' ), 
+getTabAnchorE( APP_SUPPORT ) ) . "'";
 echo '<tr>';
 echo "<td><label for='$view_id'>" . ucwords( $log_name ) . " log</label></td>";
 echo '<td>:</td>';
@@ -52,7 +56,10 @@ echo '<td ' . ( $log_exists ? '' : 'colspan="4"' ) . '>' . ( $log_exists ? str_r
 LOG_DIR, 
 '<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="jsMyBackup.helpROOT();">ROOT</span>' .
 DIRECTORY_SEPARATOR, 
-$logfile ) : '(log file does not exist)' ) . '</td>';
+$logfile ) : sprintf( 
+'(%s) <a class="help" onclick=%s> [?]</a>', 
+_esc( 'log file does not exist' ), 
+getHelpCall( $help_1, true ) ) ) . '</td>';
 if ( $log_exists ) {
 echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='jsMyBackup.post(jsMyBackup.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" .
 ( isWin() ? addslashes( $logfile ) : $logfile ) . "\",nonce:\"" . wp_create_nonce_wrapper( 'dwl_file' ) .
@@ -90,34 +97,45 @@ private function _getJavaScripts() {
 global $PROGRESS_PROVIDER;
 $this->java_scripts[] = "parent.plugin_dir='" . addslashes( dirname( realpath( $_SERVER['SCRIPT_NAME'] ) ) ) .
 "';";
-$this->java_scripts[] = "var d = document.getElementById('monitor_job'),
-spy_status = document.getElementById('td_job_status').innerHTML,
-callback = function () {
-jsMyBackup.or = function () {
-var status = document.getElementById('td_job_status').innerHTML;
-if (status && status != spy_status) {
-d = d && d.style && d.style.display == 'none' ? 'block' : 'none';
-var el=document.getElementById('monitor_job');
-if(el)el.style.display = d;
-el=document.getElementById('monitor_log');
-if(el)style.display = d;
-spy_status = status;
-}
-};" . $this->_fct_chk_status . "}";
-$this->java_scripts[] = "setInterval(callback," . LOG_CHECK_TIMEOUT . ");";
-$this->java_scripts[] = "parent.helpROOT=function(){" .
-getHelpCall( "'This is the site log folder, that is:<br><i>" . normalize_path( LOG_DIR ) . "</i>'", false ) .
-"}";
+$action = 'chk_status';
+ob_start();
+?>
+parent.chk_status_nonce="<?php echo wp_create_nonce_wrapper( $action );?>";
+parent.check_job_status=function(){
+if(!parent.chk_status_nonce)
+return;
+var on_status_ready = function(xhr) {
+var status = document.getElementById('td_job_status'),i,btn;
+try {
+var job_status = JSON.parse(xhr.responseText);
+parent.chk_status_nonce=job_status.nonce;
+if(status) status.innerHTML = job_status.message;
+btn=document.querySelectorAll('.btn_monitor');
+if(btn)
+for(i=0;btn.length>i;i+=1)
+btn[i].style.display=job_status.status?'inherit':'none';
+} catch (e) {if(status) status.innerHTML = xhr.responseText;}
+};
+parent.asyncGetContent(parent.ajaxurl, 'action=<?php echo $action;?>&tab=logs&nonce='+parent.chk_status_nonce, parent.dummy, on_status_ready);
+parent.chk_status_nonce=false;
+};
+setInterval(parent.check_job_status,<?php echo LOG_CHECK_TIMEOUT ;?>);
+parent.helpROOT=function(){<?php echo getHelpCall( "'This is the site log folder, that is:<br><i>" . normalize_path( LOG_DIR ) . "</i>'", false );?>};
+parent.clearLog=function(log_type, log_name){<?php
 $clear_log_click = sprintf( 
 'jsMyBackup.post(jsMyBackup.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', 
 wp_create_nonce_wrapper( 'clear_log' ) );
-$this->java_scripts[] = "parent.clearLog=function(log_type, log_name){" . sprintf( 
+printf( 
 "parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", 
 _esc( 'Log clear confirmation' ), 
 sprintf( _esc( 'Are you sure you want to clear the %s log file?' ), "<b>'+log_name+'</b>" ), 
-_esc( 'Yes' ), 
+_esc( 'Yes, I`m damn sure' ), 
 $clear_log_click, 
-_esc( 'No' ) ) . "}";
+_esc( 'No' ) );
+?>
+};
+<?php
+$this->java_scripts[] = ob_get_clean();
 $this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );
 }
 protected function initTarget() {
@@ -125,8 +143,6 @@ parent::initTarget();
 $this->_index = 0;
 $this->_is_running = isJobRunning();
 $this->root = ROOT_PATH;
-$this->_fct_chk_status = "jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl,'action=chk_status&tab=logs&nonce=" .
-wp_create_nonce_wrapper( 'chk_status' ) . "','td_job_status',jsMyBackup.or);";
 $this->inBetweenContent = $this->_getDebugTemplate();
 $this->_getJavaScripts();
 }

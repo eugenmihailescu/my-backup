@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : wp-wrappers.php $
  * 
- * @id      : wp-wrappers.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : wp-wrappers.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -78,6 +78,29 @@ return function_exists( '\\delete_option' ) ? delete_option( $option ) : delete_
 function wp_get_schedules_wrapper() {
 return function_exists( '\\wp_get_schedules' ) ? wp_get_schedules() : array();
 }
+function wp_get_cron_schedules( $schedule_name = null ) {
+$result = array();
+$schedules = wp_get_schedules_wrapper();
+if ( empty( $schedule_name ) )
+return $schedules;
+foreach ( $schedules as $scheduled => $schedule_def )
+if ( $schedule == $schedule_name ) {
+$result = $schedule_def;
+break;
+}
+return $result;
+}
+function wp_get_schedule_by_hookname( $hook ) {
+$schedules = get_option( 'cron' );
+if ( $schedules )
+foreach ( $schedules as $timestamp => $cron_jobs ) {
+if ( ! ( is_array( $cron_jobs ) && is_numeric( $timestamp ) ) )
+continue;
+if ( isset( $cron_jobs[$hook] ) )
+return array( $timestamp => $cron_jobs[$hook] );
+}
+return false;
+}
 function wp_create_nonce_wrapper( $action ) {
 return function_exists( '\\wp_create_nonce' ) ? wp_create_nonce( $action ) : create_nonce( $action );
 }
@@ -89,7 +112,7 @@ if ( isset( $_SESSION ) && $_SESSION['login_redirect'] )
 return;
 $wp_pluggable = @constant( 'ABSPATH' ) && @constant( 'WPINC' ) ? ABSPATH . WPINC . DIRECTORY_SEPARATOR .
 'pluggable.php' : false;
-if ( $wp_pluggable && is_wp() && file_exists( $wp_pluggable ) && function_exists( '\\is_user_logged_in' ) &&
+if ( $wp_pluggable && is_wp() && _file_exists( $wp_pluggable ) && function_exists( '\\is_user_logged_in' ) &&
 ! is_user_logged_in() ) {
 add_session_var( 'login_redirect', true );
 include_once $wp_pluggable;
@@ -116,7 +139,7 @@ return false;
 }
 function is_wp() {
 return @constant( 'ABSPATH' ) && $GLOBALS['wp_version'] &&
-file_exists( ABSPATH . DIRECTORY_SEPARATOR . 'wp-includes' . DIRECTORY_SEPARATOR . 'version.php' ) &&
+_file_exists( ABSPATH . DIRECTORY_SEPARATOR . 'wp-includes' . DIRECTORY_SEPARATOR . 'version.php' ) &&
 function_exists( '\\add_management_page' );
 }
 function wp_get_timezone_string() {
@@ -153,14 +176,19 @@ if ( ! empty( $array ) ) {
 $filename = get_wp_config_path();
 $backup = $filename . '.' . time();
 $buffer = file_get_contents( $filename );
-$comment = ' by ' . WPMYBACKUP . ' @ ' . date( DATETIME_FORMAT.' e' );
+$comment = ' by ' . WPMYBACKUP . ' @ ' . date( DATETIME_FORMAT . ' e' );
 $summary = array();
 foreach ( $array as $key => $value ) {
 $pattern = '/((define\s*\(\s*[\'"]' . $key . '[\'"]\s*,\s*)([\w]+)([^;]+;)).*/';
 if ( preg_match( $pattern, $buffer ) )
 $buffer = preg_replace( $pattern, '$2' . $value . '$4 // changed' . $comment . ' << $1', $buffer );
-else
-$buffer .= PHP_EOL . "define('$key' , $value); // added" . $comment . PHP_EOL;
+else {
+$pattern = '/([\S\s]+)(?=\?>)([\s\S]*)/';
+$buffer = preg_replace( 
+$pattern, 
+"$1\n" . "define('$key' , $value); // added" . $comment . "\n$2\n", 
+$buffer );
+}
 $summary[] = "<b>$key</b> = <i>$value</i>";
 }
 if ( copy( $filename, $backup ) && file_put_contents( $filename, $buffer ) ) {
@@ -189,7 +217,7 @@ return\get_bloginfo( 'admin_email' );
 }
 function wp_get_upload_dir() {
 return wp_exec_in_blog( function () {
-return\wp_upload_dir();
+return \wp_upload_dir();
 } );
 }
 function wp_get_db_prefix() {

@@ -24,21 +24,22 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : mysql-remote.php $
  * 
- * @id      : mysql-remote.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : mysql-remote.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
 <tr>
 <td><label for="mysql_host"><?php _pesc('MySQL Host');?></label></td>
-<td><input type="url" style='width: 100%' name='mysql_host' id="mysql_host"
-value=<?php echo '"'.$this->_mysql_host.'" '.$this->enabled_tag; ?>></td>
+<td><input type="url" style='width: 85%' name='mysql_host' id="mysql_host"
+value=<?php echo '"'.$this->_mysql_host.'" '.$this->enabled_tag; ?>> <a
+class="help" onclick=<?php echoHelp( $help_5 );?>> [?]</a></td>
 <td style='text-align: right;'><label for="mysql_port"><?php _pesc('Port');?></label></td>
 <td><input type="number" style='width: 100%' name='mysql_port' id="mysql_port"
 value=<?php echo '"'.$this->_mysql_port.'" '.$this->enabled_tag; ?> min="20"
@@ -72,7 +73,5 @@ echo "</$ctrl_type>";
 <?php if($mysqldump)echo ' checked ';echo $this->enabled_tag;?>
 onclick="document.getElementById('tables').disabled=this.checked;jsMyBackup.submitOptions(this,0);">
 <input type="hidden" name="mysqldump" value="0"><a class='help'
-onclick=<?php
-echoHelp( $help_2 );
-?>> [?]</a></td><?php }?>
+onclick=<?php echoHelp( $help_2 ); ?>> [?]</a></td><?php }?>
 </tr>

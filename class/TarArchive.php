@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : TarArchive.php $
  * 
- * @id      : TarArchive.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : TarArchive.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -216,7 +216,7 @@ if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort
 false !== _call_user_func( $this->onAbortCallback ) ) )
 break;
 $bw += fwrite( $fw, fread( $fr, $chunksize ) );
-$this->onProgress( $filename, $bw, $fsize, $this );
+$this->onProgress( $filename, $bw, $fsize, $this, PT_WRITE );
 }
 flock( $fr, LOCK_UN );
 } else {
@@ -226,18 +226,19 @@ fseek( $fw, - strlen( $header ), SEEK_END );
 fclose( $fr );
 } else {
 fwrite( $fw, file_get_contents( $filename ) );
-$this->onProgress( $filename, $fsize, $fsize, $this );
 }
 $pad_len = ceil( ( $fsize ) / TAR_EXTHEADER_LEN ) * TAR_EXTHEADER_LEN - $fsize;
 $pad_len > 0 && fwrite( $fw, str_repeat( chr( 0 ), $pad_len ) );
-} catch ( Exception $err ) {
+} catch ( \Exception $err ) {
 }
 fclose( $fw );
 if ( false !== $err )
 throw new MyException( $err->getMessage(), $err->getCode(), $err->getPrevious() );
+$this->onProgress( $filename, $fsize, $fsize, $this, PT_WRITE );
 return false === $abort_signal_received;
 }
 public function compress( $method, $level ) {
+parent::compress( $method, $level );
 if ( NONE == $method )
 return $this->getFileName();
 global $COMPRESSION_NAMES;
@@ -252,8 +253,8 @@ _esc(
 '%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), 
 strtoupper( $filter ) ) );
 $output_file = $this->getFileName() . $ext;
-file_exists( $output_file ) && @unlink( $output_file ); 
-if ( ! file_exists( $this->getFileName() ) )
+_file_exists( $output_file ) && @unlink( $output_file ); 
+if ( ! _file_exists( $this->getFileName() ) )
 throw new MyException( 
 sprintf( _esc( "Cannot compress the file %s due to it does not exist" ), $this->getFileName() ) );
 if ( '' != $filter ) {
@@ -267,25 +268,19 @@ if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort
 false !== _call_user_func( $this->onAbortCallback) ) )
 break;
 $bw += _call_user_func( $filter . 'write', $fw, fread( $fr, MB ) );
-if ( _is_callable( $this->onProgressCallback ) )
-_call_user_func( 
-$this->onProgressCallback, 
-$this->getProvider(), 
-$this->getFileName(), 
-$bw, 
-$fsize, 
-3 );
-$this->getCPUSleep() > 0 && _usleep( 1000 * $this->getCPUSleep() );
+$this->onProgress( $output_file, $bw, $fsize, $this, PT_COMPRESS );
 }
 fclose( $fr );
 }
 _call_user_func( $filter . 'close', $fw );
+$this->onProgress( $output_file, $fsize, $fsize, $this, PT_COMPRESS );
 }
 return false === $abort_signal_received ? $this->getFileName() . $ext : false;
 }
-public function decompress( $method = null, $uncompress_size = 0, $new_name = null ) {
+public function decompress( $method = null, $uncompressed_size = 0, $new_name = null ) {
+parent::decompress( $method, $uncompressed_size );
 global $COMPRESSION_NAMES;
-$gz_uncompressed = function ( $filename ) {
+$get_gz_uncompressed = function ( $filename ) {
 $result = 0;
 $fr = fopen( $filename, 'rb' );
 if ( false !== $fr ) {
@@ -299,44 +294,53 @@ return $result;
 };
 $result = false;
 $abort_signal_received = false;
-if ( null === $method &&
-preg_match( '/\.((' . implode( '|', $COMPRESSION_NAMES ) . ')$)/i', $this->getFileName(), $matches ) ) {
+$ext = '';
+if ( null === $method ) {
+if ( preg_match( '/\.((' . implode( '|', $COMPRESSION_NAMES ) . ')$)/i', $this->getFileName(), $matches ) ) {
 ( $filter = $matches[2] ) && $method = array_search( $filter, $COMPRESSION_NAMES );
 $mode = 'r';
+$ext = strtolower( $filter );
 }
-( null !== $method ) && list( $filter, $mode ) = $this->_getFilterMode( $method );
-if ( empty( $filter ) || in_array( $method, array( GZ, BZ2 ) ) && ! _function_exists( $filter . 'open' ) )
+}
+list( $filter, $mode ) = $this->_getFilterMode( $method );
+if ( ( empty( $filter ) && 'tar' != $ext ) ||
+( in_array( $method, array( GZ, BZ2 ) ) && ! _function_exists( $filter . 'open' ) ) )
 throw new MyException( 
 sprintf( 
 _esc( 
 '%s support is not enabled. Check your PHP configuration (php.ini) or contact your hosting provider.' ), 
 strtoupper( $filter ) ) );
-if ( ! empty( $filter ) ) {
+if ( ! empty( $filter ) || 'tar' == $ext ) {
 if ( ! $this->fixArchiveCRLF( $this->getFileName(), $method ) ) 
 throw new MyException( 
-sprintf( _esc( 'Archive %s has a bad signature. Unsupported format.' ), $this->getFileName() ) );
-0 == $uncompress_size && GZ == $method && $uncompress_size = $gz_uncompressed( $this->getFileName() );
+sprintf( 
+_esc( 'Archive %s has a bad signature. Unsupported format.' ), 
+shorten_path( $this->getFileName() ) ) );
+if ( ( 0 == $uncompressed_size ) && ( GZ == $method ) )
+$uncompressed_size = $get_gz_uncompressed( $this->getFileName() );
 if ( ! empty( $new_name ) )
 $result = $new_name;
 else
 $result = preg_replace( 
-'/(\.(' . implode( '|', $COMPRESSION_NAMES ) . '))$/i', 
+'/(\.(' . implode( '|', array_diff( $COMPRESSION_NAMES, array( NONE => 'tar' ) ) ) . '))$/i', 
 '', 
 $this->getFileName() );
+if ( empty( $filter ) || 'tar' == $ext )
+return $result;
 $fr = _call_user_func( $filter . 'open', $this->getFileName(), $mode );
 $eof_func = ( GZ == $method ? 'gz' : 'f' ) . 'eof';
 $fw = fopen( $result, 'wb' );
-$error = false;
 $bw = 0;
+0 < $uncompressed_size || $uncompressed_size = filesize( $this->getFileName() );
+$error = false;
 if ( false !== $fr ) {
-$uncompress_size = 0; 
 while ( ! _call_user_func( $eof_func, $fr ) && false === $abort_signal_received ) {
 if ( _is_callable( $this->onAbortCallback ) && ( $abort_signal_received = $abort_signal_received ||
 false !== _call_user_func( $this->onAbortCallback) ) )
 break;
 $str = _call_user_func( $filter . 'read', $fr, TAR_BUFFER_LENGTH );
 $bw += strlen( $str );
-$uncompress_size < 0 && $bw > $uncompress_size && $bw = $uncompress_size; 
+$uncompressed_size < 0 && $bw > $uncompressed_size && $bw = $uncompressed_size; 
 if ( false === $str )
 $error = sprintf( _esc( '%s problem' ), $filter );
 elseif ( BZ2 == $method && BZ_OK !== bzerrno( $fr ) )
@@ -344,36 +348,23 @@ $error = bzerrstr( $fr );
 if ( false !== $error )
 break;
 fwrite( $fw, $str );
-_is_callable( $this->onProgressCallback ) && _call_user_func( 
-$this->onProgressCallback, 
-$this->getProvider(), 
-$this->getFileName(), 
-$bw, 
-$uncompress_size, 
-8 );
-$this->getCPUSleep() > 0 && _usleep( 1000 * $this->getCPUSleep() );
+$this->onProgress( $result, $bw, $uncompressed_size, $this, PT_WRITE );
 }
-_is_callable( $this->onProgressCallback ) && _call_user_func( 
-$this->onProgressCallback, 
-$this->getProvider(), 
-$this->getFileName(), 
-$uncompress_size, 
-$uncompress_size, 
-8 );
+$this->onProgress( $result, $uncompressed_size, $uncompressed_size, $this, PT_WRITE );
 }
 fclose( $fw );
 _call_user_func( $filter . 'close', $fr );
 if ( $error )
 throw new MyException( $error );
-$bw < $uncompress_size && $this->_stdOutput( 
-sprintf( _esc( '[!] Expected %d bytes to decompress but I got only %d' ), $uncompress_size, $bw ) );
+$bw < $uncompressed_size && $this->_stdOutput( 
+sprintf( _esc( '[!] Expected %d bytes to decompress but I got only %d' ), $uncompressed_size, $bw ) );
 }
 return $result;
 }
 public function getArchiveFiles( $filename = null ) {
 $filename = empty( $filename ) ? $this->getFileName() : $filename;
 $max_offset = filesize( $filename );
-if ( ! ( $result = file_exists( $filename ) && $this->isValidTar( $filename ) ) )
+if ( ! ( $result = _file_exists( $filename ) && $this->isValidTar( $filename ) ) )
 return false;
 $result = array();
 if ( ! ( $fr = fopen( $filename, 'rb' ) ) )
@@ -427,7 +418,7 @@ return $result;
 public function extract( $filename = null, $dst_path = null, $force_extrct = true ) {
 $filename = empty( $filename ) ? $this->getFileName() : $filename;
 if ( $result = false !== ( $tar_files = $this->getArchiveFiles( $filename ) ) )
-! ( empty( $dst_path ) || file_exists( $dst_path ) ) && $result = mkdir( $dst_path, 0770, true );
+! ( empty( $dst_path ) || _file_exists( $dst_path ) ) && $result = mkdir( $dst_path, 0770, true );
 if ( ! $result )
 return false;
 if ( ! ( $fr = fopen( $filename, 'rb' ) ) )
@@ -448,7 +439,7 @@ $orig_filename = $file_header['name'];
 $output_file .= str_replace( array( '\\', '/' ), DIRECTORY_SEPARATOR, $orig_filename );
 if ( ( $file_header['mode'] & 16384 ) && ! empty( $file_header['name'] ) ) {
 $this->_mk_dir( $output_file );
-$this->onProgress( $filename, $i++, $max, $this, 0 );
+$this->onProgress( $filename, $i++, $max, $this, PT_EXTRACTFILE );
 continue;
 } else {
 $this->_mk_dir( dirname( $output_file ) );
@@ -475,7 +466,7 @@ basename( $filename ) ) );
 }
 fclose( $fw );
 }
-$this->onProgress( $filename, $i++, $max, $this, 0 );
+$this->onProgress( $filename, $i++, $max, $this, PT_EXTRACTFILE );
 if ( $error && $force_extrct )
 $this->_stdOutput( 
 sprintf( 
@@ -487,7 +478,7 @@ fclose( $fr );
 return $result;
 }
 public function isValidTar( $filename ) {
-if ( ! file_exists( $filename ) )
+if ( ! _file_exists( $filename ) )
 return false;
 $result = false;
 $fr = fopen( $filename, 'rb' );

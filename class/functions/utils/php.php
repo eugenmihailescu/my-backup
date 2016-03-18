@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : php.php $
  * 
- * @id      : php.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : php.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -81,11 +81,17 @@ return function_exists( $function_name ) || function_exists( _get_ns_function_na
 function _is_callable( $function_name ) {
 return is_callable( is_string( $function_name ) ? _get_ns_function_name( $function_name ) : $function_name );
 }
-function _call_user_func( $function_name ) {
-$args = array_slice( func_get_args(), 1 ); 
+function _call_user_func_array( $function_name, $args ) {
 return call_user_func_array( 
 is_string( $function_name ) ? _get_ns_function_name( $function_name ) : $function_name, 
 $args );
+}
+function _call_user_func( $function_name ) {
+$args = array_slice( func_get_args(), 1 ); 
+$result = call_user_func_array( 
+is_string( $function_name ) ? _get_ns_function_name( $function_name ) : $function_name, 
+$args );
+return $result;
 }
 function obsafe_print_r( $var, $return = false, $html = false, $level = 0 ) {
 $spaces = "";

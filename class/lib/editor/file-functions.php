@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : file-functions.php $
  * 
- * @id      : file-functions.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : file-functions.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -44,13 +44,13 @@ while ( false !== ( $filename = @readdir( $dh ) ) ) {
 if ( '.' == $filename || '..' == $filename )
 continue;
 $file = addTrailingSlash( addslashes( $path ), $directory_separator ) . $filename;
-$is_dir = is_dir( $file );
-if ( ! $is_dir && ! empty( $filter ) && 1 != preg_match( "/\." . $filter . "$/", $filename ) )
+$_is_dir = _is_dir( $file );
+if ( ! $_is_dir && ! empty( $filter ) && 1 != preg_match( "/\." . $filter . "$/", $filename ) )
 continue;
 $files[] = array( 
 'name' => $file, 
-'is_dir' => $is_dir, 
-'size' => $is_dir ? 0 : @filesize( $file ), 
+'is_dir' => $_is_dir, 
+'size' => $_is_dir ? 0 : @filesize( $file ), 
 'time' => @filemtime( $file ) );
 }
 }
@@ -180,11 +180,11 @@ $path = key( $path );
 $path = addTrailingSlash( $path );
 $dh = @opendir( $path );
 $dirs = array();
-if ( $level > 0 && is_dir( $path ) && $dh ) {
+if ( $level > 0 && _is_dir( $path ) && $dh ) {
 while ( false !== ( $filename = readdir( $dh ) ) ) {
 $fullPath = $path . $filename;
 if ( $filename != "." && $filename != ".." )
-if ( is_dir( $fullPath ) ) {
+if ( _is_dir( $fullPath ) ) {
 $children = getDirList( $fullPath, $dir_show_size, $level - 1, $output_style );
 $output_style && ksort( $children ) || asort( $children );
 if ( $output_style ) {
@@ -219,8 +219,8 @@ function getWPSourceDirList( $path, $filters = null, $reverse_filter = false ) {
 if ( ! empty( $filters ) && ! is_array( $filters ) )
 $filters = array( $filters );
 $wp_dirs = array();
-$is_multisite = is_multisite_wrapper();
-$wp_upload_dir = wp_get_upload_dir();
+$is_multisite = IS_MULTISITE;
+$wp_upload_dir = wp_get_upload_dir( 'basedir' );
 $WP_CONTENT_DIR = @constant( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ( $path . 'wp-content' );
 $WPINC = @constant( 'WPINC' ) ? WPINC : 'wp-includes';
 $wp_content = basename( $WP_CONTENT_DIR );
@@ -379,7 +379,7 @@ $level = 1;
 $result = array();
 $path = addTrailingSlash( $path );
 $group_style = array( 'row' => 'background-color:#00adee;color:white', 'link' => 'color:white' );
-$multisite = is_multisite_wrapper();
+$multisite = IS_MULTISITE;
 $wp_upload_dir = wp_get_upload_dir();
 $WP_CONTENT_DIR = @constant( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ( $path . 'wp-content' );
 $WP_PLUGIN_DIR = @constant( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : ( $WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'plugins' );

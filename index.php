@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : index.php $
  * 
- * @id      : index.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : index.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -135,7 +135,7 @@ $settings = loadSettings();
 require_once CLASS_PATH . 'regactions.php'; 
 $dashboard_class = 'ProDashboard';
 $dashboard_file = CLASS_PATH . "$dashboard_class.php";
-file_exists( $dashboard_file ) || $dashboard_class = 'Dashboard';
+_file_exists( $dashboard_file ) || $dashboard_class = 'Dashboard';
 require_once CLASS_PATH . "$dashboard_class.php";
 $dashboard_class = __NAMESPACE__ . '\\' . $dashboard_class;
 $dashboard = new $dashboard_class();

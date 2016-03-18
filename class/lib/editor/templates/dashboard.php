@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : dashboard.php $
  * 
- * @id      : dashboard.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : dashboard.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
 <tr>
-<td colspan="3"><span id="job_info_title"
-style="font-size: 1.3em; font-weight: 600"></span></td>
+<td colspan="3" id="job_info_title" title="<?php _pesc('Refresh');?>"
+class="dashboard-stats-row" onclick="jsMyBackup.get_last_jobinfo();"></td>
 <td style="width: 100%" rowspan="10">
 <div style="text-align: center; margin-bottom: 10px;">
 <?php
@@ -73,46 +73,10 @@ class="button-primary" onclick="<?php echo $on_restore_click1;?>">
 </div>
 </td>
 </tr>
+<?php echo $this->_last_job['html'];?>
 <tr>
-<td colspan="3" style="vertical-align: top;">
-<table class="<?echo $this->container_shape;?>">
-<tr>
-<td><label><?php _pesc('Date');?></label></td>
-<td id="job_info_start"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Status');?></label></td>
-<td id="job_info_status"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('State');?></label></td>
-<td id="job_info_state"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Mode');?></label></td>
-<td id="job_info_mode"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Size');?></label></td>
-<td id="job_info_size"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Includes');?></label></td>
-<td id="job_info_source"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Location');?></label></td>
-<td id="job_info_location"></td>
-</tr>
-<tr>
-<td><label><?php _pesc('Next schedule');?></label></td>
-<td><?php echo $next_schedule;?></td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td><input type="button" class="button-primary"
+<td><input type="button"
+class="button-primary<?php count($this->_enabled_targets)|| print(' button-red');?>"
 value="<?php echo _esc('Run Backup');?>"
 onclick="<?php echo $on_backup_click;?>"></td>
 <td><input type="button" class="button-primary"
@@ -122,4 +86,41 @@ onclick="<?php echo $on_restore_click;?>" id="btn_restore_backup"
 <td><input type="button" class="button-primary" id="btn_view_log"
 value="<?php echo _esc('View Log');?>"
 onclick="<?php echo $on_viewlog_click;?>"></td>
+</tr>
+<tr>
+<td colspan="3">&nbsp;</td>
+</tr>
+<tr>
+<td id="stat_info_title" colspan="3" class="dashboard-stats-row"
+onclick="jsMyBackup.get_wp_jobs_stats(true);" title="<?php _pesc('Refresh');?>"><?php _pesc('Backup & Restore Statistics');?></td>
+</tr>
+<tr>
+<td colspan="3" style="vertical-align: top;">
+<table class="<?php echo $container_shape;?>">
+<tr>
+<td><label><?php _pesc('# of backup jobs');?></label></td>
+<td id="stat_info_bak_done">0</td>
+</tr>
+<tr>
+<td><label><?php _pesc('# of restoration jobs');?></label></td>
+<td id="stat_info_rst_done">0</td>
+</tr>
+<tr>
+<td><label><?php _pesc('# of processed files');?></label></td>
+<td id="stat_info_files_count">0</td>
+</tr>
+<tr>
+<td><label><?php _pesc('Avg. compression ratio');?></label></td>
+<td id="stat_info_ratio">0</td>
+</tr>
+<tr>
+<td><label><?php _pesc('Size of backed-up files');?></label></td>
+<td id="stat_info_files_size">0</td>
+</tr>
+<tr>
+<td><label><?php _pesc('Size of transfered backups');?></label></td>
+<td id="stat_info_data_size">0</td>
+</tr>
+</table>
+</td>
 </tr>

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : backupjob.php $
  * 
- * @id      : backupjob.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : backupjob.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -51,7 +51,7 @@ size="30"><a class='help' onclick=<?php echo echoHelp($help_2); ?>>[?]</a></td>
 </tr>
 <tr>
 <?php
-if ( is_multisite_wrapper() ) {
+if ( IS_MULTISITE ) {
 $wrkdir_name = 'blog_wrkdir';
 $wrkdir_prefix = $wpmu_dir_url;
 } else {
@@ -98,7 +98,8 @@ for="toolchain_int"><?php echo WPMYBACKUP; ?></label></td>
 <table>
 <tr>
 <td><input type="radio" name="toolchain" id="toolchain_ext"
-value="extern" <?php echo $extern_checked . $extern_enabled; ?>
+value="extern"
+<?php echo ' '.$extern_checked . ' '.$extern_enabled.' '; ?>
 onclick="jsMyBackup.submitOptions(this,0);">
 <?php
 if ( isWin() ) {
@@ -130,11 +131,13 @@ title="<?php _pesc('Run a toolchain benchmark test now');?>"
 onclick="<?php
 echo "jsMyBackup.popupConfirm('" . _esc( 'Choose what to test' ) . "','" . sprintf( 
 _esc( 
-"This will create a %s random file and will try to use both (<b>%s</b> and <b>%s</b>) compression tools to measure/compair their performance. Its aim is to assist you deciding which tool to use and why.<br>On the other hand perhaps you might want to test some real-life data, namely those files you selected on the <b>Backup source</b> tab. So what is going to be?" ), 
+"This will create a %s random file and will try to use both (<b>%s</b> and <b>%s</b>) compression tools to measure/compair their performance. Its aim is to assist you deciding which tool to use and why.<br>On the other hand perhaps you might want to test some real-life data, namely those files you selected on the <b>%s</b> tab. So what is going to be?" ), 
 getHumanReadableSize( BENCHMARK_FILE_SIZE * MB ), 
 WPMYBACKUP, 
-PHP_OS ) . "',null,{'" . _esc( 'Random file' ) . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(1);','" .
-_esc( 'My files' ) . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(0);','" . _esc( 'Cancel' ) . "':null});";
+PHP_OS, 
+getTabTitleById( SRCFILE_SOURCE ) ) . "',null,{'" . _esc( 'Random file' ) .
+"':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(1);','" . _esc( 'My files' ) .
+"':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(0);','" . _esc( 'Cancel' ) . "':null});";
 ?>"></td>
 <td><a class="help" onclick=<?php
 echo echoHelp( $help_8 );
@@ -202,10 +205,10 @@ echoHelp( $help_5 );
 <td colspan="2">
 <table>
 <tr>
-<td><input type="button" name='run_wpmybackup_backup' class="button"
+<td><input type="button" name='run_wpmybackup_backup'
+class="button<?php count($this->_enabled_targets)|| print(' button-red');?>"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run Backup Now');?>"
-id="btn_run_backup"
-onclick=<?php echo '"jsMyBackup.asyncRunBackup(\'run_backup\',\''._esc('Backup').'\',\''.wp_create_nonce_wrapper('run_backup').'\',\''.wp_create_nonce_wrapper('get_progress').'\',\''.wp_create_nonce_wrapper('cleanup_progress').'\',\''.wp_create_nonce_wrapper('abort_job').'\');" ';?>
+id="btn_run_backup" onclick="<?php echo $on_backup_click;?>"
 title='<?php _pesc('Click to run the backup now. It may take a while..');?>'></td>
 <td><input type="hidden" name="run_backup" value="0"></td>
 <td><div class="spin" id="spin_run"></div></td>

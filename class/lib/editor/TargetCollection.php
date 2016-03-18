@@ -24,73 +24,73 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : TargetCollection.php $
  * 
- * @id      : TargetCollection.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : TargetCollection.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class TargetCollection {
 private $_items;
 private $_filename;
-function __construct($filename = null) {
-$this->_items = array ();
+function __construct( $filename = null ) {
+$this->_items = array();
 $this->_filename = $filename;
-if (file_exists ( $filename ))
-$this->loadFromFile ( $filename );
+if ( file_exists( $filename ) )
+$this->loadFromFile( $filename );
 }
-public function addTargetItem($target_item, $uniq_id = null) {
-(null == $uniq_id) && $uniq_id = uniqid ( null, true );
+public function addTargetItem( $target_item, $uniq_id = null ) {
+( null == $uniq_id ) && $uniq_id = uniqid( null, true );
 $target_item->uniq_id = $uniq_id;
-$this->_items [$uniq_id] = $target_item;
-return end ( $this->_items );
+$this->_items[$uniq_id] = $target_item;
+return end( $this->_items );
 }
-public function delTargetItem($item_id) {
-if (! isset( $this->_items [ $item_id]))
-throw new MyException ( "No item with id=$item_id found on target collection" );
-unset ( $this->_items [$item_id] );
-$this->saveToFile ();
+public function delTargetItem( $item_id ) {
+if ( ! isset( $this->_items[$item_id] ) )
+throw new MyException( "No item with id=$item_id found on target collection" );
+unset( $this->_items[$item_id] );
+return $this->saveToFile();
 }
-public function getTargetItem($item_id) {
-$found = isset( $this->_items [ $item_id]);
-return $found ? $this->_items [$item_id] : false;
+public function getTargetItem( $item_id ) {
+$found = isset( $this->_items[$item_id] );
+return $found ? $this->_items[$item_id] : false;
 }
 public function getCount() {
-return count ( $this->_items );
+return count( $this->_items );
 }
-public function saveToFile($filename = null) {
+public function saveToFile( $filename = null ) {
 $fname = null == $filename ? $this->_filename : $filename;
-$err = _esc ( "Cannot save target items due to file " ) . "'$fname' %s";
-if (empty ( $fname ))
-throw new MyException ( sprintf ( $err, _esc ( 'is empty' ) ) );
-$array = array ();
+$err = _esc( "Cannot save target items due to file " ) . "'$fname' %s";
+if ( empty( $fname ) )
+throw new MyException( sprintf( $err, _esc( 'is empty' ) ) );
+$array = array();
 foreach ( $this->_items as $item_id => $target_item )
-$array [$item_id] = array (
-'description' => $target_item->description,
-'enabled' => $target_item->enabled,
-'type' => $target_item->type,
-'targetSettings' => $target_item->targetSettings 
-);
-file_put_contents ( $fname, json_encode ( $array ) );
+$array[$item_id] = array( 
+'description' => $target_item->description, 
+'enabled' => $target_item->enabled, 
+'type' => $target_item->type, 
+'targetSettings' => $target_item->targetSettings );
+return file_put_contents( $fname, json_encode( $array ) );
 }
-public function loadFromFile($filename = null) {
+public function loadFromFile( $filename = null ) {
 $fname = null == $filename ? $this->_filename : $filename;
-$err = _esc ( "Cannot load target items due to file " ) . "'$fname' %s";
-if (empty ( $fname ))
-throw new MyException ( sprintf ( $err, _esc ( 'is empty' ) ) );
-$this->_items = array ();
-if (file_exists ( $fname )) {
-$array = json_decode ( file_get_contents ( $fname ), true );
-foreach ( $array as $key => $target_item ) {
-$item_def = array_merge ( $target_item, $this->getItemInfoByType ( $target_item ['type'] ) );
-$item_obj = new TargetCollectionItem ( $item_def );
-$target_item = $this->addTargetItem ( $item_obj, $key );
+$err = _esc( "Cannot load target items due to file " ) . "'$fname' %s";
+if ( empty( $fname ) )
+throw new MyException( sprintf( $err, _esc( 'is empty' ) ) );
+$this->_items = array();
+if ( file_exists( $fname ) ) {
+$data = json_decode( file_get_contents( $fname ), true );
+foreach ( $data as $key => $target_item ) {
+$item_def = array_merge( $target_item, $this->getItemInfoByType( $target_item['type'] ) );
+$item_obj = new TargetCollectionItem( $item_def );
+$target_item = $this->addTargetItem( $item_obj, $key );
 }
 }
+return $this->_items;
 }
 public function getItems() {
 return $this->_items;
@@ -98,16 +98,15 @@ return $this->_items;
 public function getFileName() {
 return $this->_filename;
 }
-public function getItemInfoByType($type) {
+public function getItemInfoByType( $type ) {
 global $registered_targets;
-$target_info = $registered_targets [$type];
-return array (
-'folder_style' => $target_info ['folder_style'],
-'function_name' => $target_info ['file_function'],
-'icon' => $target_info ['logo'],
-'title' => $target_info ['title'],
-'type' => $type 
-);
+$target_info = $registered_targets[$type];
+return array( 
+'folder_style' => $target_info['folder_style'], 
+'function_name' => $target_info['file_function'], 
+'icon' => $target_info['logo'], 
+'title' => $target_info['title'], 
+'type' => $type );
 }
 }
 ?>

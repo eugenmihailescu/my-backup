@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : notification.php $
  * 
- * @id      : notification.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : notification.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,18 +38,19 @@ namespace MyBackup;
 <tr>
 <td>
 <?php
-if ($this->_alerts_count > 0) {
+if ( $this->_alerts_count > 0 ) {
 ?>
 <b>Show : </b> <input type="radio" name="message_show" id="new_messages"
-value="0" checked
-onchange="jsMyBackup.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==jsMyBackup.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
+value="<?php echo $this->MESSAGE_ITEM_UNREAD;?>" checked
+onchange="jsMyBackup.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==jsMyBackup.getShowWhat()?'<?php _pesc('read');?>':'<?php _pesc('unread');?>');">
 <label for="new_messages"><?php _pesc('unread messages');?></label> <input
-type="radio" name="message_show" id="old_messages" value="1"
-onchange="jsMyBackup.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==jsMyBackup.getShowWhat()?'<?php _pesc('unread');?>':'<?php _pesc('read');?>');">
+type="radio" name="message_show" id="old_messages"
+value="<?php echo $this->MESSAGE_ITEM_READ;?>"
+onchange="jsMyBackup.messages_scroll(0);document.getElementById('mark_msg_btn').value='<?php _pesc('Mark all as ');?>'+(1==jsMyBackup.getShowWhat()?'<?php _pesc('read');?>':'<?php _pesc('unread');?>');">
 <label for="old_messages"><?php _pesc('read messages');?></label> <input
-id="mark_msg_btn" type="button"
-value="<?php _pesc('Mark all as read');?>" class="button"
-onclick="<?php printf("jsMyBackup.popupConfirm('%s','"._esc('Are you sure you want to mark all messages as %sYou may still find them later in the %s messages%s, though.')."',null,{'%s':'jsMyBackup.messages_scroll(0,1==jsMyBackup.getShowWhat()?\'%s\':\'%s\');jsMyBackup.read_alerts();jsMyBackup.removePopupLast();','%s':null});",_esc('Confirm'),"'+(1==jsMyBackup.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'?&lt;br&gt;","&lt;b&gt;'+(0==jsMyBackup.getShowWhat()?'"._esc('unread')."':'"._esc('read')."')+'","&lt;/b&gt;",_esc("Yes, I`m pretty sure"),'unread','read',_esc("Cancel"));?>">
+id="mark_msg_btn" type="button" value="<?php _pesc('Mark all as read');?>"
+class="button"
+onclick="<?php printf("jsMyBackup.popupConfirm('%s','"._esc('Are you sure you want to mark all messages as %sYou may still find them later in the %s messages%s, though.')."',null,{'%s':'jsMyBackup.messages_scroll(0,1==jsMyBackup.getShowWhat()?\'%s\':\'%s\');jsMyBackup.read_alerts();jsMyBackup.removePopupLast();','%s':null});",_esc('Confirm'),"'+(1==jsMyBackup.getShowWhat()?'"._esc('read')."':'"._esc('unread')."')+'?&lt;br&gt;","&lt;b&gt;'+(1==jsMyBackup.getShowWhat()?'"._esc('read')."':'"._esc('unread')."')+'","&lt;/b&gt;",_esc("Yes, I`m pretty sure"),'unread','read',_esc("Cancel"));?>">
 <p style="font-weight: bold"><?php echo $message_status_title;?></p>
 <?php }?>
 <div id="message_list"

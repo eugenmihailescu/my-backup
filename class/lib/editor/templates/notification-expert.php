@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : notification-expert.php $
  * 
- * @id      : notification-expert.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : notification-expert.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -40,7 +40,7 @@ namespace MyBackup;
 <td><input id="message_top" name="message_top" type="number"
 value="<?php echo $message_top;?>"> <?php _pesc('messages');?></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_1 );
+echoHelp( $help_1 );
 ?>> [?]</a></td>
 </tr>
 <tr>
@@ -48,16 +48,27 @@ echoHelp ( $help_1 );
 <td><input id="message_age" name="message_age" type="number"
 value="<?php echo $message_age;?>" min="0"> <?php _pesc('days');?></td>
 <td><a class='help' onclick=<?php
-echoHelp ( $help_2 );
+echoHelp( $help_2 );
 ?>> [?]</a></td>
 </tr>
-<?php if($this->_alerts_count>0){?>
+<?php if(defined(__NAMESPACE__.'\\NOTIFICATION_EMAIL')&&NOTIFICATION_EMAIL){?>
+<tr>
+<td><label for="message_email"><?php _pesc('Send to email');?></label></td>
+<td colspan="2"><input id="message_email" name="message_email" type="checkbox"
+value="1" <?php $message_email && print(' checked ');?>><input type="hidden"
+value="0" name="message_email"> <a class='help'
+onclick=<?php echoHelp( $help_4 ); ?>> [?]</a></td>
+</tr>
+<?php
+}
+if ( $this->_alerts_count > 0 ) {
+?>
 <tr>
 <td colspan="3"><input type="button" class="button"
 value="<?php _pesc('Flush ALL messages');?>"
-onclick="jsMyBackup.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return;jsMyBackup.read_alerts();jsMyBackup.messages_scroll(1);jsMyBackup.message_info();});jsMyBackup.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
+onclick="jsMyBackup.popupConfirm('<?php _pesc('Confirm');?>','<?php _pesc('Are you sure you want to delete ALL messages?');?>',null,{'<?php _pesc('Yes, I`m damn sure');?>':'jsMyBackup.asyncGetContent(jsMyBackup.ajaxurl, \'action=read_folder&tab=notification&sender=notification&nonce=<?php echo wp_create_nonce_wrapper('read_folder');?>&flush=1\',\'message_list\',function(xmlhttp){if(\'1\'!=xmlhttp.responseText.trim())return jsMyBackup.clear_ra_cache();jsMyBackup.read_alerts();jsMyBackup.messages_scroll(1);jsMyBackup.message_info();});jsMyBackup.removePopupLast();','<?php _pesc('Cancel');?>':null});"><a
 class='help' onclick=<?php
-echoHelp ( $help_3 );
+echoHelp( $help_3 );
 ?>> [?]</a></td>
 </tr>
 <?php }?>

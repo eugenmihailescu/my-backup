@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : disksrc.php $
  * 
- * @id      : disksrc.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : disksrc.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -81,10 +81,12 @@ title=<?php
 echo '\'' . WPMYBACKUP_ROOT . '\'';
 ?>></td>
 <?php } if($this->is_wp &&$this->_show_dir_buttons){$plugin_dir=ROOT_PATH;;?>
-<td><input type="button" name="folder_plugin" id="btn_plugin"
+<!-- <td>
+<input type="button" name="folder_plugin" id="btn_plugin"
 onclick="<?php
 echo 'document.getElementsByName(\'dir\')[0].value=\'' . addslashes( $plugin_dir ) . '\';' .
 $reload_file_list;
 ?>"
-class="button" title="<?php echo $plugin_dir;?>"></td><?php }?>
+class="button" title="<?php echo $plugin_dir;?>"></td> -->
+<?php }?>
 </tr>

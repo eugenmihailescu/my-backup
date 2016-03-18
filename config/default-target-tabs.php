@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : default-target-tabs.php $
  * 
- * @id      : default-target-tabs.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : default-target-tabs.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,7 +38,7 @@ namespace MyBackup;
 require_once EDITOR_PATH . 'target-functions.php';
 require_once UTILS_PATH . 'arrays.php';
 include_once CONFIG_PATH . 'forward-target-tabs.php';
-$is_multisite = is_multisite_wrapper();
+$is_multisite = IS_MULTISITE;
 $BACKUP_TARGETS = array( 
 DISK_TARGET => 'disk', 
 FTP_TARGET => 'ftp', 
@@ -61,21 +61,21 @@ $NOT_BACKUP_TARGETS = array( TMPFILE_SOURCE, MYSQL_SOURCE );
 registerDefaultTab( 
 APP_BACKUP_JOB, 
 'BackupJobEditor', 
-$is_multisite ? _esc( 'Site backup' ) : ( is_wp() ? _esc( 'WP backup' ) : _esc( 'Backup settings' ) ) );
+$is_multisite ? _esc( 'Site backup' ) : ( is_wp() ? _esc( 'WP backup job' ) : _esc( 'Backup job' ) ) );
 registerTab( 
 MYSQL_SOURCE, 
 'MySQLSourceEditor', 
 $is_multisite ? _esc( 'Site database' ) : ( is_wp() ? _esc( 'WP database' ) : _esc( 'MySQL database' ) ) );
-registerTab( DISK_TARGET, 'DiskTargetEditor', _esc( 'File system' ), 'getDiskFiles', 'folder', 'drive-harddisk.png' );
+registerTab( DISK_TARGET, 'DiskTargetEditor', _esc( 'Local disk' ), 'getDiskFiles', 'folder', 'drive-harddisk.png' );
 registerTab( DROPBOX_TARGET, 'DropboxTargetEditor', _esc( 'Dropbox' ), 'getDropboxFiles', 'dropbox', 'dropbox.png' );
 registerTab( APP_SUPPORT, 'SupportEditor', _esc( 'Support' ) );
-registerTab( APP_CHANGELOG, 'ChangeLogEditor', _esc( 'Change log' ) );
-registerTab( APP_TABBED_TARGETS, 'BackupTargetsEditor', _esc( 'Backup targets' ) );
-registerTab( APP_SCHEDULE, 'ScheduleEditor', _esc( 'Backup Schedule' ) );
+registerTab( APP_CHANGELOG, 'ChangeLogEditor', _esc( 'Version change log' ) );
+registerTab( APP_TABBED_TARGETS, 'BackupTargetsEditor', _esc( 'Copy backup to' ) );
+registerTab( APP_SCHEDULE, 'ScheduleEditor', _esc( 'Backup Scheduler' ) );
 registerTab( WEBDAV_TARGET, 'WebDAVTargetEditor', _esc( 'WebDAV' ), 'getWebDAVFiles', 'folder', 'dav.png' );
 registerTab( FTP_TARGET, 'FtpTargetEditor', _esc( 'FTP/FTPS' ), 'getFtpFiles', 'folder', 'folder-remote.png' );
 registerTab( SSH_TARGET, 'SSHTargetEditor', _esc( 'SFTP/SCP' ), 'getSSHFiles', 'folder', 'ssh.png' );
-registerTab( APP_LOGS, 'LogsEditor', _esc( 'Logs' ) );
+registerTab( APP_LOGS, 'LogsEditor', _esc( 'Log files' ) );
 registerTab( MAIL_TARGET, 'MailTargetEditor', _esc( 'E-mail' ) );
 registerTab( APP_WELCOME, 'WelcomeEditor', _esc( 'Welcome' ) );
 registerTab( APP_NOTIFICATION, 'NotificationEditor', _esc( 'Notifications' ) );

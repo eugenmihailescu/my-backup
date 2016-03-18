@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : LogFile.php $
  * 
- * @id      : LogFile.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : LogFile.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -59,7 +59,7 @@ function __construct( $log_file = null, $settings = null ) {
 global $_branch_id_;
 $this->_logrotate = false;
 $this->_logsize = 1;
-$this->_logdir = ! empty( $log_file ) ? dirname( $log_file ) : ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() );
+$this->_logdir = ! empty( $log_file ) ? dirname( $log_file ) : ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir() );
 $this->_log_filename = ! empty( $log_file ) ? $log_file : null;
 is_array( $settings ) && $this->initFromArray( $settings );
 if ( defined( __NAMESPACE__.'\\BRANCHED_LOGS' ) && BRANCHED_LOGS && ! empty( $_branch_id_ ) ) {
@@ -108,7 +108,7 @@ $filter = '';
 $ext = '.' . $COMPRESSION_NAMES[$this->_filter];
 $filter = $COMPRESSION_FILTERS[$this->_filter][0];
 $mode = sprintf( $COMPRESSION_FILTERS[$this->_filter][1], 9 ); 
-if ( in_array( $this->_filter, array( GZ, BZ2 ) ) &&! _function_exists( $filter . 'open' ) )
+if ( in_array( $this->_filter, array( GZ, BZ2 ) ) && ! _function_exists( $filter . 'open' ) )
 throw new MyException( 
 sprintf( 
 _esc( 
@@ -145,8 +145,7 @@ isset( $array[$key] ) && $this->$prop = $array[$key];
 public function writeLog( $str ) {
 $logfile = $this->_getLogfile();
 $this->_validateFilename( $logfile );
-if ( $this->_logrotate && file_exists( $logfile ) &&
-filesize( $logfile ) + strlen( $str ) > $this->_logsize * MB )
+if ( $this->_logrotate && file_exists( $logfile ) && filesize( $logfile ) + strlen( $str ) > $this->_logsize * MB )
 if ( false !== $this->_rotateLog( $logfile ) )
 @unlink( $logfile );
 $line = is_string( $str ) ? $str : obsafe_print_r( $str, true );
@@ -182,17 +181,19 @@ _call_user_func( $this->_rw_filter . 'close', $fw );
 return $log_data;
 }
 }
-public function getLastJobId() {
+public function getLastJobId( $job_id = null ) {
 $result = false;
-if ( false !== ( $fr = fopen( $this->_log_filename, 'r' ) ) ) {
+if ( is_file( $this->_log_filename ) && false !== ( $fr = fopen( $this->_log_filename, 'r' ) ) ) {
 $buff_len = min( 4096, filesize( $this->_log_filename ) );
 if ( 0 == fseek( $fr, - $buff_len, SEEK_END ) && false !== ( $buff = fread( $fr, $buff_len ) ) ) {
 $key = 'job_id:';
 $p = strrpos( $buff, $key );
 false !== $p && ( $p = strrpos( substr( $buff, 0, $p ), PHP_EOL ) );
 $buff = substr( $buff, $p ); 
-if ( preg_match( '/\[([\d\-\s\:]+)\][^\(]+\(' . $key . '\s*([\-\d]+)\)/', $buff, $matches ) )
+$pattern = '\[([\d\-\s\:]+)\][^\(]+\(' . $key . '\s*([\-\d]+)\)';
+if ( preg_match( '/' . $pattern . '/', $buff, $matches ) ) {
 $result = $matches;
+}
 }
 fclose( $fr );
 }

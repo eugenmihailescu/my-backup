@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : logs.php $
  * 
- * @id      : logs.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : logs.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -41,7 +41,7 @@ namespace MyBackup;
 <td id='td_job_status'><?php echo $this->_is_running[1]; ?></td>
 <td><input style='width: 100%;' type="button" name="check_status"
 id="check_status" value="<?php _pesc('Check');?>" class="button"
-onclick=<?php echo '"'.$this->_fct_chk_status.'"';?>
+onclick="jsMyBackup.check_job_status();"
 title='<?php _pesc('Click to check the status now');?>'></td>
 <td colspan="3"><a class='help' onclick=<?php echo echoHelp($help_1);?>>[?]</a></td>
 </tr>

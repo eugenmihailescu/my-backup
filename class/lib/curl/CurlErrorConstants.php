@@ -24,26 +24,27 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlErrorConstants.php $
  * 
- * @id      : CurlErrorConstants.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlErrorConstants.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-$_CURL_ERROR_CODES_ = array (
-0 => 'CURLSHE_OK',
-1 => 'CURLSHE_BAD_OPTION',
-2 => 'CURLSHE_IN_USE',
-3 => 'CURLSHE_INVALID',
-4 => 'CURLSHE_NOMEM',
-5 => 'CURLSHE_NOT_BUILT_IN',
-6 => 'CURLM_UNKNOWN_OPTION',
-7 => 'CURLM_ADDED_ALREADY',
+global $_CURL_ERROR_CODES_;
+$_CURL_ERROR_CODES_=array(
+0 => 'CURLE_OK',
+1 => 'CURLE_UNSUPPORTED_PROTOCOL',
+2 => 'CURLE_FAILED_INIT',
+3 => 'CURLE_URL_MALFORMAT',
+4 => 'CURLE_NOT_BUILT_IN',
+5 => 'CURLE_COULDNT_RESOLVE_PROXY',
+6 => 'CURLE_COULDNT_RESOLVE_HOST',
+7 => 'CURLE_COULDNT_CONNECT',
 8 => 'CURLE_FTP_WEIRD_SERVER_REPLY',
 9 => 'CURLE_REMOTE_ACCESS_DENIED',
 10 => 'CURLE_FTP_ACCEPT_FAILED',
@@ -116,6 +117,7 @@ $_CURL_ERROR_CODES_ = array (
 86 => 'CURLE_RTSP_SESSION_ERROR',
 87 => 'CURLE_FTP_BAD_FILE_LIST',
 88 => 'CURLE_CHUNK_FAILED',
-89 => 'CURLE_NO_CONNECTION_AVAILABLE' 
-);
+89 => 'CURLE_NO_CONNECTION_AVAILABLE',
+90 => 'CURLE_SSL_PINNEDPUBKEYNOTMATCH',
+91 => 'CURLE_SSL_INVALIDCERTSTATUS');
 ?>

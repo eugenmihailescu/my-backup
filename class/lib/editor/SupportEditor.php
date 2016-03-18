@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : SupportEditor.php $
  * 
- * @id      : SupportEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : SupportEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -93,7 +93,7 @@ $this->_getExpertJavaScripts();
 private function _getExpertJavaScripts() {
 $this->java_scripts[] = "parent.print_debug_sample=function(type){parent.asyncGetContent(parent.ajaxurl,'action=print_debug_sample&type='+type+'&nonce=" .
 wp_create_nonce_wrapper( 'print_debug_sample' ) .
-"','__dummy__',function(xmlhttp){jsMyBackup.popupWindow('Sample '+type+' log','<div class=\'cui-console\'><pre>'+xmlhttp.responseText+'</pre></div>');});}";
+"',parent.dummy,function(xmlhttp){jsMyBackup.popupWindow('Sample '+type+' log','<div class=\'cui-console\'><pre>'+xmlhttp.responseText+'</pre></div>');});}";
 $this->java_scripts_load[] = 'parent.toggle_header("support_expert_box");'; 
 }
 protected function initTarget() {
@@ -116,14 +116,14 @@ echo $this->_getContactTemplate( false );
 return;
 }
 $support_addon = TEMPLATES_PATH . 'support-addon.php';
-file_exists( $support_addon ) && include_once $support_addon;
+_file_exists( $support_addon ) && include_once $support_addon;
 $help_3 = "'" . _esc( 'This will check your system to detect any missing or miss-configured extension.' ) . "'";
 $php_min_ver = '<a class="help" onclick=' . getHelpCall( 
 "'" . sprintf( 
 _esc( 
-"Please don`t bother using any version older than PHP %s. Their %s occured like %d years ago, are very,very buggy and they have lots of security holes. That`s why I don`t bother writting software for anything else than PHP %s or newer :-)<br>Make sure your web hosting company provides you at least the version %s (which btw ended also like %.1f years ago)." ), 
+"Please don`t bother using any version older than PHP %s. Their %s occurred like %d years ago, are very,very buggy and they have lots of security holes. That`s why I don`t bother writting software for anything else than PHP %s or newer :-)<br>Make sure your web hosting company provides you at least the version %s (which btw ended also like %.1f years ago)." ), 
 SUPPORT_MIN_PHP, 
-getAnchorE( 'End-Of-Life', 'http://php.net/eol.php' ), 
+getAnchorE( 'End-Of-Life', PHP_HOME_URL.'eol.php' ), 
 time() / 31536000 - 41.03, 
 SUPPORT_MIN_PHP, 
 SUPPORT_MIN_PHP, 
@@ -151,7 +151,7 @@ _esc( 'See example' ) . '</a>.' );
 $help_debug_on .= _esc( 
 "<p style=\'font-weight:bold\'>OK, but what has this to do with me?</p>Well, it has everything to do with you when you`ll got an error and you need support. If you come to me empty-handed I will return to you empty-handed.<br>" );
 $help_debug_on .= _esc( 
-"So you see, the easiest way to fix a problem is to gather as much technical data from you as possible. Not that much, though. I <i>a priori</i> assume that not everyone of you are techyes so my jobs is to make your life easier when comes to `debugging`. It would be hard for someone that is neither programmer or sysadmin to understand the complexity behind the software, it is really complex even for us who make a life from it.<br>Back to the topic, this `debug` option captures the last function calls just before the error|exception occured. It will point me in the right source file at the exact line of code that triggered that error. From there to the `hotfix` is just a matter of hours.<br>So I will not aggress you with techy questions, you won`t spend your time by making a ping-pong with the support team, it`s a win-win situation.<br>I`ve spent many years in the first line of technical support and hotline so it is supposed that I know what I am talking about :-)<p style=\'font-weight:bold\'>When shouldI activate this option? Always? Never?</p>Well, basically you won`t need to activate this right now. Anyway when a problem occurs and you think it may be a software malfunction (because anytime you run a specific job you get exactly the same error, no matter what) you could just turn ON this option, try to repeat whatever you did before until you get the same error then submit a bug report by choosing to include (see <i>Attach system info</i>) also the debug information. Then you may turn off this option, there is no good to keep it activated all the time. But if you keep it for let`s say half year it will capture (in a trace log file) all those errors you`ve got so far so sending to me a half year error log file won`t help either." ) .
+"So you see, the easiest way to fix a problem is to gather as much technical data from you as possible. Not that much, though. I <i>a priori</i> assume that not everyone of you are techyes so my jobs is to make your life easier when comes to `debugging`. It would be hard for someone that is neither programmer or sysadmin to understand the complexity behind the software, it is really complex even for us who make a life from it.<br>Back to the topic, this `debug` option captures the last function calls just before the error|exception occurred. It will point me in the right source file at the exact line of code that triggered that error. From there to the `hotfix` is just a matter of hours.<br>So I will not aggress you with techy questions, you won`t spend your time by making a ping-pong with the support team, it`s a win-win situation.<br>I`ve spent many years in the first line of technical support and hotline so it is supposed that I know what I am talking about :-)<p style=\'font-weight:bold\'>When shouldI activate this option? Always? Never?</p>Well, basically you won`t need to activate this right now. Anyway when a problem occurs and you think it may be a software malfunction (because anytime you run a specific job you get exactly the same error, no matter what) you could just turn ON this option, try to repeat whatever you did before until you get the same error then submit a bug report by choosing to include (see <i>Attach system info</i>) also the debug information. Then you may turn off this option, there is no good to keep it activated all the time. But if you keep it for let`s say half year it will capture (in a trace log file) all those errors you`ve got so far so sending to me a half year error log file won`t help either." ) .
 "'";
 $help_curl_debug_on = sprintf( 
 _esc( 
@@ -202,7 +202,7 @@ readMoreHereE( 'https://codex.wordpress.org/WP_DEBUG' ) ) . "'";
 $help_whitespace = "'" .
 _esc( 
 'Specify the minimum interval in minutes the dashboard will check and notify you if, when attempting to download a file via dashboard (a SQL script, a remote file), the downloaded file seems corrupted (cannot be opened) because some extra whitespaces are inserted in the file`s header.' ) .
-' ' . readMoreHereE( 'http://mynixworld.info/shop/faq-mybackup/#q7' ) . '.<br>' .
+' ' . readMoreHereE( APP_PLUGIN_FAQ_URI.'#q7' ) . '.<br>' .
 _esc( 'When set to 0 (zero) this option is regarded as disabled.' ) . "'";
 $options = array( 
 'debug' => _esc( 'Debug trace ON' ), 

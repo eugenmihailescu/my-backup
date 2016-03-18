@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : constants.php $
  * 
- * @id      : constants.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : constants.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -51,11 +51,14 @@ define( __NAMESPACE__.'\\PROXY_REGISTER', 'register' );
 define( 
 __NAMESPACE__.'\\PROXY_PARAMS', 
 sprintf( 'a=%s&h=%s&o=%s&u=%s&%s', PROXY_APP_ID, PROXY_HOST_ID, PROXY_OPEN_ID, PROXY_UNIQ_ID, PROXY_REGISTER ) );
-define( __NAMESPACE__.'\\WPMYBACKUP', 'WP MyBackup' );
-! defined( __NAMESPACE__.'\\PLUGIN_EDITION' ) && define( __NAMESPACE__."\\PLUGIN_EDITION", WPMYBACKUP . '%EDITION%' );
+define( __NAMESPACE__.'\\WPMYBACKUP', 'MyBackup' );
+! defined( __NAMESPACE__.'\\PLUGIN_EDITION' ) && define( __NAMESPACE__."\\PLUGIN_EDITION", WPMYBACKUP  );
 define( __NAMESPACE__.'\\APP_ADDONS_SHOP_URI', 'http://mynixworld.info/shop/' );
-define( __NAMESPACE__.'\\APP_PLUGIN_URI', 'https://wordpress.org/plugins/wp-mybackup');
+define( __NAMESPACE__.'\\APP_PLUGIN_URI', 'https://wordpress.org/plugins/wp-mybackup' );
 define( __NAMESPACE__.'\\APP_ADDONS_URI', APP_ADDONS_SHOP_URI . 'product-category/addons' );
+define( __NAMESPACE__.'\\APP_PLUGIN_FAQ_URI', APP_ADDONS_SHOP_URI . 'faq-mybackup' );
+define( __NAMESPACE__.'\\PHP_HOME_URL', 'http://php.net/' );
+define( __NAMESPACE__.'\\PHP_MANUAL_URL', PHP_HOME_URL . 'manual/en/' );
 define( __NAMESPACE__."\\WPMYBACKUP_LOGS", strtolower( preg_replace( '/[^\w]/', '', WPMYBACKUP ) ) );
 define( __NAMESPACE__.'\\MB', 1048576 );
 define( __NAMESPACE__.'\\SECDAY', 86400 );
@@ -67,15 +70,17 @@ define( __NAMESPACE__.'\\GZ', 1 );
 define( __NAMESPACE__.'\\BZ2', 2 );
 file_exists( CLASS_PATH . 'MyPclZipArchive.php' ) && define( __NAMESPACE__.'\\PCLZIP', 6 );
 $COMPRESSION_NAMES = array( NONE => 'tar', GZ => 'gz', BZ2 => 'bz2' );
-defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_NAMES[PCLZIP] = 'zip';
+defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_NAMES[PCLZIP] = 'pclzip';
 $COMPRESSION_FILTERS = array( NONE => array(), GZ => array( 'gz', 'wb%d' ), BZ2 => array( 'bz', 'w' ) );
 defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_FILTERS[PCLZIP] = array( 'zip', 'w' );
 $COMPRESSION_HEADERS = array( 
 BZ2 => array( 10, 'BZh\d1AY&SY' ), 
-GZ => array( 10, '\x1f\x8b\d{8}' ) );
+GZ => array( 
+10, 
+'\x1f\x8b[\x00-\x08][\x00-\x02\x04\x08\x10\x20\x40\x80][\x00-\xff]{4}[\x00\x02\x04][\x00-\x0d\xff]' ) );
 defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_HEADERS[PCLZIP] = array( 4, '(PK(\x03|\x05|\x07)(\x04|\x06|\x08))' );
 $COMPRESSION_APPS = array( NONE => '', GZ => 'gzip', BZ2 => 'bzip2' );
-defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_APPS[PCLZIP] = 'zip';
+defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_APPS[PCLZIP] = 'pclzip';
 $COMPRESSION_LIBS = array( GZ => 'zlib', BZ2 => 'bz2' );
 defined( __NAMESPACE__.'\\PCLZIP' ) && $COMPRESSION_LIBS[PCLZIP] = 'zlib';
 $COMPRESSION_ARCHIVE = array( NONE => 'TarArchive', GZ => 'TarArchive', BZ2 => 'TarArchive' );
@@ -109,6 +114,7 @@ define( __NAMESPACE__.'\\APP_BACKUP_JOB', 19 );
 define( __NAMESPACE__.'\\APP_WELCOME', 25 );
 define( __NAMESPACE__.'\\NEWEST', 1 ); 
 define( __NAMESPACE__.'\\OLDEST', - 1 ); 
+define( __NAMESPACE__.'\\OPER_RESTORE', - 7 );
 define( __NAMESPACE__.'\\OPER_MAINT_MYSQL', - 6 );
 define( __NAMESPACE__.'\\OPER_COMPRESS_INTERN', - 5 );
 define( __NAMESPACE__.'\\OPER_SRCFILE_BACKUP', - 3 );
@@ -159,10 +165,11 @@ $logs_path = implode( DIRECTORY_SEPARATOR, array( $logs_path['basedir'], WPMYBAC
 restore_current_blog();
 }
 }
+define( __NAMESPACE__.'\\DASHBOARD_REMINDER', 5 ); 
 define( __NAMESPACE__.'\\IS_MULTISITE', $multisite );
 define( __NAMESPACE__.'\\SITE_ID', $multisite ? $site_id : '' );
 define( __NAMESPACE__.'\\LOG_DIR', $logs_path );
-! file_exists( LOG_DIR ) && mkdir( LOG_DIR, 0770, true );
+is_dir( LOG_DIR ) || mkdir( LOG_DIR, 0770, true );
 define( __NAMESPACE__."\\LOG_PREFIX", LOG_DIR . WPMYBACKUP_LOGS ); 
 define( __NAMESPACE__."\\FILES_MD5_LOG", LOG_PREFIX . "-files-md5.log" ); 
 define( __NAMESPACE__."\\BACKUP_FILTER_LOG", LOG_PREFIX . "-backup-filter.log" ); 
@@ -207,4 +214,65 @@ define( __NAMESPACE__.'\\COOKIE_ACCEPT_MAXAGE', 365 );
 define( __NAMESPACE__.'\\COOKIE_NOACCEPT_MAXAGE', 30 ); 
 define( __NAMESPACE__.'\\MAIL_TEST_ACCOUNT', 'test.wpmybackup@mynixworld.info' ); 
 define( __NAMESPACE__."\\ROOT_OAUTH_FILE", LOG_DIR );
+define( __NAMESPACE__.'\\PT_DOWNLOAD', 0 );
+define( __NAMESPACE__.'\\PT_UPLOAD', 1 );
+define( __NAMESPACE__.'\\PT_ADDFILE', 2 );
+define( __NAMESPACE__.'\\PT_COMPRESS', 3 );
+define( __NAMESPACE__.'\\PT_WRITE', 4 );
+define( __NAMESPACE__.'\\PT_DELETE', 5 );
+define( __NAMESPACE__.'\\PT_ANALYZE', 6 );
+define( __NAMESPACE__.'\\PT_EXECUTE', 7 );
+define( __NAMESPACE__.'\\PT_DECOMPRESS', 8 );
+define( __NAMESPACE__.'\\PT_EXTRACTFILE', 9 );
+define( __NAMESPACE__.'\\PT_ENQUEUE', 10 );
+define( __NAMESPACE__.'\\MESSAGE_ITEM_UNREAD', 1 );
+define( __NAMESPACE__.'\\MESSAGE_ITEM_READ', 2 );
+define( __NAMESPACE__.'\\MESSAGE_TYPE_NORMAL', 0 );
+define( __NAMESPACE__.'\\MESSAGE_TYPE_WARNING', 1 );
+define( __NAMESPACE__.'\\MESSAGE_TYPE_ERROR', 2 );
+define( 
+__NAMESPACE__.'\\JS_INJECT_COMMENT', 
+PHP_EOL . '/* inject our runtime generated local (%s) functions into the global application namespace */' . PHP_EOL );
+! defined( __NAMESPACE__.'\\SORT_NATURAL' ) && define( __NAMESPACE__.'\\SORT_NATURAL', SORT_STRING );
+$open_basedir = ini_get( 'open_basedir' );
+if ( ! empty( $open_basedir ) ) {
+defined( __NAMESPACE__.'\\OPEN_BASEDIR' ) || define( 
+__NAMESPACE__.'\\OPEN_BASEDIR', 
+implode( 
+PATH_SEPARATOR, 
+array_map( 
+function ( $item ) {
+$item = trim( $item );
+is_link( $item ) || $item = @realpath( $item );
+return str_replace( '/', DIRECTORY_SEPARATOR, $item );
+}, 
+explode( PATH_SEPARATOR, $open_basedir ) ) ) );
+}
+function _dir_in_allowed_path( $dir, $realpath = false ) {
+if ( empty( $dir ) || ! defined( __NAMESPACE__.'\\OPEN_BASEDIR' ) ) {
+return true;
+}
+( '\\' == DIRECTORY_SEPARATOR ) &&
+$dir = str_replace( array( DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, '/' ), DIRECTORY_SEPARATOR, $dir );
+foreach ( explode( PATH_SEPARATOR, OPEN_BASEDIR ) as $path ) {
+if ( false !== strpos( $dir, $path ) )
+return true;
+}
+if ( ! $realpath && ! ( @is_link( $dir ) && '.' == @readlink( $dir ) ) ) {
+$real_dir = $dir;
+if ( ( $real_dir = @realpath( $dir ) ) && $dir != $real_dir )
+return _dir_in_allowed_path( $real_dir, true );
+}
+return false;
+}
+function _sys_get_temp_dir() {
+$temp_dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR;
+if ( $temp_in_path = _dir_in_allowed_path( $temp_dir ) )
+return $temp_dir;
+return LOG_DIR;
+}
+$tmp_dir = _sys_get_temp_dir();
+@is_dir( $tmp_dir ) || @mkdir( $tmp_dir, 0770, true );
+@is_readable( $tmp_dir ) ||
+trigger_error( sprintf( _( 'The system temporary directory does not exist (%s)' ), $tmp_dir ), E_USER_WARNING );
 ?>

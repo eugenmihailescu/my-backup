@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : utils.php $
  * 
- * @id      : utils.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : utils.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,6 +38,7 @@ namespace MyBackup;
 date_default_timezone_set( "UTC" );
 define( __NAMESPACE__."\\WPMYBACKUP_AUTHOR", '@author:		Eugen Mihailescu <eugenmihailescux@gmail.com> $' );
 $utils_includes = array( 
+'arrays.php', 
 'php.php', 
 'wp-schedule.php', 
 'cli-options.php', 
@@ -47,6 +48,7 @@ $utils_includes = array(
 'random.php', 
 'url.php', 
 'mail.php', 
+'html-mail.php', 
 'nonce.php', 
 'signals.php', 
 'session.php', 
@@ -58,7 +60,9 @@ $utils_includes = array(
 'ftp.php', 
 'format.php', 
 'vat.php', 
-'mysql.php' );
+'mysql.php', 
+'pdo_mysql.php', 
+'help.php' );
 foreach ( $utils_includes as $include_file )
 file_exists( UTILS_PATH . $include_file ) && include_once UTILS_PATH . $include_file;
 function getDatesByAge( $dates, $days, $filter_by ) {
@@ -70,6 +74,8 @@ $result[] = $d;
 return $result;
 }
 function getHumanReadableSize( $size, $precision = 2, $return_what = 0 ) {
+if ( PHP_INT_MAX == $size )
+return _esc( 'unknown' );
 $units = array( 'B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB' );
 for ( $i = 0; abs( $size ) >= 1024; $i++ )
 $size /= 1024;
@@ -171,5 +177,28 @@ $tmp = $item1;
 $item1 = $item2;
 $item2 = $tmp;
 return true;
+}
+function add_alert_message( $message, $job_id = null, $type = MESSAGE_TYPE_WARNING, $status = MESSAGE_ITEM_UNREAD, $interval = SECDAY ) {
+is_array( $message ) || $message = array( $message );
+$mhdl = new MessageHandler( MESSAGES_LOGFILE );
+$result = array();
+foreach ( $message as $str ) {
+$last_msg = $mhdl->getLastMessageByType( $type, MESSAGE_ITEM_READ | MESSAGE_ITEM_UNREAD, $str );
+if ( ! ( $last_msg && ( time() - $last_msg->timestamp < $interval ) ) ) {
+$msg_item = $mhdl->addMessage( $type, $str, $job_id, $status );
+$result[] = $msg_item->msg_id;
+}
+}
+if ( ! empty( $result ) && defined( __NAMESPACE__.'\\NOTIFICATION_EMAIL' ) && NOTIFICATION_EMAIL ) {
+global $java_scripts;
+$timeout = 10000;
+$action = 'send_email';
+$params = array( 
+'action' => $action, 
+'nonce' => wp_create_nonce_wrapper( $action ), 
+'msg_ids' => implode( '|', $result ) );
+$java_scripts[$action] = "setTimeout(function(){parent.asyncGetContent(parent.ajaxurl,'" .
+http_build_query( $params ) . "',parent.dummy);},$timeout);";
+}
 }
 ?>

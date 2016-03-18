@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlSSHWrapper.php $
  * 
- * @id      : CurlSSHWrapper.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlSSHWrapper.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -49,8 +49,8 @@ $options = array (
 CURLOPT_SSH_AUTH_TYPES => CURLSSH_AUTH_DEFAULT,
 CURLOPT_SSL_VERIFYPEER => false 
 );
-$options [CURLOPT_SSH_PUBLIC_KEYFILE] = ! empty ( $this->_ssh_publickey_file ) && file_exists ( $this->_ssh_publickey_file ) ? $this->_ssh_publickey_file : null;
-if (! empty ( $this->_ssh_privkey_file ) && file_exists ( $this->_ssh_privkey_file )) {
+$options [CURLOPT_SSH_PUBLIC_KEYFILE] = ! empty ( $this->_ssh_publickey_file ) && _file_exists ( $this->_ssh_publickey_file ) ? $this->_ssh_publickey_file : null;
+if (! empty ( $this->_ssh_privkey_file ) && _file_exists ( $this->_ssh_privkey_file )) {
 $options [CURLOPT_SSH_PRIVATE_KEYFILE] = $this->_ssh_privkey_file;
 ! empty ( $this->_ssh_privkey_pwd ) && $options [CURLOPT_KEYPASSWD] = $this->_ssh_privkey_pwd;
 } else
@@ -90,11 +90,11 @@ throw new MyException ( $e->getMessage (), $e->getCode (), $e->getPrevious () );
 }
 return parent::getSSHInfo ();
 }
-public function deleteFile($filename, $is_dir = false, $bool_output = true) {
+public function deleteFile($filename, $_is_dir = false, $bool_output = true) {
 if (CURLPROTO_SCP == $this->_protocol) {
 throw new MyException ( 'Delete not available for SCP protocol' );
 } else
-return parent::deleteFile ( $filename, $is_dir, $bool_output );
+return parent::deleteFile ( $filename, $_is_dir, $bool_output );
 }
 public function getFtpFiles($path = '') {
 if (CURLPROTO_SCP == $this->_protocol) {

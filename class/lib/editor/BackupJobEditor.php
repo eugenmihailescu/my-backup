@@ -24,19 +24,21 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : BackupJobEditor.php $
  * 
- * @id      : BackupJobEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : BackupJobEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class BackupJobEditor extends AbstractTargetEditor {
+private $_enabled_targets;
 private function _getJavaScripts() {
 global $COMPRESSION_LEVEL_SUPPORT, $PROGRESS_PROVIDER, $registered_ciphres;
+$this->java_scripts[] = 'parent.enabled_backup_targets=[' . implode( ',', $this->_enabled_targets ) . '];';
 $level_support = "var can_level,support_level=[],e=document.getElementById('compression_level');";
 foreach ( $COMPRESSION_LEVEL_SUPPORT as $format => $support )
 $support && $level_support .= sprintf( 'support_level[%d]=%s;', $format, $support );
@@ -59,15 +61,37 @@ _esc( 'Decrypt Now' ) .
 wp_create_nonce_wrapper( 'decrypt_file' ) .
 "');document.getElementById('wpmybackup_admin_form').submit();}}";
 }
+ob_start();
+?>
+parent.onJobDone = function(xhr, job_id) {
+parent.onJobAbnormalExit(xhr, job_id,'<?php echo wp_create_nonce_wrapper( 'job_abnormal_exit' );?>','<?php echo wp_create_nonce_wrapper( 'wp_jobs_stats' );?>');
+};
+<?php
+$this->java_scripts[] = ob_get_clean();
 $this->java_scripts[] = getBackupSourcesJS( $PROGRESS_PROVIDER );
 }
 protected function initTarget() {
 parent::initTarget();
-$this->enabled_tag = is_multisite_wrapper() ? 'disabled' : '';
+global $BACKUP_TARGETS;
+$this->_enabled_targets = array();
+foreach ( $BACKUP_TARGETS as $target => $opt )
+strToBool( getParam( $this->settings, $opt . '_enabled', 0 ) ) && $this->_enabled_targets[] = $target;
+$this->enabled_tag = IS_MULTISITE ? 'disabled' : '';
 $this->_getJavaScripts();
 }
 protected function getEditorTemplate() {
 global $COMPRESSION_NAMES, $COMPRESSION_LIBS, $VERBOSITY_MODES, $exclude_files_factory;
+$backup_action = 'run_backup';
+$on_backup_click = sprintf( 
+"if(!jsMyBackup.enabled_backup_targets.length)return jsMyBackup.popupError('%s','%s');jsMyBackup.asyncRunBackup('%s','%s','%s','%s','%s','%s',null,null,jsMyBackup.onJobDone);", 
+_esc( 'Error' ), 
+sprintf( _esc( 'You have not selected any %s option.' ), getTabAnchorE( APP_TABBED_TARGETS ) ), 
+$backup_action, 
+_esc( 'Backup' ), 
+wp_create_nonce_wrapper( $backup_action ), 
+wp_create_nonce_wrapper( 'get_progress' ), 
+wp_create_nonce_wrapper( 'cleanup_progress' ), 
+wp_create_nonce_wrapper( 'abort_job' ) );
 $excl_files = explode( ',', $this->settings['excludefiles'] );
 foreach ( $excl_files as $key => $value )
 if ( in_array( $value, $exclude_files_factory ) )
@@ -89,7 +113,7 @@ $os_tool_ok = true;
 $extern_enabled = $os_tool_ok ? '' : ' disabled';
 if ( ! $os_tool_ok ) {
 $this->settings['toolchain'] = 'intern';
-update_option_wrapper( WPMYBACKUP_OPTION_NAME, $this->settings );
+submit_options( null, $this->settings );
 }
 if ( 'extern' == $compression_tool )
 $compress_cmd = getTarNZipCmd( 
@@ -134,8 +158,7 @@ $key,
 $key == $this->settings['compression_type'] ? ' selected' : '', 
 strtoupper( $value ) );
 if ( is_wp() ) {
-$wpmu_dir = addTrailingSlash( 
-get_site_option( 'wpmu_wrkdir', sys_get_temp_dir() . DIRECTORY_SEPARATOR . WPMYBACKUP_LOGS ) );
+$wpmu_dir = addTrailingSlash( get_site_option( 'wpmu_wrkdir', _sys_get_temp_dir() . WPMYBACKUP_LOGS ) );
 $wpmu_dir_url = getAnchor( $wpmu_dir, network_admin_url( 'settings.php' ) . '#' . WPMYBACKUP_LOGS );
 }
 $help_1 = "'" .
@@ -149,9 +172,9 @@ getSpanE( 'YYMMDD-HHMMSS', 'brown' ),
 getSpanE( 'timestamp', 'brown' ) ) . "'";
 $help_3 = _esc( 
 'The path where the temporary files (like the temporary backup file) will be created.<br>Make sure that WordPress has read-write access and there is enough disk space.' );
-is_multisite_wrapper() && $help_3 .= '<br>' . sprintf( 
+IS_MULTISITE && $help_3 .= '<br>' . sprintf( 
 _esc( 
-'On multisite installation this location is set automatically. The network administrator may change it globally on the %s page.' ), 
+'On multisite installation this location is set automatically. The network administrator may change it globally on the %s page (see `Global working directory` option).' ), 
 getAnchor( 
 __( 'Network Settings' ), 
 network_admin_url( 'settings.php' ) . '#' . WPMYBACKUP_LOGS, 
@@ -186,10 +209,10 @@ _esc( '%s is both.' ),
 getAnchorE( 'Zip', 'http://en.wikipedia.org/wiki/Zip_%28file_format%29' ) );
 $help_6 .= '<br><br>' . sprintf( 
 _esc( '<b>Compression ratio</b> : %s (the lower the better)' ), 
-getSpanE( 'BZip2', 'green', 'bold' ) . ' < GZip < Zip < LZF' );
+getSpanE( 'BZip2', 'green', 'bold' ) . ' < GZip < Zip|PclZip < LZF' );
 $help_6 .= '<br><b>' . sprintf( 
 _esc( 'Compression speed</b> : %s (the higher the better)' ), 
-getSpanE( 'LZF', 'green', 'bold' ) . ' > GZip > Zip > BZip2' );
+getSpanE( 'LZF', 'green', 'bold' ) . ' > GZip > Zip > BZip2 > PclZip' );
 $help_6 .= '<br><br>' . readMoreHereE( 
 'http://pokecraft.first-world.info/wiki/Quick_Benchmark:_Gzip_vs_Bzip2_vs_LZMA_vs_XZ_vs_LZ4_vs_LZO' );
 $help_6 = "'$help_6'";
@@ -293,7 +316,8 @@ _esc(
 $help_6 = "'" . _esc( 'Enter the number of <b>seconds</b> to wait between two retries.' ) . "'";
 $help_7 = "'" . sprintf( 
 _esc( 
-'Set the number of seconds the backup job is allowed to run. If this is reached, the script returns a fatal error. The default limit is %s seconds. If set to zero, no time limit is imposed.' ), 
+'Set the number of seconds the backup job is allowed to run. If this is reached, the script returns a fatal error. The default limit is %s seconds. If set to zero, no time limit is imposed.' ) .
+'<br>' . _esc( 'This option has no effect when PHP is running in safe mode.' ), 
 $factory_options['backup']['max_exec_time'][0] ) . "'";
 $help_8 = "'" .
 _esc( 
@@ -314,6 +338,7 @@ $help_11 = "'" .
 _esc( 
 'This option automatically creates a safe copy of any individual plug-ins/themes just before Wordpress updates them.' ) .
 "'";
+$safe_mode = ini_get( 'max_execution_time' ) != $this->settings["max_exec_time"];
 require_once $this->getTemplatePath( 'backupjob-expert.php' );
 }
 }

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlFtpWrapper.php $
  * 
- * @id      : CurlFtpWrapper.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlFtpWrapper.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -277,7 +277,7 @@ $this->setCurlOptions ( $cmd_options );
 $this->_execCurl ();
 return $parse_result ( $this->curlGetDebugOutput (), $raw_cmd );
 }
-public function deleteFile($filename, $is_dir = false, $bool_output = true) {
+public function deleteFile($filename, $_is_dir = false, $bool_output = true) {
 if (! (empty ( $filename ) || is_array ( $filename )))
 $filename = array (
 $filename 
@@ -285,7 +285,7 @@ $filename
 foreach ( $filename as $name ) {
 try {
 $output = "Deleting $name..";
-$this->ftpExecRawCmds ( CURLPROTO_SFTP == $this->_protocol ? ($is_dir ? 'rmdir' : 'rm') : ($is_dir ? 'RMD' : 'DELE'), $name );
+$this->ftpExecRawCmds ( CURLPROTO_SFTP == $this->_protocol ? ($_is_dir ? 'rmdir' : 'rm') : ($_is_dir ? 'RMD' : 'DELE'), $name );
 $output .= 'successfully :-)';
 $success = 1;
 } catch ( MyException $e ) {

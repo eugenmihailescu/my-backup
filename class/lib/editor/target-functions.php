@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : target-functions.php $
  * 
- * @id      : target-functions.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : target-functions.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -90,7 +90,7 @@ return;
 }
 $target_editor_class = __NAMESPACE__ . '\\' . $target_editor_class;
 $class_filename = EDITOR_PATH . preg_replace( '@(.*)(?<=[\\\\/])@', '', $target_editor_class ) . '.php';
-if ( file_exists( $class_filename ) )
+if ( _file_exists( $class_filename ) )
 include_once $class_filename;
 else {
 echo sprintf( $err_msg, _esc( "file does not exist:" ) . "<br>" . $class_filename );

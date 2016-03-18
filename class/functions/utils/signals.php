@@ -24,20 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : signals.php $
  * 
- * @id      : signals.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : signals.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 function addProcessSignal($process_name, $sender = '') {
 0 !== $process_name && empty ( $process_name ) && die ( _esc ( 'Internal error: cannot register a signal for an undefined process' ) );
-if (! (file_exists ( SIGNALS_LOGFILE ) && filesize ( SIGNALS_LOGFILE ) > 0))
+if (! (_file_exists ( SIGNALS_LOGFILE ) && filesize ( SIGNALS_LOGFILE ) > 0))
 $signals = array ();
 else
 $signals = json_decode ( file_get_contents ( SIGNALS_LOGFILE ), true );
@@ -49,7 +49,7 @@ file_put_contents ( SIGNALS_LOGFILE, json_encode ( $signals ) );
 }
 function ackProcessSignal($process_name, $sender = null) {
 0 !== $process_name && empty ( $process_name ) && die ( _esc ( "Cannot acknowledge a signal for the specified (empty) process" ) );
-if (! (file_exists ( SIGNALS_LOGFILE )))
+if (! (_file_exists ( SIGNALS_LOGFILE )))
 return false;
 $signals = json_decode ( file_get_contents ( SIGNALS_LOGFILE ), true );
 $changed = false;
@@ -66,7 +66,7 @@ $changed = true;
 $changed && file_put_contents ( SIGNALS_LOGFILE, json_encode ( $signals ) );
 }
 function chkProcessSignal($process_name, $sender = null) {
-if (! (file_exists ( SIGNALS_LOGFILE )))
+if (! (_file_exists ( SIGNALS_LOGFILE )))
 return false;
 $signals = json_decode ( file_get_contents ( SIGNALS_LOGFILE ), true );
 if (is_array ( $signals ))
@@ -78,7 +78,7 @@ $sender
 return false;
 }
 function clearObsoleteProcessSignals() {
-if (! (file_exists ( SIGNALS_LOGFILE )))
+if (! (_file_exists ( SIGNALS_LOGFILE )))
 return;
 $count = 0;
 $signals = json_decode ( file_get_contents ( SIGNALS_LOGFILE ), true );

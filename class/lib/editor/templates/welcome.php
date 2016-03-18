@@ -24,16 +24,130 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : welcome.php $
  * 
- * @id      : welcome.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : welcome.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+
+defined( __NAMESPACE__.'\\LMGTFY_URL' ) || define( __NAMESPACE__.'\\LMGTFY_URL', 'http://lmgtfy.com/?q=' );
+defined( __NAMESPACE__.'\\APP_PLUGIN_URI' ) || define( __NAMESPACE__.'\\APP_PLUGIN_URI', 'https://wordpress.org/plugins/wp-mybackup' );
+defined( __NAMESPACE__.'\\APP_ADDONS_SHOP_URI' ) || define( __NAMESPACE__.'\\APP_ADDONS_SHOP_URI', 'http://mynixworld.info/shop/' );
+defined( __NAMESPACE__.'\\WPMYBACKUP_LOGS' ) || define( __NAMESPACE__.'\\WPMYBACKUP_LOGS', strtolower( preg_replace( '/[^\w]/', '', WPMYBACKUP ) ) );
+defined( __NAMESPACE__.'\\APP_PLUGIN_FAQ_URI' ) || define( __NAMESPACE__.'\\APP_PLUGIN_FAQ_URI', APP_ADDONS_SHOP_URI . 'faq-mybackup' );
+defined( __NAMESPACE__.'\\PHP_HOME_URL' ) || define( __NAMESPACE__.'\\PHP_HOME_URL', 'http://php.net/' );
+defined( __NAMESPACE__.'\\PHP_MANUAL_URL' ) || define( __NAMESPACE__.'\\PHP_MANUAL_URL', PHP_HOME_URL . 'manual/en/' );
+if ( ! function_exists( __NAMESPACE__ . '\\lmgtfy' ) ) {
+function lmgtfy( $string ) {
+return LMGTFY_URL . urlencode( $string );
+}
+}
+isset( $COMPRESSION_NAMES ) || $COMPRESSION_NAMES = array( 0 => 'tar', 1 => 'gz', 2 => 'bz2' );
+if ( ! isset( $registered_forward_map ) ) {
+global $registered_forward_map, $forward_compatible_targets;
+$registered_forward_map = array( 
+'APP_BACKUP_JOB' => array( _esc( 'WP backup job' ), null, 19 ), 
+'MYSQL_SOURCE' => array( _esc( 'WP database' ), null, - 1 ), 
+'APP_TABBED_TARGETS' => array( _esc( 'Copy backup to' ), null, 15 ), 
+'APP_SCHEDULE' => array( _esc( 'Backup Scheduler' ), null, 17 ), 
+'APP_SUPPORT' => array( _esc( 'Support' ), null, 11 ), 
+'APP_LOGS' => array( _esc( 'Log files' ), null, 9 ), 
+'WP_SOURCE' => array( _esc( 'WP files' ), null, - 4 ), 
+'SRCFILE_SOURCE' => array( sprintf( _esc( '%s files' ), PHP_OS ), 'any-file-visible-to-the-wp', - 3 ), 
+'APP_JOB_HISTORY' => array( _esc( 'Job history' ), 'query-job-history', 8 ), 
+'APP_STATISTICS' => array( _esc( 'Statistics' ), 'backup-statistics', 10 ), 
+'APP_LICENSE' => array( _esc( 'License' ), null, 12 ), 
+'APP_LISTVIEW_TARGETS' => array( _esc( 'Backup jobs++' ), 'backup-wizard', 16 ), 
+'BACKUP_SETTINGS' => array( _esc( 'Settings' ), 'advanced-network-settings', 18 ), 
+'APP_EULA' => array( _esc( 'EULA' ), null, 20 ), 
+'APP_RESTORE' => array( _esc( 'Restore' ), 'restore-wizard', 21 ), 
+'APP_OS_SCHEDULE' => array( PHP_OS . '-Cron', 'wp-schedule-the-backup-via-os', 22 ), 
+'APP_WP_SCHEDULE' => array( 'WP-Cron', null, 23 ), 
+'APP_ADDONDROPIN' => array( _esc( 'Addons Drop-in' ), 'product-category/addons', 24 ), 
+'APP_DASHBOARD' => array( _esc( 'Dashboard' ), null, 26 ) );
+foreach ( $registered_forward_map as $constant => $tab_info )
+$forward_compatible_targets[$tab_info[2]] = array( 
+'title' => $tab_info[0], 
+'link' => null == $tab_info[1] ? '#' : APP_ADDONS_SHOP_URI . $tab_info[1] );
+}
+$wpmybackup_plugin_link = getAnchor( WPMYBACKUP, APP_PLUGIN_URI );
+$restore_addon_link = getAnchor( _esc( 'Restore Addon' ), APP_ADDONS_SHOP_URI . 'shop/restore-wizard' );
+$diff_restore_addon_link = getAnchor( 
+_esc( 'Differential backup' ), 
+APP_ADDONS_SHOP_URI . 'shop/differential-backup-support' );
+$inc_restore_addon_link = getAnchor( 
+_esc( 'Incremental backup' ), 
+APP_ADDONS_SHOP_URI . 'shop/incremental-backup-support' );
+$arcname_pattern = '[a-z0-9\-\.]';
+$gz_bz2_pre = '<pre>' . implode( '|', array( 'gz', 'bz2' ) ) . '</pre>';
+isset( $on_plugin ) || $on_plugin = false;
+isset( $wp_components ) || $wp_components = array();
+isset( $dashboard_link ) || $dashboard_link = _esc( 'Dashboard' );
+isset( $is_wp ) || $is_wp = true;
+isset( $_addons ) || $_addons = array();
+isset( $_nocheck ) || $_nocheck = true;
+isset( $_init_error ) || $_init_error = false;
+isset( $_video_ids ) || $_video_ids = array( '' );
+isset( $_upload_constraint_link ) || $_upload_constraint_link = array( '', '' );
+isset( $getImgURL ) || $getImgURL = function ( $filename ) {
+$getFileRelativePath = function ( $filename ) {
+$relpath = str_replace( realpath( $_SERVER['DOCUMENT_ROOT'] ), '', $filename );
+DIRECTORY_SEPARATOR != substr( $relpath, 0, 1 ) && $relpath = DIRECTORY_SEPARATOR . $relpath; 
+return dirname( $relpath );
+};
+$plugins_url_wrapper = function ( $path, $plugin ) use(&$getFileRelativePath ) {
+$plugin_root = str_replace( DIRECTORY_SEPARATOR, '/', $getFileRelativePath( $plugin ) );
+'/' != substr( $path, 0, 1 ) && '/' != substr( $plugin_root, - 1 ) && ( $plugin_root .= '/' ) ||
+( '/' == substr( $plugin_root, - 1 ) && ( $plugin_root = substr( $plugin_root, 0, - 1 ) ) );
+$result = $plugin_root . $path;
+return $result;
+};
+return $plugins_url_wrapper( 'img/' . $filename, dirname( __DIR__ ) . DIRECTORY_SEPARATOR . 'img' );
+};
+isset( $getTabAnchor ) || $getTabAnchor = function ( $tab, $array = null ) {
+if ( isset( $tab ) ) {
+global $registered_targets;
+$tabs = isset( $array ) ? $array : $registered_targets;
+return isset( $tabs[$tab] ) && isset( $tabs[$tab]['title'] ) ? $tabs[$tab]['title'] : null;
+}
+return '???';
+};
+isset( $getTabAnchorByConstant ) || $getTabAnchorByConstant = function ( $constant ) use(&$getTabAnchor ) {
+global $forward_compatible_targets, $registered_forward_map;
+$nconstant = 0 !== strpos( $constant, __NAMESPACE__ . '\\' ) ? __NAMESPACE__ . '\\' . $constant : $constant;
+$tab = null !== @constant( $nconstant ) ? constant( $nconstant ) : ( isset( $registered_forward_map[$constant] ) ? $registered_forward_map[$constant][2] : null );
+return $getTabAnchor( $tab, @constant( $nconstant ) ? null : $forward_compatible_targets );
+};
+isset( $getHumanReadableSize ) || $getHumanReadableSize = function ( $size, $precision = 2, $return_what = 0 ) {
+if ( PHP_INT_MAX == $size )
+return _esc( 'unknown' );
+$units = array( 'B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB' );
+for ( $i = 0; abs( $size ) >= 1024; $i++ )
+$size /= 1024;
+$i = $i + 1 > count( $units ) ? count( $units ) - 1 : $i;
+if ( $return_what == 1 )
+return $i;
+elseif ( $return_what == 2 )
+return $units[$i];
+else
+return sprintf( '%.' . $precision . 'f %s', $size, $units[$i] );
+};
+isset( $getUploadLimit ) || $getUploadLimit = function () {
+$value = ini_get( 'upload_max_filesize' );
+$units = array( 'K', 'M', 'G', 'T', 'P' );
+$multiply = 1;
+if ( preg_match( "/[KMGTP]/i", $value, $matches ) )
+$multiply = pow( 1024, 1 + array_search( strtoupper( $matches[0] ), $units ) );
+if ( preg_match( "/\d*/", $value, $matches ) && strlen( $matches[0] ) > 0 )
+return intval( $matches[0] ) * $multiply;
+else
+return false;
+};
 ?>
 <style>
 .vertical ul li:active, a:FOCUS {
@@ -48,12 +162,13 @@ list-style: inside none square;
 display: inline-block;
 background-color: #E6F7FD;
 padding: 1px;
+overflow: visible;
 }
 </style>
 <table class="welcome">
 <tr>
 <td style="text-align: center"><img
-src="<?php echo $this->getImgURL('mybackup-plugin-banner.png');?>">
+src="<?php echo $getImgURL('mybackup-plugin-banner.png');?>">
 <div>
 <span><?php printf(_esc('Welcome to %s'),WPMYBACKUP);?></span>
 </div></td>
@@ -62,15 +177,15 @@ src="<?php echo $this->getImgURL('mybackup-plugin-banner.png');?>">
 <td><h3 style="margin-top: 2em"><?php _pesc('Thank you for choosing our software!');?></h3></td>
 </tr>
 <?php
-if ( $this->_init_error ) {
+if ( $_init_error ) {
 ?>
 <tr>
 <td style="border: 1px solid #C0C0C0; padding: 10px; border-radius: 5px;">
 <?php
 $err = error_get_last();
-$err = sprintf( _esc( 'An unexpected error occured while initializing the application: %s' ), $err['message'] );
+$err = sprintf( _esc( 'An unexpected error occurred while initializing the application: %s' ), $err['message'] );
 echo '<p style="color:red">', $err, '</p>';
-if ( ! empty( $this->_addons ) )
+if ( ! empty( $_addons ) )
 printf( 
 '<p>' . _esc( 'Click %s to continue.' ) . '</p>', 
 '<input type="button" class="button" value="' . _esc( 'this button' ) . '" onclick="' .
@@ -89,8 +204,8 @@ _pesc(
 </tr>
 <?php
 $schedule_tabs = array();
-defined( __NAMESPACE__.'\\APP_WP_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_WP_SCHEDULE' );
-defined( __NAMESPACE__.'\\APP_OS_SCHEDULE' ) && $schedule_tabs[] = getTabAnchorByConstant( 'APP_OS_SCHEDULE' );
+defined( __NAMESPACE__.'\\APP_WP_SCHEDULE' ) && $schedule_tabs[] = $getTabAnchorByConstant( 'APP_WP_SCHEDULE' );
+defined( __NAMESPACE__.'\\APP_OS_SCHEDULE' ) && $schedule_tabs[] = $getTabAnchorByConstant( 'APP_OS_SCHEDULE' );
 $format_adv_li = function ( $option, $hint = '' ) {
 return sprintf( '<i>%s</i>%s', $option, empty( $hint ) ? '' : ( ' (' . $hint . ')' ) );
 };
@@ -98,8 +213,8 @@ $fwh = _esc( 'Free Web Hosting' );
 $lmgfy = function ( $str ) use(&$fwh ) {
 return '`' . getAnchor( $str, lmgtfy( $fwh . ' ' . $str ) ) . '`';
 };
-echo '<tr><td class="highlight-box hintbox rounded-container">';
-echo '<p style="padding-left: 5px;border-left: 4px solid #1E8CBE;">', sprintf( 
+echo '<tr><td>';
+echo '<p class="highlight-box hintbox rounded-container" style="padding-left: 5px;border-left: 4px solid #1E8CBE;">', sprintf( 
 _esc( 
 'If you are using a %s provider then %s may reach some of their system limitations like %s or %s. Moreover, some %s providers will (temporarely) suspend your website if you exceed these limitation frequently.' ), 
 '<strong>' . $fwh . '</strong>', 
@@ -109,8 +224,15 @@ $lmgfy( _esc( 'Script Timeout' ) ),
 $fwh ), '<br>';
 echo sprintf( 
 _esc( 'In order to overcome that situation you might want to tune the %s.' ), 
-WPMYBACKUP . ' ' . getAnchor( _esc( 'Expert settings' ), '#advanced', '_self' ) ), '</p>';
-if ( ! $this->_nocheck && $issue_count = count( $setup_issues ) ) {
+WPMYBACKUP . ' ' . getAnchor( _esc( 'Expert settings' ), '#advanced', '_self' ) ), '<br>';
+echo sprintf( 
+_esc( 'Check also the question %s, %s, %s and %s on %s page.' ), 
+getAnchor( '#10', APP_PLUGIN_FAQ_URI . '/#q10' ), 
+getAnchor( '#18', APP_PLUGIN_FAQ_URI . '/#q18' ), 
+getAnchor( '#20', APP_PLUGIN_FAQ_URI . '/#q20' ), 
+getAnchor( '#22', APP_PLUGIN_FAQ_URI . '/#q22' ), 
+getAnchor( _esc( 'FAQ' ), APP_PLUGIN_FAQ_URI ) ), '</p>';
+if ( ! $_nocheck && $issue_count = count( $setup_issues ) ) {
 echo '<p>';
 printf( 
 _esc( 'The following %s issues were found while checked if your system supports this application:' ), 
@@ -140,7 +262,7 @@ echo '</ol>';
 printf( 
 _esc( 'Use the %s on %s tab for an exhaustive report.' ), 
 '<strong>' . _esc( 'Check PHP setup' ) . '</strong>', 
-getTabAnchor( APP_SUPPORT ) );
+$getTabAnchorByConstant( 'APP_SUPPORT' ) );
 echo '</p>';
 }
 echo '</td></tr>';
@@ -154,7 +276,7 @@ echo '</td></tr>';
 <li><a href="#run"><?php _pesc('Run the backup job');?></a></li>
 <li><a href="#restore"><?php _pesc('Restore a backup copy');?></a>
 <ol>
-<?php if(is_wp()){?>
+<?php if($is_wp){?>
 <li><?php printf(_esc('if using the %s plug-in then:'),$wpmybackup_plugin_link)?><ol>
 <li><a href="#wp_full_restore"><?php _pesc('Full backup');?></a></li>
 </ol></li>
@@ -181,7 +303,7 @@ echo '</td></tr>';
 <td><p>You may also watch this video tutorial</p>
 <div class="video-container">
 <iframe
-src="http://www.youtube.com/embed/<?php echo empty($this->_video_ids)?'':$this->_video_ids[0];?>?autoplay=0<?php echo count($this->_video_ids)>1?'&playlist='.implode(array_slice($this->_video_ids, 1)):'';?>">
+src="http://www.youtube.com/embed/<?php echo empty($_video_ids)?'':$_video_ids[0];?>?autoplay=0<?php echo count($_video_ids)>1?'&playlist='.implode(array_slice($_video_ids, 1)):'';?>">
 </iframe>
 </div></td>
 </tr>
@@ -195,7 +317,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <td><a id="requirements"></a>
 <h4>I. <?php _pesc('Check if your system meets the requirements');?></h4>
 <p>
-<?php printf(_esc('Please click %s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'._esc('this button').'" onclick="jsMyBackup.php_setup();">');?>
+<?php printf(_esc('Please click %s%s to start gathering the information about your system (like OS, web software, PHP version, other resources). It will display a table of the required PHP extensions (eg. curl, safe_mode, etc) and also will explain why they are used. Make sure they are tagged as OK/enabled (green color) with one exception - safe_mode - that could be red.'),'<input type="button" class="button" value="'.( $on_plugin ? _esc( 'this button' ) : _esc( 'Check PHP setup' ) ).'"'.($on_plugin?' onclick="jsMyBackup.php_setup();"':'').'>',$on_plugin?'':_esc(' on Support page'));?>
 </p></td>
 </tr>
 <tr>
@@ -204,8 +326,14 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <p>
 <?php  _pesc ( 'Before you do anything else make sure your set the following global options:' );?>
 </p>
+<?php
+printf( 
+_esc( 
+'If your site is running on a multi-network|multisite installation then make sure your Network Admin customizes the `Global working directory` option on %s page.' ), 
+getAnchor( __( 'Network Settings' ), network_admin_url( 'settings.php' ) . '#' . WPMYBACKUP_LOGS ) );
+?>
 <ol style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab then set:'),getTabAnchor(APP_BACKUP_JOB));?>
+<li><?php echo sprintf(_esc('go to the %s tab then set:'),$getTabAnchorByConstant('APP_BACKUP_JOB'));?>
 <ul>
 <li><?php _pesc('either the backup name or the backup prefix');?></li>
 <li><?php _pesc('the temporary working directory (make sure you are read/write access)');?></li>
@@ -219,9 +347,9 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <h4>III. <?php _pesc('Define the backup job');?></h4>
 <p><?php _pesc('A backup job represents the totality of those options that together instruct the application what to backup, how to backup and where to copy the backup. Normally these steps should be done only once (at install time) but also when you decide to change the backup source/destination:');?></p>
 <ol style="list-style-type: decimal">
-<li><a id="define_source"></a><?php echo sprintf(_esc('go to the %s tab then set the directory you want to backup'),getTabAnchorByConstant(is_wp()?'WP_SOURCE':'SRCFILE_SOURCE'));?></li>
-<li><a id="define_mysql"></a><?php echo sprintf(_esc('go to the %s tab then check the <b>Enabled</b> checkbox'),getTabAnchor(MYSQL_SOURCE));?></li>
-<li><a id="define_target"></a><?php echo sprintf(_esc('go to the %s tab and for each destination (aka target) where you want to store your backup archives make sure that you:'),getTabAnchor(APP_TABBED_TARGETS));?>
+<li><a id="define_source"></a><?php echo sprintf(_esc('go to the %s tab then set the directory you want to backup'),$getTabAnchorByConstant($is_wp?'WP_SOURCE':'SRCFILE_SOURCE'));?></li>
+<li><a id="define_mysql"></a><?php echo sprintf(_esc('go to the %s tab then check the <b>Enabled</b> checkbox'),$getTabAnchorByConstant('MYSQL_SOURCE'));?></li>
+<li><a id="define_target"></a><?php echo sprintf(_esc('go to the %s tab and for each destination (aka target) where you want to store your backup archives make sure that you:'),$getTabAnchorByConstant('APP_TABBED_TARGETS'));?>
 <ul>
 <li><?php _pesc('check the <b>Enabled</b> checkbox to enable the usage of that target or uncheck it if you don`t want to use it');?>
 </li>
@@ -237,21 +365,21 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <ul>
 <li><?php _pesc('run the backup at your request');?>
 <ol style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab and click the button <b>Run Backup Now</b>'),getTabAnchor(APP_BACKUP_JOB));?></li>
+<li><?php echo sprintf(_esc('go to the %s tab and click the button <b>Run Backup Now</b>'),$getTabAnchorByConstant('APP_BACKUP_JOB'));?></li>
 <li><?php _pesc('watch its progress; a scrollable window will be shown containing the job events and messages');?></li>
 </ol></li>
 <li><a id="run_schedule"></a><?php _pesc('run the backup automatically at a scheduled time');?>
 <ol style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab and then select the %s child tab, depending on what scheduler you want to use:'),getTabAnchor(APP_SCHEDULE),implode(_esc('or'), $schedule_tabs));?>
+<li><?php echo sprintf(_esc('go to the %s tab and then select the %s child tab, depending on what scheduler you want to use:'),$getTabAnchorByConstant('APP_SCHEDULE'),implode(_esc('or'), $schedule_tabs));?>
 <ul>
-<?php if(is_wp()){?>
+<?php if($is_wp){?>
 <li><b>WP-Cron</b>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('check the <b>Enable scheduler</b> checkbox then select one of those predefined schedule options and set the <b>Next run</b> datetime value (in the past if you want to start immediately, otherwise in the future)');?>
 </li>
 </ol></li>
 <?php }?>
-<li><b>OS-Cron</b><?php is_wp()&&printf(' ('._esc('requires the %s addon').')',getAnchor(_esc('Schedule the WP backup via OS'), APP_ADDONS_SHOP_URI.'wp-schedule-the-backup-via-os'));?>
+<li><b>OS-Cron</b><?php $is_wp&&printf(' ('._esc('requires the %s addon').')',getAnchor(_esc('Schedule the WP backup via OS'), APP_ADDONS_SHOP_URI.'wp-schedule-the-backup-via-os'));?>
 <ol style="list-style-type: decimal">
 <li><?php _pesc('check the <b>Enable scheduler</b> checkbox then copy the command-line (that was automatically created) content in clipboard');?>
 </li>
@@ -265,7 +393,7 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <tr>
 <td><a id="restore"></a>
 <h4>V. <?php _pesc('Restore a backup copy');?></h4>
-<?php if(is_wp()){?>
+<?php if($is_wp){?>
 <p>
 <?php printf(_esc('If you are using the WordPress version of this software (%s) then restoring a backup can be done as described below:'),$wpmybackup_plugin_link);?>
 </p> <a id="wp_full_restore"></a>
@@ -287,12 +415,12 @@ style="display: inline-block;"><?php printf(_esc('For a more comprehensive tutur
 <li><?php
 printf( 
 _esc( 'The uploaded file size should not be larger than your php.ini %s.' ), 
-implode( '|', $this->_upload_constraint_link ) );
+implode( '|', $_upload_constraint_link ) );
 ! ( defined( __NAMESPACE__.'\\IMPORT_PAGE' ) && IMPORT_PAGE ) && printf( 
 ' ' . _esc( 
 'Your current php.ini is configured such that the uploaded file size cannot be larger than %s.' ) .
 ' ' . _esc( 'You may overcome this by using %s option (see Expert settings).' ), 
-getHumanReadableSize( getUploadLimit() ), 
+$getHumanReadableSize( $getUploadLimit() ), 
 '<strong>' . _esc( 'Upload files in chunks' ) . '</strong>' );
 ?>
 </li>
@@ -329,7 +457,7 @@ class="highlight-box hintbox rounded-container" style="display:block">
 <?php printf(_esc('However, if you have installed the %s then restoring the backup is like shooting fish in a barrel:'),$restore_addon_link);?>
 </p>
 <ul style="list-style-position: inside;">
-<li><?php echo sprintf(_esc('go to the %s tab then follow the instruction provided there. Basically is just a "next-next-finish" 6-steps task assisted by Wizard.'),getTabAnchorByConstant('APP_RESTORE'));?></li>
+<li><?php echo sprintf(_esc('go to the %s tab then follow the instruction provided there. Basically is just a "next-next-finish" 6-steps task assisted by Wizard.'),$getTabAnchorByConstant('APP_RESTORE'));?></li>
 <li><?php printf(_esc('for restoring an incremental or differential backup make sure you select the restore point %s option and not %s (see step 3 of 6)'),'<strong>'._esc('from a backup target').'</strong>','<strong>'._esc('from a date interval').'</strong>');?></li>
 </ul>
 </box></td>
@@ -342,7 +470,7 @@ class="highlight-box hintbox rounded-container" style="display:block">
 </p>
 <p><?php printf(_esc('Sometimes you want to create different backup jobs for different purposes. For instance a job that will pack your images into a ZIP archive then upload it to your Google Drive, another job that will pack with GZIP compression and encrypt your MySQL database and then upload it to your Dropbox drive, a job that will pack with BZip2 compresssion some other directory then upload it to a FTP server.</p>Using the backup procedure(s) described above this wouldn`t work. It requires a tool that allows you to define and run in a batch all these different backup jobs. The %s is just what we need. Defining such a job is just a 6-steps task where you are assisted by a Wizard:'),'<a href="'.APP_ADDONS_SHOP_URI.'shop/backup-wizard/" target="_blank">'._esc('Advanced backup Wizard').'</a>');?></p>
 <ol style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab then start defining a new job by clicking the <b>Add new</b> button'),getTabAnchorByConstant('APP_LISTVIEW_TARGETS'));?>
+<li><?php echo sprintf(_esc('go to the %s tab then start defining a new job by clicking the <b>Add new</b> button'),$getTabAnchorByConstant('APP_LISTVIEW_TARGETS'));?>
 </li>
 <li><?php printf(_esc('select the target type (ie. disk,FTP,Dropbox,etc) and also set a short description of your job (like "%s")'),'domain.com PNGs @ Dropbox');?></li>
 <li><?php printf(_esc('set the job global options (like %s)'),'<a href="#configure">I '._esc('above').'</a>');?>
@@ -377,15 +505,15 @@ _pesc( 'The installation procees is straightforward:' );
 <ol style="list-style-type: decimal">
 <li><?php printf(_esc('Install one or multiple addons at once (multiple available on %s)'),$a3);?><ol
 style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab and expand the <b>Export settings</b> panel'),getTabAnchorByConstant('APP_LICENSE'));?></li>
+<li><?php echo sprintf(_esc('go to the %s tab and expand the <b>Export settings</b> panel'),$getTabAnchorByConstant('APP_LICENSE'));?></li>
 <li><?php _pesc('click the <b>Browse/Choose file</b> button then select the addon files (*.tar.bz2)');?></li>
 <li><?php _pesc('click the <b>Install Add-on</b> button');?></li>
 </ol></li>
 <li><?php printf(_esc('Install multiple addons at once on non-%s'),$a3);?><ol
 style="list-style-type: decimal">
 <li><?php printf(_esc('copy the addon files (*.tar.bz2) to the %s folder'),$dropin_dir);?></li>
-<li><?php echo sprintf(_esc('go to the %s tab'),getTabAnchorByConstant('APP_LICENSE'));?></li>
-<li><?php echo sprintf(_esc('the %s page should be shown; follow the instructions there'),getTabAnchorByConstant('APP_ADDONDROPIN'));?></li>
+<li><?php echo sprintf(_esc('go to the %s tab'),$getTabAnchorByConstant('APP_LICENSE'));?></li>
+<li><?php echo sprintf(_esc('the %s page should be shown; follow the instructions there'),$getTabAnchorByConstant('APP_ADDONDROPIN'));?></li>
 </ol></li>
 </ol></td>
 </tr>
@@ -394,13 +522,13 @@ style="list-style-type: decimal">
 <h4>VIII. <?php _pesc('Advanced options');?></h4>
 <p><?php printf(_esc('By default the %s settings are tunned to fit everyone expectations. However, you might want to tune these settings in order to fit your needs. Here are few options you way want to consider:'),WPMYBACKUP);?></p>
 <ol>
-<li><?php printf('%s '._esc('Expert settings'),getTabAnchor(APP_BACKUP_JOB));?><ul>
+<li><?php printf('%s '._esc('Expert settings'),$getTabAnchorByConstant('APP_BACKUP_JOB'));?><ul>
 <li><?php echo $format_adv_li(_esc('Use file relative path'),_esc('important for restoring the backup at other location'));?></li>
 <li><?php echo $format_adv_li(_esc('Script memory limit'),_esc('inline with hosting limitations'));?></li>
 <li><?php echo $format_adv_li(_esc('Max. execution time'),_esc('inline with hosting limitations'));?></li>
 <li><?php echo $format_adv_li(_esc('CPU throttling'),_esc('overcomes `CPU Limit Exceeded`'));?></li>
 </ul></li>
-<li><?php printf('%s '._esc('Expert settings'),getTabAnchor(is_wp()?WP_SOURCE:SRCFILE_SOURCE));?><ul>
+<li><?php printf('%s '._esc('Expert settings'),$getTabAnchorByConstant($is_wp?'WP_SOURCE':'SRCFILE_SOURCE'));?><ul>
 <li><?php echo $format_adv_li(_esc('Do not compress files by extension'),_esc('spare the CPU when possible'));?></li>
 <li><?php echo $format_adv_li(_esc('Exclude files by extension'),_esc('eg. do not backup some huge files'));?></li>
 <li><?php echo $format_adv_li(_esc('Exclude file links'));?></li>
@@ -410,16 +538,17 @@ style="list-style-type: decimal">
 <tr>
 <td><a id="debug"></a>
 <h4>VIII. <?php _pesc('Troubleshooting');?></h4>
-<p><?php _pesc('Hopefully you will never encounter a problem thus you will never need to know the instruction below. But we live in an imperfect world where imperfect people (like me) write imperfect software (like this one) so probably this chapter cannot be avoided forever.');?></p>
+<p><?php _pesc('Hopefully you will never encounter a problem thus you will never have to follow the instructions below. But we live in an imperfect world where imperfect people (like me) write imperfect software (like this one) so probably this chapter cannot be avoided forever.');?></p>
 <p><?php _pesc('What to do when something doesn`t work as expected:');?></p>
 <ol style="list-style-type: decimal">
+<li><?php printf(_esc('You are not the only one who might encounter a specific issue => check the %s. If it does not help then continue to read below.'),getAnchor('FAQ', APP_PLUGIN_FAQ_URI));?></li>
 <li><?php printf(_esc('make sure that %s'),'<a href="#requirements">'._esc('your system meets the requirements').'</a>');?></li>
 <li><?php _pesc('if the application provides an error message or any other kind of output that seems related to the problem you encountered try to follow the instruction shown there (if any)');?></li>
 <li><?php printf(_esc('check again the %s and %s; make sure they have the expected values'),'<a href="#configure">'._esc('global options').'</a>','<a href="#define">'._esc('the job settings').'</a>');?>
 </li>
-<li><?php printf(_esc('if the application shows a warning/error message (%s) that you suspect to be the root of the problem then we have to bring the heavy artillery:'),'<a href="http://php.net/manual/en/internals2.ze1.zendapi.php#internals2.ze1.zendapi.tab.error-messages" target="_blank">'._esc('see example').'</a>');?>
+<li><?php printf(_esc('if the application shows a warning/error message (%s) that you suspect to be the root of the problem then we have to bring the heavy artillery:'),'<a href="'.PHP_MANUAL_URL.'internals2.ze1.zendapi.php#internals2.ze1.zendapi.tab.error-messages" target="_blank">'._esc('see example').'</a>');?>
 <ol style="list-style-type: decimal">
-<li><?php echo sprintf(_esc('go to the %s tab then in the <b>Expert settings</b> panel make sure you set ON the following options:'),getTabAnchor(APP_SUPPORT));?>
+<li><?php echo sprintf(_esc('go to the %s tab then in the <b>Expert settings</b> panel make sure you set ON the following options:'),$getTabAnchorByConstant('APP_SUPPORT'));?>
 <ul>
 <li><?php _pesc('Debug trace ON');?></li>
 <li><?php _pesc('Curl debug ON');?></li>
@@ -429,7 +558,7 @@ style="list-style-type: decimal">
 <ul>
 <li><?php _pesc('Yayui optimize ON');?></li>
 </ul></li>
-<li><?php echo sprintf(_esc('Re-execute the job or whatever cause the problem you are debugging then check the following log(s) in the %s tab:'),getTabAnchor(APP_LOGS));?>
+<li><?php echo sprintf(_esc('Re-execute the job or whatever cause the problem you are debugging then check the following log(s) in the %s tab:'),$getTabAnchorByConstant('APP_LOGS'));?>
 <ul>
 <li><?php _pesc('if the problem seems to be related to network connection/authentication then check the <b>Curl Debug log</b>');?>
 </li>
@@ -437,18 +566,18 @@ style="list-style-type: decimal">
 </li>
 <li><?php _pesc('if the problem seems to be related to some options not saved you may check the <b>Trace Action log</b>; this log traces all requests (like save, tab changed, etc) sent from your browser to this application; if you are a (former) sysadmin or coder you might eventually hack the problem');?>
 </li>
-<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="jsMyBackup.php_setup();">'._esc('Check PHP setup').'</a>',getTabAnchor(APP_SUPPORT));?>
+<li><?php printf(_esc('if the problem seems to be more an unexpected warning/error thrown by the PHP/web server then probably something is rotten in the state of Denmark (I live in Sweden so I know what I am talking about). If that`s the case then open a support ticket by following the instruction found at the %s. Make sure you have downloaded all the log files mentioned earlier together with the <b>Jobs log</b> and the <b>Full log</b>. Moreover, the information provided by the <b>%s</b> button (in the %s tab) is also very useful when open a helpdesk ticket.'),'<a href="'.APP_ADDONS_SHOP_URI.'get-support/" target="_blank">'._esc('Support Center').'</a>','<a class="help" onclick="jsMyBackup.php_setup();">'._esc('Check PHP setup').'</a>',$getTabAnchorByConstant('APP_SUPPORT'));?>
 </li>
 </ul></li>
 </ol></li>
 </ol></td>
 </tr>
 <tr>
-<td><p class="highlight-box hintbox rounded-container"><?php _pesc('As a software developer I did helpdesk, troubleshooting and support (level 1 to 3) for many, many years now. Hopefully I can help you finding the cause and fixing the problem.');?></p></td>
+<td><p class="highlight-box hintbox rounded-container"><?php _pesc('As a software developer I did helpdesk, troubleshooting and support (level 1 to 3) for many, many years now. Hopefully I can help you finding the cause and fix the problem.');?></p></td>
 </tr>
 </table>
 <?php
-if ( ! empty( $this->_addons ) ) {
-printf( '<input type="hidden" name="dropin_files" value="%s">', implode( ',', $this->_addons ) );
+if ( ! empty( $_addons ) ) {
+printf( '<input type="hidden" name="dropin_files" value="%s">', implode( ',', $_addons ) );
 }
 ?>

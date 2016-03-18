@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : history.php $
  * 
- * @id      : history.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : history.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -58,7 +58,7 @@ global $java_scripts;
 $java_scripts[] = sprintf( 
 "jsMyBackup.popupError('%s','%s');", 
 _esc( 'DB Upgrade Error' ), 
-implode( PHP_EOL, $success ) );
+implode( '.<br>', array_unique( $success ) ) );
 }
 };
 if ( null == $opts )
@@ -66,12 +66,15 @@ $opts = $settings;
 if ( $opts['historydb'] == 'sqlite' ) {
 $params = STATISTICS_LOGFILE;
 } else {
+$is_wp = is_wp();
 $params = array( 
-'host' => $opts['mysql_host'], 
-'port' => $opts['mysql_port'], 
-'db_name' => $opts['mysql_db'], 
-'user' => $opts['mysql_user'], 
-'pwd' => $opts['mysql_pwd'] );
+'host' => $is_wp ? DB_HOST : $opts['mysql_host'], 
+'db_name' => $is_wp ? DB_NAME : $opts['mysql_db'], 
+'user' => $is_wp ? DB_USER : $opts['mysql_user'], 
+'pwd' => $is_wp ? DB_PASSWORD : $opts['mysql_pwd'], 
+'charset' => $is_wp ? DB_CHARSET : 'utf8', 
+'collate' => $is_wp ? DB_COLLATE : '' );
+$is_wp || $params['port'] = $opts['mysql_port'];
 }
 $result = new StatisticsManager( $params, $opts );
 $upgrade_db( $result, $opts );
@@ -160,59 +163,76 @@ TBL_JOBS . '.' : '' ) . $item;
 empty( $where ) || $where = ' WHERE ' . $where;
 $rst = $stat_mngr->queryData( 
 'SELECT id FROM ' . TBL_PREFIX . TBL_JOBS . $where . ' ORDER BY started_time DESC LIMIT 1;' );
-$data = $stat_mngr->fetchArray( $rst );
+$data = $stat_mngr->fetchArray( $rst, 1 );
 $job_id = $data['id'];
-return getJobInfo( $stat_mngr, $job_id );
+return array( $job_type => getJobInfo( $stat_mngr, $job_id ) );
 }
 function getJobStatusStr( $job_status, $started_time ) {
+$job_status_fg_color = '#FFF';
 switch ( $job_status ) {
 case JOB_STATUS_RUNNING :
 if ( time() - $started_time > LONG_RUNNING_JOB_TIMEOUT ) {
-$job_status = _esc( 'suspect' );
-$job_status_style = 'red';
+$job_status_str = _esc( 'suspect' );
+$job_status_bg_color = 'tomato';
 } else {
-$job_status = _esc( 'running' );
-$job_status_style = '#2EA2CC';
+$job_status_str = _esc( 'running' );
+$job_status_bg_color = '#2EA2CC';
 }
 break;
 case JOB_STATUS_ABORTED :
-$job_status = _esc( 'aborted' );
-$job_status_style = 'red';
+$job_status_str = _esc( 'aborted' );
+$job_status_bg_color = 'tomato';
 break;
 case JOB_STATUS_FINISHED :
-$job_status = _esc( 'done' );
-$job_status_style = 'green';
+$job_status_str = _esc( 'done' );
+$job_status_bg_color = '#00BD46';
 break;
 case JOB_STATUS_SUSPENDED :
-$job_status = _esc( 'suspended' );
-$job_status_style = 'red';
+$job_status_str = _esc( 'suspended' );
+$job_status_bg_color = 'tomato';
 break;
 default :
-$job_status = _esc( 'unknown' );
-$job_status_style = 'red';
+$job_status_str = _esc( 'unknown' );
+$job_status_bg_color = 'tomato';
 break;
 }
-return array( $job_status, $job_status_style );
+return array( $job_status_str, $job_status_fg_color, $job_status, $job_status_bg_color );
 }
 function getJobStateStr( $job_state ) {
+$job_state_fg_color = '#FFF';
 switch ( $job_state ) {
 case JOB_STATE_COMPLETED :
-$job_state = _esc( 'completed' );
-$job_state_style = 'green';
+$job_state_str = _esc( 'completed' );
+$job_state_bg_color = '#00BD46';
 break;
 case JOB_STATE_PARTIAL :
-$job_state = _esc( 'partial' );
-$job_state_style = '#FF8000';
+$job_state_str = _esc( 'partial' );
+$job_state_bg_color = '#FFB600';
 break;
 case JOB_STATE_FAILED :
-$job_state = _esc( 'failed' );
-$job_state_style = 'red';
+$job_state_str = _esc( 'failed' );
+$job_state_bg_color = 'tomato';
 break;
 default :
-$job_state = _esc( 'unknwon' );
-$job_state_style = 'red';
+$job_state_str = _esc( 'unknwon' );
+$job_state_bg_color = 'tomato';
 break;
 }
-return array( $job_state, $job_state_style );
+return array( $job_state_str, $job_state_fg_color, $job_state, $job_state_bg_color );
+}
+function getJobsStatistics( $stat_mngr ) {
+if ( null == $stat_mngr )
+return false;
+$tbl_jobs = TBL_PREFIX . TBL_JOBS;
+$tbl_files = TBL_PREFIX . TBL_FILES;
+$result = array();
+foreach ( array( JOB_BACKUP, - 4 ) as $job_type ) {
+$rst = $stat_mngr->queryData( 
+'SELECT SUM(B.completed) AS completed, SUM(B.partial) AS partial, SUM(B.failed) AS failed, SUM(B.files_count) AS files_count, SUM(B.job_size) AS file_size, SUM(B.data_size) AS data_size, AVG(B.ratio) as ratio FROM (SELECT CASE WHEN A.job_status = 2 AND A.job_state = 0 THEN 1 ELSE 0 END AS completed, CASE WHEN A.job_status in (1,2) AND A.job_state = 1 THEN 1 ELSE 0 END AS partial, CASE WHEN A.job_status=3 OR A.job_state in (null,2) THEN 1 ELSE 0 END AS failed, A.files_count, A.job_size, A.ratio, (SELECT SUM(B.filesize) FROM ' .
+$tbl_files . ' B WHERE B.jobs_id = A.id) AS data_size FROM ' . $tbl_jobs . ' A WHERE A.job_type = ' .
+$job_type . ') B' );
+$result[$job_type] = $stat_mngr->fetchArray( $rst, 1 );
+}
+return $result;
 }
 ?>

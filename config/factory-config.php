@@ -24,18 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : factory-config.php $
  * 
- * @id      : factory-config.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : factory-config.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 include_once LOCALE_PATH . 'locale.php';
+$temp_dir = _sys_get_temp_dir();
 $factory_options = array();
 $is_wp = is_wp();
 $url = get_home_url_wrapper();
@@ -67,9 +68,9 @@ preg_replace( '/http(s*):\/\//', '', is_cli() ? basename( $url ) : $url ) ),
 'url:', 
 'u:', 
 _esc( 'The prefix used for a dynamic backup archive name' ) ), 
-'wrkdir' => array( sys_get_temp_dir(), 'wrkdir:', 'w:', _esc( 'Temporary working directory' ) ), 
+'wrkdir' => array( $temp_dir, 'wrkdir:', 'w:', _esc( 'Temporary working directory' ) ), 
 'blog_wrkdir' => array( 
-is_multisite_wrapper() ? wp_get_current_blog_id() : '', 
+IS_MULTISITE ? wp_get_current_blog_id() : '', 
 'blog_wrkdir:', 
 '', 
 _esc( 'Blog temporary working directory' ) ), 
@@ -171,6 +172,7 @@ $factory_options['mysql'] = array(
 '', 
 _esc( 'The MySQL host name/IP' ) ), 
 'mysql_port' => array( 3306, 'mysqlport:', '', _esc( 'The MySQL port' ) ), 
+'mysql_socket' => array( '', '', '' ), 
 'mysql_user' => array( 
 @constant( 'DB_USER' ) ? DB_USER : '', 
 'mysqluser:', 
@@ -223,7 +225,8 @@ false,
 'mysqlmntno', 
 '', 
 _esc( 'Use this option if you want to print-out the MySQL maintenance alerts' ), 
-true ) );
+true ), 
+'mysql_ext' => array( '', '', '' ) );
 $exclude_files_factory = array( 
 '%NONCE_LOGFILE%', 
 '%JOBS_LOGFILE%', 
@@ -252,6 +255,7 @@ $known_compressed_formats = array(
 'lxz', 
 'pak', 
 'rar', 
+'tar', 
 'tgz', 
 'zip' ), 
 'other' => array( 'enc' ) );
@@ -276,7 +280,9 @@ implode( ',', $nocompress_ext ),
 'nocompress:', 
 '', 
 _esc( 'Do not compress following extensions (comma-delimited list)' ) ), 
-'excludelinks' => array( true, 'linkexcl', '', _esc( 'Use this option to exclude the file links' ), true ) );
+'excludelinks' => array( true, 'linkexcl', '', _esc( 'Use this option to exclude the file links' ), true ), 
+'use_cache_preload' => array( false, '', '' ), 
+'cache_preload_age' => array( 1440, '', '' ) );
 $factory_options['restore'] = array( 
 'extractforcebly' => array( false, '', '' ), 
 'restore_method' => array( 'wizard', '', '' ),  
@@ -290,8 +296,9 @@ $factory_options['restore'] = array(
 'restore_reconcile' => array( 'rename', '', '' ),  
 'downloadforcebly' => array( false, '', '' ), 
 'restore_mybackup' => array( false, '', '' ), 
-'restore_acid' => array( true, '', '' ) );
-$upload_max_chunk_size = min( getUploadLimit(), disk_free_space( sys_get_temp_dir() ) ) / 1024;
+'restore_acid' => array( false, '', '' ), 
+'restore_backup_mysql_dir' => array( false, '', '' ) );
+$upload_max_chunk_size = min( getUploadLimit(), @disk_free_space( $temp_dir ) ) / 1024;
 $upload_max_chunk_size -= $upload_max_chunk_size % 1000;
 $factory_options['dashboard'] = array( 
 'restore_upl_chunked' => array( false, '', '' ), 
@@ -425,7 +432,7 @@ $factory_options['logs'] = array(
 'logsize' => array( 1, '', '', _esc( 'The maximum allowed size for the logs' ) ), 
 'logbranched' => array( defined( __NAMESPACE__.'\\BRANCHED_LOGS' ) && BRANCHED_LOGS, '', '' ) );
 $factory_options['notification'] = array( 
-'message_top' => array( 15, '', '' ), 'message_age' => array( 90, '', '' ) );
+'message_top' => array( 15, '', '' ), 'message_age' => array( 90, '', '' ), 'message_email' => array( true, '', '' ) );
 $factory_options['support'] = array( 
 'help' => array( '', '', '', _esc( 'Show this help message' ) ), 
 'debug_on' => array( false, '', '' ), 
@@ -448,6 +455,8 @@ $short_opts[] = $option_params[2];
 $_config_files_ = array();
 foreach ( array( RULES_PATH . '*.php', RULES_PATH . '*.php.fix', ADDONS_PATH . '*.php', ADDONS_PATH . '*.php.fix' ) as $pattern ) {
 $_files_ = glob( $pattern );
+if ( empty( $_files_ ) )
+continue;
 asort( $_files_ );
 foreach ( $_files_ as $_config_file_ )
 include_once $_config_file_;
@@ -455,15 +464,16 @@ include_once $_config_file_;
 function initFactorySettings( $settings ) {
 $check_dir = function ( $option_name, $settings ) {
 isset( $settings[$option_name] ) &&
-( is_dir( $settings[$option_name] ) || mkdir( $settings[$option_name], 0770, true ) );
+( @_is_dir( $settings[$option_name] ) || @mkdir( $settings[$option_name], 0770, true ) );
 };
 $new_options = array();
-if ( is_multisite_wrapper() ) {
+if ( IS_MULTISITE ) {
 if ( ! ( $wpmu_wrkdir = get_site_option( 'wpmu_wrkdir' ) ) ) {
-$wpmu_wrkdir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . WPMYBACKUP_LOGS;
+$tmp_dir = _sys_get_temp_dir() . WPMYBACKUP_LOGS;
+$wpmu_wrkdir = $tmp_dir;
 $new_options['wpmu_wrkdir'] = $wpmu_wrkdir;
 }
-is_dir( $wpmu_wrkdir ) || mkdir( $wpmu_wrkdir, 0770, true );
+_is_dir( $wpmu_wrkdir ) || mkdir( $wpmu_wrkdir, 0770, true );
 $old_blog_wrkdir = isset( $settings['blog_wrkdir'] ) ? $settings['blog_wrkdir'] : null;
 $fixed_blog_wrkdir = wp_get_current_blog_id();
 if ( $old_blog_wrkdir != $fixed_blog_wrkdir ) {
@@ -491,21 +501,26 @@ return array();
 $check_interval = isset( $settings['whitespace_check'] ) && intval( $settings['whitespace_check'] ) ? $settings['whitespace_check'] : 0;
 if ( $check_interval ) {
 global $java_scripts_load;
-$cache_file = LOG_PREFIX . '-whitespace.tmp';
-is_file( $cache_file ) && ( $timestamp = file_get_contents( $cache_file ) ) || $timestamp = 0;
+is_session_started();
 $current_timestamp = time();
-if ( $current_timestamp - $timestamp > 60 * $check_interval ) {
-file_put_contents( $cache_file, $current_timestamp );
+$session_key = 'mynix_whitespace_check';
+if ( ! isset( $_SESSION[$session_key] ) ||
+( $current_timestamp - $_SESSION[$session_key] > 60 * $check_interval ) ) {
+add_session_var( $session_key, $current_timestamp );
 $service = 'test';
-$err_msg = sprintf( 
-_esc( 'Download in browser is troublesome. Expected %s, got %s. %s' ), 
-'`' . $service . '`', 
-'`"+encodeURIComponent(xmlhttp.responseText)+"`', 
-readMoreHereE( APP_ADDONS_SHOP_URI . 'faq-mybackup/#q7' ) );
+$message = sprintf( 
+_esc( 'Download in browser is troublesome. Expected %s, got %%s.' ), 
+'`' . $service . '`' );
+$err_msg = sprintf( $message, '`"+encodeURIComponent(xmlhttp.responseText)+"`' ) . ' ' .
+readMoreHereE( APP_PLUGIN_FAQ_URI . '#q7' );
 $span = '<span class=\\"warning-span\\">' . $err_msg . '</span>';
 $java_scripts_load[] = 'parent.asyncGetContent(parent.ajaxurl, "action=test_dwl&service=' . $service .
-'&nonce=' . wp_create_nonce_wrapper( 'test_dwl' ) . '","_dummy_",function(xmlhttp, el){if("' . $service .
-'" != xmlhttp.responseText){document.getElementById("notification_msg").innerHTML="' . $span . '";}});';
+'&nonce=' . wp_create_nonce_wrapper( 'test_dwl' ) . '",parent.dummy,function(xmlhttp, el){if("' .
+$service . '" != xmlhttp.responseText){document.getElementById("notification_msg").innerHTML="' . $span .
+'";}});';
+$message = sprintf( $message, '`' . _esc( 'something else' ) . '`' ) . ' ' .
+readMoreHere( APP_PLUGIN_FAQ_URI . '#q7' );
+add_alert_message( $message, null, MESSAGE_TYPE_WARNING, MESSAGE_ITEM_UNREAD, 3600 );
 }
 }
 return array();

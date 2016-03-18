@@ -24,17 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : CurlWrapper.php $
  * 
- * @id      : CurlWrapper.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : CurlWrapper.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
-require_once 'CurlErrorMessages.php';
+require_once CURL_PATH . 'CurlErrorMessages.php';
 class CurlWrapper extends FileContextUrl {
 private $_exec_options;
 private $_ssh_cached_cert_info;
@@ -129,7 +129,7 @@ $errmsg = curl_error( $ch );
 $info = curl_getinfo( $ch );
 if ( 0 != $errcode )
 throw new MyException( 
-sprintf( _esc( 'An unexpected error occured while posting data to %s:<br>%s' ), $url, $errmsg ), 
+sprintf( _esc( 'An unexpected error occurred while posting data to %s:<br>%s' ), $url, $errmsg ), 
 $errcode );
 $errcode = $info['http_code'];
 if ( isset( $this->_protocol_status_codes[$errcode] ) )
@@ -185,18 +185,25 @@ return $proxy_options;
 private function _getSSLOptions() {
 if ( ( $this->_protocol & ( CURLPROTO_FTPS | CURLPROTO_HTTPS ) ) == 0 )
 return array();
-$ssl_options = array( 
-CURLOPT_SSLVERSION => $this->_ssl_ver, 
-CURLOPT_SSL_VERIFYPEER => $this->_ssl_chk_peer, 
-CURLOPT_SSL_VERIFYHOST => $this->_ssl_chk_host ); 
+$ssl_options = array();
+$ssl_verifypeer = $this->_ssl_chk_peer ? 1 : 0;
+if ( strlen( ini_get( 'open_basedir' ) ) ) {
+$is_dir = is_dir( $this->_ssl_cainfo );
+$cert = $is_dir ? glob( addTrailingSlash( $this->_ssl_cainfo ) . '*.pem' ) : array();
+$ssl_verifypeer = $ssl_verifypeer && $is_dir && count( $cert );
+}
+$ssl_options = array( CURLOPT_SSLVERSION => $this->_ssl_ver, CURLOPT_SSL_VERIFYPEER => $ssl_verifypeer );
+$ssl_options[CURLOPT_SSL_VERIFYHOST] = 2 * ( $ssl_verifypeer && $this->_ssl_chk_host );
+if ( $ssl_verifypeer ) {
 if ( ! empty( $this->_ssl_cainfo ) ) {
-if ( is_file( $this->_ssl_cainfo ) )
-$ssl_options[CURLOPT_CAINFO] = $this->_ssl_cainfo; 
-elseif ( file_exists( $this->_ssl_cainfo ) )
+if ( is_file( $this->_ssl_cainfo ) ) {
+$ssl_options[CURLOPT_CAINFO] = $this->_ssl_cainfo;
+} elseif ( file_exists( $this->_ssl_cainfo ) ) {
 $ssl_options[CURLOPT_CAPATH] = $this->_ssl_cainfo; 
-else
+} else
 throw new MyException( 
 'The specified "' . $this->_ssl_cainfo . '" option is neither an existent file or directory' );
+}
 }
 if ( ! empty( $this->_ssl_cert ) )
 $ssl_options += array( 
@@ -284,8 +291,8 @@ $this->_validateCurlOptions( $all_options );
 if ( null == $this->_conn_handle ) {
 $this->_initConnHandle();
 }
-if ( strToBool( ini_get( 'open_basedir' ) ) || strToBool( ini_get( 'safe_mode' ) ) )
-if ( isset( $all_options[CURLOPT_FOLLOWLOCATION] ) )
+if ( ( strToBool( ini_get( 'open_basedir' ) ) || strToBool( ini_get( 'safe_mode' ) ) ) &&
+isset( $all_options[CURLOPT_FOLLOWLOCATION] ) )
 unset( $all_options[CURLOPT_FOLLOWLOCATION] );
 $this->_exec_options = $all_options;
 @curl_setopt_array( $this->_conn_handle, $all_options );
@@ -480,8 +487,18 @@ $cmd_options += array( CURLOPT_NOPROGRESS => false, CURLOPT_PROGRESSFUNCTION => 
 }
 $this->setCurlOptions( $cmd_options );
 $result = $this->_execCurl();
-while ( null != ( $file = array_pop( $opened_files ) ) )
+while ( null != ( $file = array_pop( $opened_files ) ) ) {
 fclose( $file );
+}
+if ( strlen( ini_get( 'open_basedir' ) ) && ( 0 == curl_errno( $this->_conn_handle ) ) ) {
+$info = curl_getinfo( $this->_conn_handle );
+if ( 307 == $info['http_code'] && isset( $info['redirect_url'] ) && ! empty( $info['redirect_url'] ) &&
+( ! isset( $info['redirect_count'] ) || $info['redirect_count'] < 50 ) ) {
+$args = func_get_args();
+$args[0] = $info['redirect_url'];
+return call_user_func_array( array( $this, __FUNCTION__ ), $args );
+}
+}
 $this->_curlOutputErrors( $this->_conn_handle, $url, $result, $outfile );
 if ( $this->_abort_received )
 return null;

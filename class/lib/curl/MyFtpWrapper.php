@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : MyFtpWrapper.php $
  * 
- * @id      : MyFtpWrapper.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : MyFtpWrapper.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -162,14 +162,14 @@ foreach ( $prepare_cmd ( $raw_cmd, $cmd_params ) as $cmd )
 $result [] = ftp_raw ( $this->_conn_handle, $cmd );
 return $result;
 }
-public function deleteFile($filename, $is_dir = false, $bool_output = true) {
+public function deleteFile($filename, $_is_dir = false, $bool_output = true) {
 if ($this->_ftpConnect ())
 return false;
 if (! (empty ( $filename ) || is_array ( $filename )))
 $filename = array (
 $filename 
 );
-$fct_name = $is_dir ? 'ftp_rmdir' : 'ftp_delete';
+$fct_name = $_is_dir ? 'ftp_rmdir' : 'ftp_delete';
 foreach ( $filename as $name ) {
 $output = sprintf ( _esc ( "Deleting %s.." ), $name );
 if (_call_user_func ( $fct_name, $this->_conn_handle, $name )) {

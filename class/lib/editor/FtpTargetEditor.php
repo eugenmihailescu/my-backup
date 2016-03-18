@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : FtpTargetEditor.php $
  * 
- * @id      : FtpTargetEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : FtpTargetEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -48,7 +48,7 @@ if ( isWin() )
 $this->java_scripts[] = 'parent.validateSSLonWin=function(sender){if(!sender)return;var b=sender.options[sender.selectedIndex].value,c=document.getElementById("ftp_lib");if(c)if("' .
 ( CURLPROTO_FTP | CURLPROTO_FTPS ) .
 '"==b && c.options[c.selectedIndex].value=="php"){parent.popupError("Warning","The official PHP build does not support out of the box the FTP over SSL functionality (' .
-readMoreHere( 'http://php.net/manual/en/function.ftp-ssl-connect.php', null, '_blank', true ) .
+readMoreHere( PHP_MANUAL_URL . 'function.ftp-ssl-connect.php', null, '_blank', true ) .
 ').<br>However, you may opt for Curl library which supports all kind of stuff, including FTPS :-)");}};';
 }
 private function _getJavaScripts() {

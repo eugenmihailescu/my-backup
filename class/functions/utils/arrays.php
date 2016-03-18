@@ -24,65 +24,96 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : arrays.php $
  * 
- * @id      : arrays.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : arrays.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-function addArrays($array1, $array2) {
-$result = array ();
+function addArrays( $array1, $array2 ) {
+$result = array();
 foreach ( $array1 as $key => $value )
-$result ["$key"] = $value;
+$result["$key"] = $value;
 foreach ( $array2 as $key => $value )
-$result ["$key"] = $value;
+$result["$key"] = $value;
 return $result;
 }
-function objectToArray($d) {
-if (is_object ( $d )) {
-$d = get_object_vars ( $d );
+function objectToArray( $d ) {
+if ( is_object( $d ) ) {
+$d = get_object_vars( $d );
 }
-if (is_array ( $d )) {
-return array_map ( __FUNCTION__, $d );
+if ( is_array( $d ) ) {
+return array_map( __FUNCTION__, $d );
 } else {
 return $d;
 }
 }
-function insertArray(&$array, $position, $insert_value, $insert_key = null) {
-$keep_key = ! empty ( $insert_key );
-$prefix = array_slice ( $array, 0, $position, $keep_key );
-$sufix = array_slice ( $array, $position, count ( $array ) - $position, $keep_key );
-$new_item = array (
-$keep_key ? $insert_key : $position => $insert_value 
-);
-$array = $keep_key ? $prefix + $new_item + $sufix : array_merge ( $prefix, $new_item, $sufix );
+function insertArray( &$array, $position, $insert_value, $insert_key = null ) {
+$keep_key = ! empty( $insert_key );
+$prefix = array_slice( $array, 0, $position, $keep_key );
+$sufix = array_slice( $array, $position, count( $array ) - $position, $keep_key );
+$new_item = array( $keep_key ? $insert_key : $position => $insert_value );
+$array = $keep_key ? $prefix + $new_item + $sufix : array_merge( $prefix, $new_item, $sufix );
 }
-function insertArrayBefore(&$array, $before_value, $insert_value, $insert_key = null) {
-insertArray ( $array, array_search ( $before_value, $array ), $insert_value, $insert_key );
+function insertArrayBefore( &$array, $before_value, $insert_value, $insert_key = null ) {
+insertArray( $array, array_search( $before_value, $array ), $insert_value, $insert_key );
 }
-function insertArrayBeforeK(&$array, $before_key, $insert_value, $insert_key = null) {
-$position = array_search ( $before_key, array_keys ( $array ) );
-insertArray ( $array, $position, $insert_value, $insert_key );
+function insertArrayBeforeK( &$array, $before_key, $insert_value, $insert_key = null ) {
+$position = array_search( $before_key, array_keys( $array ) );
+insertArray( $array, $position, $insert_value, $insert_key );
 }
-function arrayKeySort(&$array, $key_sort_order) {
-$result = array ();
+function arrayKeySort( &$array, $key_sort_order ) {
+$result = array();
 foreach ( $key_sort_order as $key )
-$result [$key] = $array [$key];
-$diff = array_diff_key ( $array, $result );
-ksort ( $diff ); 
+$result[$key] = $array[$key];
+$diff = array_diff_key( $array, $result );
+ksort( $diff ); 
 $array = $result + $diff;
 }
-function array_filter_recursive(&$array) {
+function array_filter_recursive( &$array ) {
 foreach ( $array as $key => $item ) {
-is_array ( $item ) && $array [$key] = filter_me ( $item );
-if (empty ( $array [$key] ))
-unset ( $array [$key] );
+is_array( $item ) && $array[$key] = filter_me( $item );
+if ( empty( $array[$key] ) )
+unset( $array[$key] );
 }
 return $array;
+}
+function gcdArray( $array ) {
+$gcd = '';
+$minlen = min( array_map( 'strlen', $array ) );
+$count = count( $array );
+$ok = true;
+for ( $i = 0; $ok && $i < $minlen; $i++ ) {
+for ( $j = 1; $ok && $j < $count; $j++ ) {
+$ok = $array[$j - 1][$i] == $array[$j][$i];
+}
+$ok && $gcd .= $array[0][$i];
+}
+return $gcd;
+}
+function gcdArrayGlob( $array ) {
+$gcd = '';
+$a = array_map( 'strlen', $array );
+$minlen = min( $a );
+$maxlen = max( $a );
+$count = count( $array );
+for ( $i = 0; $i < $minlen; $i++ ) {
+$ok = true;
+$xxx = array();
+for ( $j = 1; $j < $count; $j++ ) {
+$ok &= $array[$j - 1][$i] == $array[$j][$i];
+$ok || ( ( $xxx[] = $array[$j - 1][$i] ) && $xxx[] = $array[$j][$i] );
+}
+$gcd .= $ok ? $array[0][$i] : ( '[' .
+str_replace( array( '!', '-' ), array( '\\!', '\\-' ), implode( '', array_unique( $xxx ) ) ) . ']' );
+}
+$d = $maxlen - $minlen;
+$gcd .= $d > 1 ? '*' : ( $d ? '?' : '' );
+return $gcd;
 }
 ?>

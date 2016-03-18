@@ -1,35 +1,66 @@
-<!--
- * ################################################################################
- * MyBackup
- * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
- * 
- * This program is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program.  If not, see <http://www.gnu.org/licenses/>.
- * 
- * ################################################################################
- * 
- * Short description:
- * URL: http://wpmybackup.mynixworld.info
- * 
- * Git revision information:
- * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
- * @file    : changelog.html $
- * 
- * @id      : changelog.html | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
- -->
+<div class='postbox'><h3>Version Change Log</h3><div class='inside'>
+<span>0.2.3-27</span><ul><li><strong>[fix]</strong> job statistics when OS cannot provide CPU/memory info</li>
+<li><strong>[fix]</strong> pre-restore checks of a MySQL database backup</li>
+<li><strong>[new]</strong> added an installation notice on WordPress dashboard</li>
+<li><strong>[updated]</strong> set the default `Upload max chunk size` to 256KiB</li></ul>
+<span>0.2.3-21</span><ul><li><strong>[change]</strong> Version change log has changed from Git commit messages to an `user friendly` description</li></ul>
+<span>0.2.3-20</span><ul><li><strong>[new]</strong> added MySQLi and PDO MySQL support (MySQL deprecated on PHP 5.5+)</li>
+<li><strong>[new]</strong> added dashboard backup & restore brief statistics</li>
+<li><strong>[new]</strong> automatic clean-up (each 24h) of residual files left after unusual exits</li>
+<li><strong>[new]</strong> automatic unlock of the job locking file if exceeds 24h</li>
 
-<div class='postbox'><h3>Version 0.2.3-8</h3><div class='inside'><pre><span>2016-02-16</span> <i>15 files changed, 80 insertions(+), 338 deletions(-)</i></pre><ul> <li>minor tweaks of the MySQL export function</li> <li>small tweaks on chunk uploader class</li> <li>various plug-in core libs enhancements</li> </ul><pre><span>2016-02-11</span> <i></i></pre><ul> <li>fixed MySQL database info when not connected(Pro)</li> <li>improved the addon installation UI(Pro)</li> <li>fixed the encoding of Wizard Editor temporary data(Pro)</li> <li>fixed the names shown for subdirectories on File Explorer(Pro)</li> <li>fixed a PHP warning thrown by statistics handler while running backup</li> <li>added the CPU throttling feature to the Free edition too</li> </ul><pre><span>2016-02-09</span> <i></i></pre><ul> <li>added "How it works" link to the user guide</li> <li>updated the user guide</li> <li>CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an</li> <li>open_basedir is set in</li> <li>fixed export settings option</li> <li>the excluded directories in backup/WP source file list not shown</li> <li>unchecked</li> <li>unsynced namespace between main app and addon code(Pro)</li> </ul><pre><span>2015-12-28</span> <i></i></pre><ul> <li>added restore feature (last successful backup only)</li> <li>added dashboard screen (quick backup/restore/log view)</li> <li>automatic backup of plugins/themese/mysql on WordPress upgrade</li> </ul><pre><span>2015-12-09</span> <i>1 file changed, 1 insertion(+), 1 deletion(-)</i></pre><ul> <li>fixed automatic update and addon registration for WordPress|Standalone</li> <li>fixed detection of valid archive for non BZip|GZip archives</li> <li>fixed restoring Dropbox|Google authorization + logs after version</li> <li>update=fixed automatic update and addon registration for</li> <li>WordPress|Standalone (Pro)</li> <li>fix=detection of valid archive for non BZip|GZip archives</li> <li>fix=restoring Dropbox|Google authorization + logs after version upgrade</li> </ul><pre><span>2015-12-06</span> <i></i></pre><ul> <li>fixed dashboard performance issue on WP Ajax Heartbeat (admin-ajax.php)</li> <li>fixed plug-in banners not shown on Chrome due to self-signed SSL certificate error (ERR_INSECURE_RESPONSE)</li> <li>fixed divergent count of the scheduled backup files vs actual backed up files</li> <li>code refactored to prevent the collition of the global variable name of autoloader class</li> <li>updated the default file extension list excluded from backup (gz,bz,bz2)</li> <li>updated the Welcome screen and the `How to` documentation</li> <li>added a new backup expert option `script memory limit`</li> <li>set the min/max allowed value on some UI numeric inputs (like ports, retention, etc)</li> <li>show relative path instead full path on WP Source file list (shorter=&amp;gt;faster)</li> <li>stripped the Windows drive letter from the filepath included into a .tar(bz|gz) archive</li> <li>new backup expert option which allows the usage of file relative path instead full path</li> <li>Logs tab shows now the log file size for each individual log</li> <li>integration of WP MyBackup with iThemes Security plug-in</li> <li>now compatible with WordPress Multisite/Network (access restricted to blog files/db only)</li> <li>added ZIP archive support via WP PclZip (requires zlib extension)</li> <li>new option to avoid compression by extension (jpg,jpeg,png,gif,mp3,mp4,mpg,mpeg,avi,mov,qt,mkv,wmv,asf,m2v,m4v,rm)</li> <li>MySQL database WYSIWYG table selector (with automatic regex builder support)</li> <li>new Support expert option to detect extra whitespaces that may affect the browser's direct file download</li> <li></li> </ul><pre><span>2015-11-18</span> <i></i></pre><ul> <li>added automatic update (PRO only)</li> <li>enclosed constant definitions within namespace</li> <li></li> </ul></div></div>
+<li><strong>[new]</strong> MySQL support for connections using alternate port and/or Unix socket and Named Pipes </li>
+<li><strong>[improvement]</strong> usage of prepared SQL statement (increased speed & security)</li>
+<li><strong>[improvement]</strong> added alternative progress for browsers/servers not supporting buffered output</li>
+<li><strong>[improvement]</strong> performance improvement for job console screen</li>
+<li><strong>[improvement]</strong> enhanced UI feedback during backup job (useful for backups with 5K+ files)</li>
+<li><strong>[improvement]</strong> improved overall UI responsiveness (50% faster)</li>
+<li><strong>[improvement]</strong> optimized the backup filelist creation (useful for 5K+ files and slow systems)</li>
+
+
+<li><strong>[change]</strong> renamed `Backup targets` tab name to `Copy backup to`</li>
+
+
+<li><strong>[change]</strong> renamed `WP backup` tab name to `WP backup job`</li>
+<li><strong>[change]</strong> renamed `Backup Schedule` tab name to `Backup Scheduler`</li>
+<li><strong>[change]</strong> renamed `Logs` tab name to `Log files`</li>
+<li><strong>[change]</strong> renamed `Change log` tab name to `Version change log`</li>
+<li><strong>[update]</strong> added `tar` to the default `Exclude files by extension` list</li>
+<li><strong>[fix]</strong> fixed the backup console progress bar while compressing using the ZIP filter</li></ul>
+<span>0.2.3-4</span><ul><li><strong>[fix]</strong> export MySQL DB as XML</li></ul>
+<span>0.2.3-3</span><ul><li><strong>[fix]</strong> export MySQL DB as XML</li></ul>
+<span>0.2.3-2</span><ul><li><strong>[improvement]</strong> various plug-in core libs enhancements</li></ul>
+<span>0.2.3-1</span><ul><li><strong>[improvement]</strong> added `CPU throttling` feature to overcome the `CPU Limit Exceeded` on free hosting</li>
+<li><strong>[improvement]</strong> update the `How it works` user guide</li></ul>
+<span>0.2.2-4</span><ul><li><strong>[fix]</strong> dashboard performance issue on WP Ajax Heartbeat (admin-ajax.php)</li>
+<li><strong>[fix]</strong> plug-in banners not shown on Chrome due to self-signed SSL certificate error (ERR_INSECURE_RESPONSE)</li>
+<li><strong>[fix]</strong> divergent count of the scheduled backup files vs actual backed up files</li>
+<li><strong>[update]</strong> prevent the collition of the global variable name of autoloader class</li>
+<li><strong>[update]</strong> updated the default file extension list excluded from backup (gz,bz,bz2)</li>
+<li><strong>[update]</strong> updated the Welcome screen and the `How to` documentation</li>
+<li><strong>[tweak]</strong> added new backup expert option `script memory limit` </li>
+<li><strong>[tweak]</strong> set the min/max allowed value on some UI numeric inputs (like ports, retention, etc)</li>
+<li><strong>[tweak]</strong> show relative path instead full path on WP Source file list (shorter=&gt;faster)</li>
+<li><strong>[tweak]</strong> stripped the Windows drive letter from the filepath included into a .tar(bz|gz) archive</li>
+<li><strong>[tweak]</strong> new backup expert option which allows the usage of file relative path instead full path</li>
+<li><strong>[tweak]</strong> Logs tab shows now the log file size for each individual log</li>
+<li><strong>[improvement]</strong> integration of WP MyBackup with iThemes Security plug-in</li>
+<li><strong>[improvement]</strong> compatibility with WordPress Multisite/Network (access restricted to blog files/db only)</li>
+<li><strong>[improvement]</strong> added ZIP archive support via WP PclZip (requires zlib extension)</li>
+<li><strong>[improvement]</strong> new option to avoid compression by extension (jpg,jpeg,png,gif,mp3,mp4,mpg,mpeg,avi,mov,qt,mkv,wmv,asf,m2v,m4v,rm)</li>
+<li><strong>[improvement]</strong> Database WYSIWYG table selector (creates automatically the compound regex pattern)</li>
+<li><strong>[improvement]</strong> new Support expert option to detect extra whitespaces that may affect the browser's direct file download</li>
+</ul>
+<span>0.2.2-3</span><ul><li><strong>[fix]</strong> backup plugin's tmp files on plugin update instead of framework upgrade</li>
+<li><strong>[improvement]</strong> enclosed constant definitions within namespace(prevents collision)</li>
+</ul>
+<span>0.2.3</span><ul><li><strong>[improvement]</strong> added restore feature </li>
+<li><strong>[improvement]</strong> added dashboard screen (quick backup/restore/log view)</li>
+<li><strong>[improvement]</strong> automatic backup of plugins/themese/mysql on WordPress upgrade</li>
+<li><strong>[tweak]</strong> added "How it works" link to the user guide</li>
+<li><strong>[update]</strong> updated the user guide</li>
+<li><strong>[fix]</strong> CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an open_basedir is set in</li>
+<li><strong>[fix]</strong> fixed export settings option</li>
+<li><strong>[fix]</strong> the excluded directories in backup/WP source file list not shown unchecked</li>
+</ul>
+</div></div>

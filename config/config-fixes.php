@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : config-fixes.php $
  * 
- * @id      : config-fixes.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : config-fixes.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -52,10 +52,5 @@ $_SERVER['DOCUMENT_ROOT'] = str_replace( '/', DIRECTORY_SEPARATOR, $doc_root );
 if ( defined( __NAMESPACE__.'\\ALT_ABSPATH' ) )
 $_SERVER['DOCUMENT_ROOT'] = ALT_ABSPATH;
 }
-$tmp_dir = sys_get_temp_dir();
-! file_exists( $tmp_dir ) &&
-trigger_error( sprintf( _esc( 'The system temporary directory (%s) does not exist.' ), $tmp_dir ), E_USER_WARNING );
 define( __NAMESPACE__.'\\SANDBOX', file_exists( RULES_PATH . '0-sandbox.php' ) );
-@constant( 'SQLITE3_ASSOC' ) || define( '\SQLITE3_ASSOC', 1 );
-@constant( 'MYSQL_ASSOC' ) || define( '\MYSQL_ASSOC', 1 );
 ?>

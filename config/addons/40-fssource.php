@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : 40-fssource.php $
  * 
- * @id      : 40-fssource.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : 40-fssource.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,6 +38,10 @@ namespace MyBackup;
 define( __NAMESPACE__.'\\SRCFILE_SOURCE', - 3 );
 $TARGET_NAMES[SRCFILE_SOURCE] = 'fssource';
 $NOT_BACKUP_TARGETS[] = SRCFILE_SOURCE;
-registerTab( SRCFILE_SOURCE, 'DiskSourceEditor', _esc( 'Backup source' ), 'getDirList' );
-insertArrayBefore( $dashboard_tabs, defined( __NAMESPACE__.'\\WP_SOURCE' ) ? WP_SOURCE : MYSQL_SOURCE, SRCFILE_SOURCE );
+registerTab( SRCFILE_SOURCE, 'DiskSourceEditor', sprintf( _esc( '%s files' ), PHP_OS ), 'getDirList' );
+global $registered_targets;
+insertArrayBefore( 
+$dashboard_tabs, 
+defined( __NAMESPACE__.'\\WP_SOURCE' ) && isset( $registered_targets[WP_SOURCE] ) ? WP_SOURCE : MYSQL_SOURCE, 
+SRCFILE_SOURCE );
 ?>

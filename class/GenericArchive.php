@@ -24,17 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : GenericArchive.php $
  * 
- * @id      : GenericArchive.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : GenericArchive.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 abstract class GenericArchive {
+private $progress_perc;
 private $archive_files;
 private $fileName;
 private $options;
@@ -67,7 +68,7 @@ return $path .
 ( substr( $path, - strlen( DIRECTORY_SEPARATOR ) ) != DIRECTORY_SEPARATOR ? DIRECTORY_SEPARATOR : '' );
 }
 protected function _mk_dir( $path, $dir_sep = DIRECTORY_SEPARATOR ) {
-return file_exists( $path ) || mkdir( $path, 0770, true );
+return _file_exists( $path ) || mkdir( $path, 0770, true );
 }
 protected function _pipeStreams( $in, $out, $maxlength = -1, $offset = -1 ) {
 $size = 0;
@@ -79,9 +80,34 @@ $size += fwrite( $out, $buff );
 - 1 != $maxlength && $maxlength - $size > 0 && $size += fwrite( $out, fread( $in, $maxlength - $size ) );
 return $size;
 }
-protected function onProgress( $filename, $bw, $fsize, &$obj, $threshold = MB ) {
-$fsize > $threshold && _is_callable( $obj->onProgressCallback ) &&
-_call_user_func( $obj->onProgressCallback, $obj->provider, $filename, $bw, $fsize, 4 );
+protected function onProgress( 
+$filename, 
+$bw, 
+$fsize, 
+&$obj, 
+$ptype = PT_COMPRESS, 
+$running = 1, 
+$reset_timer = false, 
+$threshold = MB ) {
+$update = true;
+$perc = $bw;
+$max = $fsize;
+if ( $fsize && PT_WRITE == $ptype && $fsize < $threshold ) {
+$max = 100;
+$perc = ceil( 100 * $bw / $fsize );
+$update = $this->progress_perc < $perc;
+$this->progress_perc = $perc;
+$perc > $max && $perc = $max; 
+}
+if ( $update && _is_callable( $obj->onProgressCallback ) ) {
+_call_user_func( 
+$obj->onProgressCallback, 
+isset( $obj->provider ) ? $obj->provider : $this->provider, 
+$filename, 
+$perc, 
+$max, 
+$ptype );
+}
 ( $cpu_sleep = $obj->getCPUSleep() ) > 0 && _usleep( 1000 * $cpu_sleep );
 }
 function __construct( $filename, $provider = null, $auto_ext = true ) {
@@ -96,17 +122,21 @@ $this->options = array( 'skip_empty_files' => $this->skip_empty_files );
 $this->archive_files = array();
 }
 public function addFile( $filename, $name = null, $compress = true ) {
-if ( ! file_exists( $filename ) )
+if ( ! _file_exists( $filename ) )
 throw new MyException( sprintf( _esc( 'File %s does not exist.' ), $filename ) );
 $fsize = filesize( $filename );
 $options = $this->getOptions( 'skip_empty_files' );
-if ( $fsize == 0 && strToBool( $this->getOptions( 'skip_empty_files' ) ) )
+if ( ! $fsize && strToBool( $this->getOptions( 'skip_empty_files' ) ) )
 return false;
 $this->archive_files[$filename] = array( $name, $compress, $fsize );
 return true;
 }
-abstract public function compress( $method, $level );
-abstract public function decompress( $method = null, $uncompress_size = 0 );
+public function compress( $method, $level ) {
+$this->progress_perc = 0;
+}
+public function decompress( $method = null, $uncompress_size = 0 ) {
+$this->progress_perc = 0;
+}
 abstract public function getArchiveFiles( $filename = null );
 abstract public function extract( $filename = null, $dst_path = null, $force_extrct = true );
 protected function getOptions( $name = null ) {
@@ -131,7 +161,7 @@ public function getFileName() {
 return $this->fileName;
 }
 public function getFileSize() {
-if ( file_exists( $this->fileName ) )
+if ( _file_exists( $this->fileName ) )
 return filesize( $this->fileName );
 else
 return 0;
@@ -170,7 +200,7 @@ if ( isset( $COMPRESSION_HEADERS[$method] ) ) {
 $hdr_len = $COMPRESSION_HEADERS[$method][0];
 $hdr_pattern = $COMPRESSION_HEADERS[$method][1];
 }
-if ( file_exists( $filename ) && $hdr_len > 0 && false !== ( $fr = fopen( $filename, 'rb' ) ) ) {
+if ( _file_exists( $filename ) && $hdr_len > 0 && false !== ( $fr = fopen( $filename, 'rb' ) ) ) {
 $buff = fread( $fr, $hdr_len );
 $result = false !== $buff && preg_match( '/' . $hdr_pattern . '/', $buff );
 fclose( $fr );
@@ -182,7 +212,7 @@ public function fixArchiveCRLF( $filename, $method = null ) {
 if ( $this->isValidArchive( $filename, $method ) )
 return true;
 $result = false;
-if ( file_exists( $filename ) && false !== ( $fr = fopen( $filename, 'rb' ) ) ) {
+if ( _file_exists( $filename ) && false !== ( $fr = fopen( $filename, 'rb' ) ) ) {
 $buff = fread( $fr, TAR_BUFFER_LENGTH );
 $offset = 0;
 while ( false !== $buff && in_array( ord( substr( $buff, $offset, 1 ) ), array( 10, 13 ) ) )

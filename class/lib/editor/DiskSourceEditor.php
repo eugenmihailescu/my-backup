@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : DiskSourceEditor.php $
  * 
- * @id      : DiskSourceEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : DiskSourceEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -120,7 +120,7 @@ _esc( 'Cancel' ) );
 require_once $this->getTemplatePath( 'disksrc.php' );
 }
 protected function getExpertEditorTemplate() {
-global $exclude_files_factory, $COMPRESSION_NAMES;
+global $exclude_files_factory, $COMPRESSION_NAMES, $BACKUP_MODE, $TARGET_NAMES;
 $ext = $COMPRESSION_NAMES;
 array_walk( $ext, function ( &$item, $key, $prefix ) {
 $item = $prefix . $item;
@@ -177,6 +177,21 @@ implode( ',', $media_ext ),
 implode( ' ' . _esc( 'or' ) . ' ', $media_ext ) ) . '</li></ul>', 
 false ) . "'";
 }
+$help_5 = "'" .
+_esc( 
+'This option will scan asynchronously the directory tree and will build a preloading cache file that will be used when a new backup job is started.' );
+$help_5 .= ' ' . _esc( 'By doing this the backup job will save few seconds (or many on slower systems).' );
+$help_5 .= '<br>' . sprintf( 
+_esc( 
+'Use this only if %s directive has a small value (like 30sec) and when saving few seconds will make the difference.' ), 
+getAnchorE( 'max_execution_time', PHP_MANUAL_URL . 'info.configuration.php#ini.max-execution-time' ) );
+$help_5 .= sprintf( 
+'<br>' . _esc( 'This option is used only for %s backup mode.' ), 
+getAnchorE( $BACKUP_MODE[BACKUP_MODE_FULL], getTabLink( $TARGET_NAMES[APP_BACKUP_JOB] ), '_self' ) ) . "'";
+$help_6 = "'" .
+_esc( 
+'When the cache preloader is used then this sets the number of minutes it will live. When its age exceeds this value it will be rebuilt.' ) .
+"'";
 require_once $this->getTemplatePath( 'disksrc-expert.php' );
 }
 }

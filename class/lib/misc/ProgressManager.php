@@ -24,92 +24,102 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : ProgressManager.php $
  * 
- * @id      : ProgressManager.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : ProgressManager.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 class ProgressManager extends GenericDataManager {
 private $_lazywrite;
-public function getItem($provider, $filename) {
+public function getItem( $provider, $filename ) {
 $result = null;
-$_data = &$this->getData ();
-if (is_array ( $_data ) && isset ( $_data [$provider] )) {
-$provider_item = $_data [$provider];
-if (isset ( $provider_item [$filename] ))
-$result = $provider_item [$filename];
+$_data = &$this->getData();
+if ( is_array( $_data ) && isset( $_data[$provider] ) ) {
+$provider_item = $_data[$provider];
+if ( isset( $provider_item[$filename] ) )
+$result = $provider_item[$filename];
 }
 return $result;
 }
-public function addFile($provider, $filename, $ptype = false, $running = 1) {
-if (null != $this->getItem ( $provider, $filename ))
-throw new MyException ( sprintf ( _esc ( "Key already exists: provider=%s, filename=%s" ), $provider, $filename ) );
-$_data = &$this->getData ();
-if (! isset ( $_data [$provider] ))
-$_data [$provider] = array ();
-$_data [$provider] [$filename] = array (
-'bytes' => 0,
-'total_bytes' => 0,
-'ptype' => $ptype,
-'start' => time (),
-'eta' => 0,
-'speed' => 0,
-'running' => $running 
-);
-return $this->saveData ();
+public function addFile( $provider, $filename, $ptype = false, $running = 1 ) {
+if ( null != $this->getItem( $provider, $filename ) )
+throw new MyException( 
+sprintf( _esc( "Key already exists: provider=%s, filename=%s" ), $provider, $filename ) );
+$_data = &$this->getData();
+if ( ! isset( $_data[$provider] ) )
+$_data[$provider] = array();
+$_data[$provider][$filename] = array( 
+'bytes' => 0, 
+'total_bytes' => 0, 
+'ptype' => $ptype, 
+'start' => time(), 
+'eta' => 0, 
+'speed' => 0, 
+'running' => $running );
+return $this->saveData();
 }
-public function delFile($provider, $filename) {
-$record = $this->getItem ( $provider, $filename );
-if (null == $record)
+public function delFile( $provider, $filename ) {
+$record = $this->getItem( $provider, $filename );
+if ( null == $record )
 return false;
-$_data = &$this->getData ();
-unset ( $_data [$provider] [$filename] );
-return $this->saveData ();
+$_data = &$this->getData();
+unset( $_data[$provider][$filename] );
+return $this->saveData();
 }
-public function setProgress($provider, $filename, $bytes, $total_bytes, $ptype = 0, $running = 1, $reset_timer = false) {
-$record = $this->getItem ( $provider, $filename );
-if (null == $record && ! $this->addFile ( $provider, $filename, $ptype, $running ))
+public function setProgress( 
+$provider, 
+$filename, 
+$bytes, 
+$total_bytes, 
+$ptype = PT_DOWNLOAD, 
+$running = 1, 
+$reset_timer = false ) {
+$record = $this->getItem( $provider, $filename );
+if ( null == $record && ! $this->addFile( $provider, $filename, $ptype, $running ) )
 return false;
-$_data = &$this->getData ();
-if ($this->_lazywrite) {
-$old_perc = $_data [$provider] [$filename] ['total_bytes'] > 0 ? round ( 100 * $_data [$provider] [$filename] ['bytes'] / $_data [$provider] [$filename] ['total_bytes'] ) : 0;
-$new_perc = $total_bytes > 0 ? round ( 100 * $bytes / $total_bytes ) : 0;
+$_data = &$this->getData();
+if ( $this->_lazywrite ) {
+$old_perc = $_data[$provider][$filename]['total_bytes'] > 0 ? round( 
+100 * $_data[$provider][$filename]['bytes'] / $_data[$provider][$filename]['total_bytes'] ) : 0;
+$new_perc = $total_bytes > 0 ? round( 100 * $bytes / $total_bytes ) : 0;
 } else {
 $old_perc = 0;
 $new_perc = 0;
 }
-$_data [$provider] [$filename] ['bytes'] = $bytes;
-$_data [$provider] [$filename] ['total_bytes'] = $total_bytes;
-$reset_timer && ($_data [$provider] [$filename] ['start'] = time ());
-$diff = time () - $_data [$provider] [$filename] ['start'];
-$S=$running < 0 ? $diff : (0 == $bytes ? 0 : ($total_bytes * $diff / $bytes - $diff));
-$H=floor($S/3600);
-$M=floor(($S-3600*$H)/60);
-$S=$S-3600*$H-60*$M;
-$_data [$provider] [$filename] ['eta'] = sprintf('%02d:%02d:%02d',$H,$M,$S);
-$v = $running < 0 ? $total_bytes : ($diff > 0 ? $bytes / $diff : 0);
-$freq = $running < 0 ? '' : (2 == $ptype || 7 == $ptype ? '/sec' : 'ps');
-$_data [$provider] [$filename] ['speed'] = (2 == $ptype || 7 == $ptype ? (round ( $v ) . (7 == $ptype ? ' stmts' : ' files')) : getHumanReadableSize ( $v )) . $freq;
-$_data [$provider] [$filename] ['running'] = $running;
-return ($running >= 0 && $this->_lazywrite && $old_perc == $new_perc) || $this->saveData ();
+$_data[$provider][$filename]['bytes'] = $bytes;
+$_data[$provider][$filename]['total_bytes'] = $total_bytes;
+$reset_timer && ( $_data[$provider][$filename]['start'] = time() );
+$diff = time() - $_data[$provider][$filename]['start'];
+$S = $running < 0 ? $diff : ( 0 == $bytes ? 0 : ( $total_bytes * $diff / $bytes - $diff ) );
+$H = floor( $S / 3600 );
+$M = floor( ( $S - 3600 * $H ) / 60 );
+$S = $S - 3600 * $H - 60 * $M;
+$_data[$provider][$filename]['eta'] = sprintf( '%02d:%02d:%02d', $H, $M, $S );
+$x = in_array( $ptype, array( PT_ADDFILE, PT_EXTRACTFILE, PT_EXECUTE, PT_ENQUEUE ) );
+$v = $running < 0 ? $total_bytes : ( $diff > 0 ? $bytes / $diff : 0 );
+$freq = $running < 0 ? '' : ( $x ? '/sec' : 'ps' );
+$_data[$provider][$filename]['speed'] = ( $x ? ( round( $v ) . ( PT_EXECUTE == $ptype ? ' stmts' : ' files' ) ) : getHumanReadableSize( 
+$v ) ) . $freq;
+$_data[$provider][$filename]['running'] = $running;
+return ( $running >= 0 && $this->_lazywrite && $old_perc == $new_perc ) || $this->saveData();
 }
-public function setLazyWrite($value) {
+public function setLazyWrite( $value ) {
 $this->_lazywrite = $value;
 }
 public function cleanUp() {
 $result = null;
-$_data = &$this->getData ();
-if (is_array ( $_data )) {
-$provider = array_keys ( $_data );
+$_data = &$this->getData();
+if ( is_array( $_data ) ) {
+$provider = array_keys( $_data );
 foreach ( $provider as $p )
-foreach ( $_data [$p] as $filename => $file_info )
-if ($file_info ['bytes'] == $file_info ['total_bytes'])
-unset ( $_data [$p] [$filename] );
+foreach ( $_data[$p] as $filename => $file_info )
+if ( $file_info['bytes'] == $file_info['total_bytes'] )
+unset( $_data[$p][$filename] );
 }
 }
 }

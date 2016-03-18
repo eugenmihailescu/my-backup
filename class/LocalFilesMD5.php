@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : LocalFilesMD5.php $
  * 
- * @id      : LocalFilesMD5.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : LocalFilesMD5.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -65,7 +65,7 @@ throw new MyException( $e['message'], $e['type'] );
 }
 public function read() {
 $this->_log_records = array();
-if ( ! file_exists( $this->_ref_log_filename ) )
+if ( ! _file_exists( $this->_ref_log_filename ) )
 return false;
 $fr = fopen( $this->_ref_log_filename, 'r' );
 $this->_checkFHandle( $fr );
@@ -74,11 +74,16 @@ $cols = explode( ',', $line );
 if ( count( $cols ) < 3 )
 continue;
 $this->_log_records[$cols[0]] = array( $cols[1], 			
-$cols[2] );			
+$cols[2] ); 
 }
 return fclose( $fr );
 }
 public function write() {
+_is_callable( $this->onOutputCallback ) && _call_user_func( 
+$this->onOutputCallback, 
+_esc( 'writting the new MD5 signatures' ), 
+BULLET, 
+2 );
 $fw = fopen( $this->_log_filename, 'w' );
 $this->_checkFHandle( $fw );
 foreach ( $this->_log_records as $filename => $cols )
@@ -104,7 +109,7 @@ return $abort_signal_received ? false : $timestamp;
 }
 public function file_sync( $filename, $comp_timestamp ) {
 $changed = false;
-$current_md5 = file_exists( $filename ) && is_file( $filename ) ? md5_file( $filename ) : null;
+$current_md5 = _file_exists( $filename ) && _is_file( $filename ) ? md5_file( $filename ) : null;
 if ( isset( $this->_log_records[$filename] ) ) {
 $md5 = $this->_log_records[$filename][0];
 $timestamp = $this->_log_records[$filename][1];
@@ -131,7 +136,7 @@ public function diff( $filename, $comp_timestamp ) {
 $tmp_file = tempnam( dirname( $this->_log_filename ), uniqid() );
 if ( false === $tmp_file || false === ( $fr = fopen( $filename, 'r' ) ) )
 return false;
-if ( ! file_exists( $filename ) )
+if ( ! _file_exists( $filename ) )
 throw new MyException( 
 sprintf( _esc( 'Cannot compute the difference. File %s does not exist.' ), $filename ) );
 $ftmp_file = fopen( $tmp_file, 'w' );

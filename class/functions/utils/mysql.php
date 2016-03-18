@@ -24,87 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : mysql.php $
  * 
- * @id      : mysql.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : mysql.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
-function getMySQLError( $link = null, $key = null ) {
-$result = array( 'code' => @\mysql_errno( $link ), 'message' => @\mysql_error( $link ) );
-if ( ! empty( $key ) )
-if ( isset( $result[$key] ) )
-return $result[$key];
-else
-return null;
-else
-return $result;
-}
-function createMySQLConnection( $settings = null ) {
-$link = @\mysql_connect( 
-getMySQLparam( 'mysql_host', $settings ) . ':' . getMySQLparam( 'mysql_port', $settings ), 
-getMySQLparam( 'mysql_user', $settings ), 
-getMySQLparam( 'mysql_pwd', $settings ) );
-if ( ! ( $err = false === $link ) ) {
-$mysql_charset = getMySQLparam( 'mysql_charset', $settings );
-$mysql_db = getMySQLparam( 'mysql_db', $settings );
-! empty( $mysql_charset ) && $err = ! @\mysql_set_charset( $mysql_charset, $link );
-! ( $err || empty( $mysql_db ) ) && $err = ! @\mysql_select_db( $mysql_db, $link );
-print_r( getMySQLError( $link ), 1 );
-}
-return $err ? false : $link;
-}
-function closeMySQLConnection( $link = false ) {
-( false === $link ) || @\mysql_close( $link );
-}
-function getMySQLparam( $param_name, $options = null ) {
-global $setting;
-isset( $options ) || $options = $setting;
-$default = null;
-$is_wp = function_exists( '\\add_management_page' );
-switch ( $param_name ) {
-case 'mysql_format' :
-$default = isNull( $options, $param_name, 'sql' );
-break;
-case 'mysql_host' :
-$default = @constant( 'DB_HOST' ) ? DB_HOST : 'localhost';
-break;
-case 'mysql_port' :
-$default = 3306;
-break;
-case 'mysql_user' :
-$default = @constant( 'DB_USER' ) ? DB_USER : '';
-break;
-case 'mysql_pwd' :
-$default = @constant( 'DB_PASSWORD' ) ? DB_PASSWORD : '';
-break;
-case 'mysql_db' :
-$default = @constant( 'DB_NAME' ) ? DB_NAME : '';
-break;
-case 'mysql_charset' :
-$default = @constant( 'DB_CHARSET' ) ? DB_CHARSET : 'utf8';
-break;
-case 'mysql_collate' :
-$default = @constant( 'DB_COLLATE' ) ? DB_COLLATE : '';
-break;
-}
-return $is_wp ? $default : isNull( $options, $param_name, $default );
-}
-function getMySQLTableNamesFromPattern( $pattern = '.+', $close_link = true, $settings = null, $extended = false, $order_by_name = false ) {
-if ( false === ( $link = createMySQLConnection( $settings ) ) ) {
-return false;
-}
-$tables = array();
-$wp_db_prefix = is_wp() ? wp_get_db_prefix() : '';
-$rst = @\mysql_query( 'select DATABASE();', $link );
-if ( FALSE !== $rst && $row = @\mysql_fetch_row( $rst ) )
-$db_name = $row[0];
-else
-$db_name = getMySQLparam( 'mysql_db', $settings );
+
+function getMySQLTableNamesWhereByPattern( $pattern = '.+' ) {
 if ( false !== strpos( $pattern, '|' ) && false === strpos( $pattern, ',' ) )
 $where = explode( '|', $pattern );
 elseif ( false === strpos( $pattern, '|' ) && false !== strpos( $pattern, ',' ) )
@@ -115,27 +46,40 @@ foreach ( explode( ',', $pattern ) as $item )
 foreach ( explode( '|', $item ) as $tbl )
 $where[] = $tbl;
 }
-array_walk( 
-$where, 
-function ( &$item ) use(&$db_name ) {
+array_walk( $where, function ( &$item ) {
 $item = sprintf( "table_name REGEXP '^%s$'", $item );
 } );
 $where = empty( $where ) ? '' : ( '(' . implode( ' OR ', $where ) . ')' );
+$wp_db_prefix = is_wp() ? wp_get_db_prefix() : '';
 empty( $wp_db_prefix ) ||
 $where = sprintf( "table_name like '%s%%' AND %s", wp_get_db_prefix(), empty( $where ) ? 'true' : $where );
+return $where;
+}
+function getMySQLTableNamesFromPattern( $pattern = '.+', $mysql_obj = null, $settings = null, $extended = false, $order_by_name = false ) {
+if ( ! $mysql_obj ) {
+return false;
+}
+$db_name = null;
+if ( $rst = $mysql_obj->query( 'select DATABASE()' ) ) {
+if ( $row = $mysql_obj->fetch_row( $rst ) )
+$db_name = $row[0];
+else
+$db_name = $mysql_obj->get_param( 'mysql_db' );
+$mysql_obj->free_result( $rst );
+}
 $sql = sprintf( 
 "SELECT * FROM (SELECT table_name,table_rows,(data_length+index_length) as table_size FROM information_schema.tables WHERE table_schema='%s' AND %s) A ORDER BY A.", 
 $db_name, 
-$where );
+getMySQLTableNamesWhereByPattern( $pattern ) );
 $sql .= $order_by_name ? 'table_name' : 'table_size DESC';
-$rst = @\mysql_query( $sql, $link );
-if ( FALSE !== $rst )
-while ( $row = @\mysql_fetch_row( $rst ) ) {
+if ( $rst = $mysql_obj->query( $sql ) ) {
+$tables = array();
+while ( $row = $mysql_obj->fetch_row( $rst ) ) {
 ( $extended && $tables[$row[0]] = array( $row[1], $row[2] ) ) || $tables[] = $row[0];
 }
-else
+$mysql_obj->free_result( $rst );
+} else
 $tables = false;
-$close_link && closeMySQLConnection( $link );
 return $tables;
 }
 ?>

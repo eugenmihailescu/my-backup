@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : WPBackupHandler.php $
  * 
- * @id      : WPBackupHandler.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : WPBackupHandler.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -104,7 +104,7 @@ $this->outputError( formatErrMsg( $e, $target_name ), false, $err_params );
 }
 return $parts;
 }
-private function _upload2Storage( $filename, $target, $add_filename = false ) {
+private function _upload2Storage( $filename, $target, $uncompressed_size = 0, $add_filename = false ) {
 list( $target_name, $oper_send, $oper_sent ) = $this->getTargetOperConsts( $target );
 $metadata = array();
 if ( in_array( $target, array( FTP_TARGET, SSH_TARGET ) ) )
@@ -118,7 +118,7 @@ return $api;
 $parts = $this->_getFileParts( $api, $target, $oper_send, $filename );
 $path = $this->getTarget( $target )->getPath();
 foreach ( $parts as $part ) {
-if ( ! file_exists( $part ) )
+if ( ! _file_exists( $part ) )
 continue;
 $this->startTransfer( $oper_send, $part, $path, null, $api->isSecure() );
 $result = $api->uploadFile( 
@@ -127,7 +127,7 @@ $add_filename ? addTrailingSlash( $path, '/' ) . basename( $part ) : $path );
 if ( ! $api->curlAborted() ) {
 $this->parseResponse( $result );
 $metadata[] = $result;
-$this->stopTransfer( $oper_sent, $part, filesize( $part ) );
+$this->stopTransfer( $oper_sent, $part, filesize( $part ), $uncompressed_size );
 if ( count( $parts ) > 1 )
 unlink( $part );
 }
@@ -136,30 +136,38 @@ unlink( $part );
 $err_params = $this->getOperErrParams( $filename, $oper_send );
 $this->outputError( formatErrMsg( $e ), false, $err_params );
 $metadata = false;
-$this->getProgressManager()->setProgress( $target, isset( $part ) ? $part : null, 0, 0, 1 );
+$this->getProgressManager()->setProgress( $target, isset( $part ) ? $part : null, 0, 0, PT_UPLOAD );
 }
 return $metadata;
 }
-private function _move2Disk( $arc = null ) {
+private function _move2Disk( $arc = null, $target = DISK_TARGET, $uncompressed_size = 0 ) {
 if ( $this->chkProcessSignal() )
-return $this->processAbortSignal( DISK_TARGET, OPER_SEND_DISK );
-if ( $this->getTarget( DISK_TARGET )->isEnabled() && null !== $this->getTarget( DISK_TARGET )->getPath() ) {
+return $this->processAbortSignal( $target, OPER_SEND_DISK );
+if ( $this->getTarget( $target )->isEnabled() && null !== $this->getTarget( $target )->getPath() ) {
+if ( _dir_in_allowed_path( $this->getTarget( $target )->getPath() ) ) {
 if ( ! empty( $arc ) ) {
-$this->startTransfer( OPER_SEND_DISK, $arc, $this->getTarget( DISK_TARGET )->getPath() );
+$this->startTransfer( OPER_SEND_DISK, $arc, $this->getTarget( $target )->getPath() );
 $fsize = filesize( $arc );
 $err_params = $this->getOperErrParams( $arc, OPER_SEND_DISK );
-if ( ! file_exists( $this->getTarget( DISK_TARGET )->getPath() ) ) {
-if ( ! mkdir( $this->getTarget( DISK_TARGET )->getPath(), 0770, true ) )
+if ( ! _file_exists( $this->getTarget( $target )->getPath() ) ) {
+if ( ! mkdir( $this->getTarget( $target )->getPath(), 0770, true ) )
 $this->outputError( null, false, $err_params );
 }
 try {
-$free = disk_free_space( dirname( $arc ) );
+$free = _disk_free_space( dirname( $arc ) );
 if ( $fsize <= $free ) {
-$dest = addTrailingSlash( $this->getTarget( DISK_TARGET )->getPath() ) . basename( $arc );
+$dest = addTrailingSlash( $this->getTarget( $target )->getPath() ) . basename( $arc );
+if ( dirname( $arc ) == dirname( $dest ) ) {
+$this->outputError( 
+sprintf( 
+_esc( '<red>[!] file %s cannot be moved; working dir = destination dir</red>' ), 
+basename( $arc ) ) );
+$success = false;
+} else {
 $success = move_file( $arc, $dest );
-$this->onBytesSent( DISK_TARGET, $arc, $fsize, $fsize );
-if ( $success )
-$this->stopTransfer( OPER_SENT_DISK, $dest, $fsize );
+$this->onBytesSent( $target, $arc, $fsize, $fsize );
+}
+$success && $this->stopTransfer( OPER_SENT_DISK, $dest, $fsize, $uncompressed_size );
 return $success;
 } else {
 $this->outputError( 
@@ -174,7 +182,16 @@ $err_params );
 }
 } catch ( MyException $e ) {
 $this->outputError( formatErrMsg( $e ), false, $err_params );
+return false;
 }
+}
+} else {
+$this->outputError( 
+'<red>[!] ' . sprintf( 
+_esc( 'The target path %s is not within allowed path (see %s).' ), 
+$this->getTarget( $target )->getPath(), 
+getAnchor( 'open_basedir', PHP_MANUAL_URL . 'ini.core.php#ini.open-basedir' ) ) . '</red>' );
+return false;
 }
 }
 return true;
@@ -186,17 +203,24 @@ $target = $this->getTarget( MYSQL_SOURCE );
 if ( $target->isEnabled() ) {
 $params = $target->getParams();
 if ( ! empty( $params['tables'] ) ) {
-if ( is_wp() && $this->_statistics_manager )
-$this->_statistics_manager->_sqlExec( 
-sprintf( "DELETE FROM %s_options where option_name like '_transient_%%';", wp_get_db_prefix() ), 
-true );
+if ( is_wp() ) {
+$obj = new MySQLWrapper( $this->getOptions() );
+if ( $link = $obj->connect() ) {
+$obj->query( 
+sprintf( 
+"DELETE FROM %soptions where option_name like '_transient_%%';", 
+wp_get_db_prefix() ) );
+}
+$obj->disconnect();
+$obj = null;
+}
 $db_prefix = count( wp_get_user_blogs_prefixes() ) < 2 ? wp_get_db_prefix() : '';
 $pattern = $db_prefix . preg_replace( '/([,|])/', '\1' . $db_prefix, $params['tables'] );
 $this->logSeparator();
 $this->logOutputTimestamp( 
-sprintf( 
-_esc( '<b>Backing up the MySQL database %s tables</b>' ), 
-getSpan( $target->getOption( 'mysql_db' ), 'cyan' ) ) );
+'<b>' . sprintf( 
+_esc( 'Backing up the MySQL database %s tables' ), 
+getSpan( $target->getOption( 'mysql_db' ), 'cyan' ) ) . '</b>' );
 $this->logOutputTimestamp( sprintf( _esc( 'tables pattern: %s' ), $params['tables'] ), BULLET );
 $this->addtFileCount( 1 );
 $mysqlbkp = new MySQLBackupHandler( $target->getOptions() );
@@ -219,12 +243,22 @@ array( $this, 'onMySqlMaint' )
 array( $this, 'chkProcessSignal' ), 
 array( $this, 'onProgress' ) ) );
 $this->addVolCount( count( $arcs ) );
+$this->logOutput( 
+sprintf( 
+"<br><b>%s</b> : %s", 
+_esc( 'SUBTOTAL' ), 
+sprintf( 
+'%s files added (%s%s) from %s', 
+getSpan( $arcs[0]['count'], '#fff', 'bold' ), 
+getHumanReadableSize( $arcs[0]['bytes'] ), 
+count( $arcs ) > 1 ? sprintf( ', %d vols', count( $arcs ) ) : '', 
+'MySQL::' . $params['mysql_db'] . '.' . $db_prefix ) ) );
 return $arcs;
 }
 }
 return true;
 }
-private function _upload2Email( $filename, $target, $add_filename = false ) {
+private function _upload2Email( $filename, $target, $uncompressed_size = 0, $add_filename = false ) {
 if ( $this->chkProcessSignal() )
 return $this->processAbortSignal( MAIL_TARGET, OPER_SEND_EMAIL );
 if ( null == $target ) {
@@ -257,8 +291,8 @@ $mail_est_size = $mail_size * 1.33;
 if ( $memory_limit - $memory_usage < $mail_est_size ) 
 $this->outputError( 
 sprintf( 
-'<yellow>' .
-_esc( 'Warning: mail size : ~ %s (*1.33 => %s), PHP memory_limit : %s, mem usage: %s' ) .
+'<yellow>' . _esc( 
+'Warning : mail size : ~ %s (*1.33 => %s), PHP memory_limit : %s, mem usage: %s' ) .
 '</yellow>', 
 getHumanReadableSize( $mail_size ), 
 getHumanReadableSize( $mail_est_size ), 
@@ -269,7 +303,7 @@ $err_params );
 elseif ( $upload_limit > 0 && $upload_limit < $mail_est_size ) 
 $this->outputError( 
 sprintf( 
-'<yellow>' . _esc( 'Warning: mail size : ~ %s (*1.33 => %s), PHP upload_max_filesize : %s' ) .
+'<yellow>' . _esc( 'Warning : mail size : ~ %s (*1.33 => %s), PHP upload_maxfilesize : %s' ) .
 '</yellow>', 
 getHumanReadableSize( $mail_size ), 
 getHumanReadableSize( $mail_est_size ), 
@@ -283,6 +317,7 @@ $smtp_debug = defined( __NAMESPACE__.'\\SMTP_DEBUG' ) && SMTP_DEBUG;
 $backend_params = array( 
 'debug' => $smtp_debug, 
 'auth' => strToBool( $this->getTarget( $target )->getOption( 'backup2mail_auth' ) ) );
+if ( $backend_params['auth'] )
 foreach ( array( 
 'host' => 'backup2mail_host', 
 'port' => 'backup2mail_port', 
@@ -307,7 +342,7 @@ $err_msg = $err->getMessage();
 }
 if ( $result ) {
 $this->onBytesSent( MAIL_TARGET, $filename, $fsize, $fsize );
-$this->stopTransfer( OPER_SENT_EMAIL, $filename, $fsize );
+$this->stopTransfer( OPER_SENT_EMAIL, $filename, $fsize, $uncompressed_size );
 } else
 $this->outputError( 
 '<red>' . _esc( 'Mail send failed' ) . ( null == $err_msg ? '' : ( ': ' . $err_msg ) ) . '.</red>', 
@@ -333,11 +368,11 @@ if ( 'error' == $info[0] || 'warning' == $info[0] )
 $err_msg[] = sprintf( _esc( '%s on %s : %s' ), $info[0], $cmd, $info[1] );
 if ( count( $err_msg ) > 0 )
 $msg .= sprintf( 
-_esc( "%s found the following %d problems when checking the table %s:<br>%s<br>" ), 
+_esc( "%s found the following %d problems while checking the table %s:%s" ), 
 WPMYBACKUP, 
 count( $err_msg ), 
-$table_name, 
-implode( PHP_EOL, $err_msg ) );
+getSpan( $table_name, 'cyan' ), 
+'<ul><li>' . implode( '</li><li>', $err_msg ) . '</li></ul>' );
 }
 }
 return $msg;
@@ -431,7 +466,7 @@ case SSH_TARGET :
 $result = $file_item[6];
 break;
 case DISK_TARGET :
-$result = is_dir( $file_item );
+$result = _is_dir( $file_item );
 break;
 }
 return $result;
@@ -457,7 +492,7 @@ break;
 }
 return $result;
 };
-$get_filesize = function ( $file_item ) use(&$target, &$obj ) {
+$getfilesize = function ( $file_item ) use(&$target, &$obj ) {
 switch ( $target ) {
 case $obj->getTargetConstant( 'DROPBOX_TARGET' ) :
 case $obj->getTargetConstant( 'WEBDAV_TARGET' ) :
@@ -508,9 +543,11 @@ $api = getFtpObject( $this->getOptions(), SSH_TARGET == $target );
 break;
 case DISK_TARGET :
 $api = false;
+$metadata = array();
+if ( _dir_in_allowed_path( $targetPath ) )
 $metadata = glob( 
-addTrailingSlash( $targetPath ) . $pattern . "*." . $COMPRESSION_NAMES[$this->getCompressionMethod()] .
-"*" );
+addTrailingSlash( $targetPath ) . $pattern . "*." .
+$COMPRESSION_NAMES[$this->getCompressionMethod()] . "*" );
 $delete_func = 'unlink';
 break;
 }
@@ -559,7 +596,7 @@ $filename = _basename( $get_filename( $file, $file_id ) );
 if ( ! $this->chkProcessSignal() ) {
 if ( 0 !== strpos( $filename, $file_pattern ) )
 continue;
-$filesize = $get_filesize( $file );
+$filesize = $getfilesize( $file );
 $err_params['METRIC_FILENAME'] = $file;
 $err_params['METRIC_SIZE'] = $filesize;
 $this->startTransfer( 
@@ -573,13 +610,13 @@ if ( is_array( $del_result ) )
 $del_result = isset( $del_result[0] ) ? array_sum( $del_result ) : ( isset( 
 $del_result['message'] ) ? 0 : 1 );
 $deleted_files += $del_result;
-$this->stopTransfer( OPER_CLEANUP_OLDIES, $filename, $filesize, 'METRIC_ACTION_CLEANUP' );
+$this->stopTransfer( OPER_CLEANUP_OLDIES, $filename, $filesize, 0, 'METRIC_ACTION_CLEANUP' );
 } else {
 $this->processAbortSignal( $target, OPER_CLEANUP_OLDIES );
 break;
 }
 }
-$this->onProgress( $target, $filename, $i++, $j, 5 );
+$this->onProgress( $target, $filename, $i++, $j, PT_DELETE );
 }
 } catch ( MyException $e ) {
 $this->outputError( formatErrMsg( $e ), false, $err_params );
@@ -614,8 +651,156 @@ if ( defined( __NAMESPACE__.'\\WEBDAV_TARGET' ) && $this->getTarget( WEBDAV_TARG
 $done = $done && null !== $this->_upload2Storage( $o, WEBDAV_TARGET );
 if ( $done )
 @unlink( $o );
-$this->onProgress( TMPFILE_SOURCE, $o, $i++, $j, 1 );
+$this->onProgress( TMPFILE_SOURCE, $o, $i++, $j, PT_UPLOAD );
 }
+}
+public function calcBackupReqDiskSpace( $temp_file ) {
+$this->logOutputTimestamp( _esc( 'Calculating the necessary disk space on working directory' ) );
+if ( $files = file( $temp_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) ) {
+$necessary_space = getFilesSize( $files );
+$free_space = _disk_free_space( $this->getWorkDir() );
+$free_space_str = getHumanReadableSize( $free_space );
+$necessary_space_str = getHumanReadableSize( $necessary_space );
+if ( $free_space < $necessary_space ) {
+$msg = sprintf( 
+_esc( '[!] The free disk space (%s) on %s is smaller than the necessary disk space (%s)' ), 
+$free_space_str, 
+$this->getWorkDir(), 
+$necessary_space_str );
+$this->logOutputTimestamp( '<yellow>' . $msg . '</yellow>', BULLET );
+$this->addMessage( MESSAGE_TYPE_WARNING, $msg, $this->getCurrentJobId() );
+} else
+$this->logOutputTimestamp( 
+sprintf( 
+_esc( 'disk space OK: space required : %s, free disk space : %s' ), 
+$necessary_space_str, 
+$free_space_str ), 
+BULLET );
+}
+}
+public function updateBackupFilesFilter( $temp_file, $file_count, $callbacks ) {
+$mode = defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_DIFF == $this->getBackupMode() ? BACKUP_MODE_FULL : false;
+if ( BACKUP_MODE_FULL != $this->getBackupMode() ) {
+$last_timestamp = 0;
+$last_timestamp = $this->getLastJob( $mode );
+$diff_mode = defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_DIFF == $this->getBackupMode() ? _esc( 
+'differentially' ) : ( defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_INC == $this->getBackupMode() ? _esc( 
+'incrementally' ) : '' );
+$this->logOutputTimestamp( 
+sprintf( 
+_esc( 'Filtering out %s those files not modifed since %s' ), 
+$diff_mode, 
+date( DATETIME_FORMAT, $last_timestamp ) ), 
+BULLET, 
+1 );
+$log_filename = preg_replace( '/(.+)(\..+)$/', '$1-' . $this->getBackupMode() . '$2', BACKUP_FILTER_LOG );
+$ref_log_filename = preg_replace( 
+'/(.+)(\..+)$/', 
+'$1-' . ( false === $mode ? $this->getBackupMode() : $mode ) . '$2', 
+BACKUP_FILTER_LOG );
+! _file_exists( $ref_log_filename ) &&
+$ref_log_filename = preg_replace( '/(.+)(\..+)$/', '$1-' . BACKUP_MODE_FULL . '$2', BACKUP_FILTER_LOG );
+$this->logOutputTimestamp( 
+sprintf( 
+_esc( 'Logging the MD5 hash value of the files into %s' ), 
+str_replace( 
+array( ROOT_PATH, LOG_DIR ), 
+array( 'ROOT' . DIRECTORY_SEPARATOR, 'LOGDIR' . DIRECTORY_SEPARATOR ), 
+$log_filename ) ), 
+BULLET, 
+1 );
+$bf = new BackupFilesFilter( $log_filename, $ref_log_filename );
+$bf->setCallback( 
+$callbacks['abort'], 
+$callbacks['progress'], 
+$this->getVerbosity( VERBOSE_COMPACT ) ? $callbacks['output'] : null );
+if ( false === ( $file_count = $bf->filter( $temp_file, $last_timestamp, $mode ) ) ) {
+$e = error_get_last();
+unlink( $temp_file );
+throw new MyException( $e['message'], $e['type'] );
+}
+}
+}
+private function _loadFileList( $temp_file, $src_dir, $excl_dirs ) {
+$_this_ = &$this;
+$before_section_callback = function ( $temp_file, $file_count, $callbacks ) use(&$_this_ ) {
+$_this_->getProgressManager()->cleanUp();
+$_this_->calcBackupReqDiskSpace( $temp_file );
+$_this_->updateBackupFilesFilter( $temp_file, $file_count, $callbacks );
+$_this_->getProgressManager()->cleanUp();
+};
+$callbacks = array( 
+'abort' => array( $this, 'chkProcessSignal' ), 
+'progress' => array( $this, 'onProgress' ), 
+'output' => array( $this, 'logOutputTimestamp' ), 
+'before_section' => $before_section_callback );
+$use_cache_preloader = BACKUP_MODE_FULL == $this->getOptions( 'mode', BACKUP_MODE_FULL ) &&
+strToBool( $this->getOptions( 'use_cache_preload', false ) );
+$cache_file = LOG_PREFIX . '-srcfiles.cache';
+$array = false;
+$cache_data = false;
+if ( $use_cache_preloader && _is_file( $cache_file ) ) {
+if ( ( $cache_data = json_decode( file_get_contents( $cache_file ), true ) ) && $cache_data['done'] ) {
+if ( $cache_data['running'] || ! ( $cache_data['done'] && isset( $cache_data['filename'] ) &&
+isset( $cache_data['files_count'] ) && $cache_data['files_count'] &&
+( time() - $cache_data['timestamp'] < 60 * $this->getOptions( 'cache_preload_age', 1440 ) ) ) ) {
+$array = false;
+} else {
+$array = array( $cache_data['files_count'], $cache_data['filename'] );
+foreach ( array_keys( $array[1] ) as $filename )
+if ( ! _is_file( $filename ) ) {
+$array = false;
+break;
+}
+$array && $this->logOutputTimestamp( 
+sprintf( 
+_esc( "loaded from a cache file built %s ago" ), 
+getHumanReadableTime( time() - $cache_data['timestamp'] ) ), 
+BULLET );
+}
+}
+}
+if ( ! ( $use_cache_preloader && $array && $cache_data ) ) {
+$array = buildFileList( 
+$temp_file, 
+$this->getOptions(), 
+$src_dir, 
+$excl_dirs, 
+$this->getExcludedFiles(), 
+$this->getExcludedExt(), 
+$this->getExcludedLinks(), 
+$this->getVerbosity( VERBOSE_COMPACT ), 
+$callbacks );
+if ( ! ( isset( $array[1] ) && $array[1] ) ) {
+$this->outputError();
+$cache_data = false;
+} else {
+$cache_data = array( 
+'done' => true, 
+'running' => false, 
+'files_count' => $array[0], 
+'filename' => $array[1], 
+'timestamp' => time() );
+$use_cache_preloader && file_put_contents( $cache_file, json_encode( $cache_data ) );
+}
+}
+if ( $cache_data ) {
+if ( $use_cache_preloader ) {
+$files = array();
+$ext = uniqid();
+foreach ( $cache_data['filename'] as $section_filename => $section_file_data ) {
+$key = $section_filename . '.' . $ext;
+if ( copy( $section_filename, $key ) )
+$files[$key] = $section_file_data;
+else
+$files[$section_filename] = $section_file_data;
+}
+} else {
+$files = $cache_data['filename'];
+}
+return array( $cache_data['files_count'], $files );
+}
+return false;
 }
 private function _createFileBackup() {
 if ( $this->chkProcessSignal() )
@@ -631,97 +816,20 @@ $total_fcount = 0;
 $total_fsize = 0;
 $temp_file = tempnam( $this->getWorkDir(), WPMYBACKUP_LOGS . '_' );
 $excl_dirs = $this->getExcludedDirs();
+$file_count = 0;
 $this->logSeparator();
-$this->logOutputTimestamp( sprintf( _esc( "<b>Creating the backup file list </b> (%s)" ), $src_dir ) );
-if ( is_wp() ) {
-$wp_components = array_keys( getWPSourceDirList( WPMYBACKUP_ROOT ) );
-array_walk( 
-$wp_components, 
-function ( &$item, $key ) {
-! empty( $item ) && $item = WPMYBACKUP_ROOT . $item;
-} );
-} else
-$wp_components = array();
-foreach ( $excl_dirs as $excl_dir ) {
-$this->logOutputTimestamp( _esc( 'excluding directory ' ) . $excl_dir, BULLET );
-foreach ( $wp_components as $key => $wp_comp ) {
-if ( strlen( delTrailingSlash( $excl_dir ) ) &&
-false !== strpos( delTrailingSlash( $wp_comp ), delTrailingSlash( $excl_dir ) ) )
-unset( $wp_components[$key] );
-else {
-}
-}
-}
-if ( $this->getOptions( 'plugin_backup', false ) )
-$dir_list = array( $this->getOptions( 'dir' ) );
-else {
-$dir_list = _call_user_func( is_wp() ? 'getWPDirList' : 'getDirList', $src_dir, false, 2, false );
-$dir_list = array_merge( $dir_list, array( $src_dir ) );
-}
-$file_count = createFileList( 
-$temp_file, 
-$dir_list, 
-$excl_dirs, 
-$this->getExcludedExt(), 
-$this->getExcludedFiles(), 
-$this->getExcludedLinks(), 
-$this->getVerbosity( VERBOSE_COMPACT ) ? array( 
-array( $this, 'logOutputTimestamp' ), 
-array( $this, 'chkProcessSignal' ) ) : null );
-$mode = defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_DIFF == $this->getBackupMode() ? BACKUP_MODE_FULL : false;
-$last_timestamp = 0;
-if ( BACKUP_MODE_FULL != $this->getBackupMode() ) {
-$last_timestamp = $this->getLastJob( $mode );
-$diff_mode = defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_DIFF == $this->getBackupMode() ? _esc( 
-'differentially' ) : ( defined( __NAMESPACE__.'\\BACKUP_MODE_DIFF' ) && BACKUP_MODE_INC == $this->getBackupMode() ? _esc( 
-'incrementally' ) : '' );
 $this->logOutputTimestamp( 
-sprintf( 
-_esc( 'Filtering out %s those files not modifed since %s' ), 
-$diff_mode, 
-date( DATETIME_FORMAT, $last_timestamp ) ), 
-BULLET, 
-1 );
-}
-$log_filename = preg_replace( '/(.+)(\..+)$/', '$1-' . $this->getBackupMode() . '$2', BACKUP_FILTER_LOG );
-$ref_log_filename = preg_replace( 
-'/(.+)(\..+)$/', 
-'$1-' . ( false === $mode ? $this->getBackupMode() : $mode ) . '$2', 
-BACKUP_FILTER_LOG );
-! file_exists( $ref_log_filename ) &&
-$ref_log_filename = preg_replace( '/(.+)(\..+)$/', '$1-' . BACKUP_MODE_FULL . '$2', BACKUP_FILTER_LOG );
-$this->logOutputTimestamp( 
-sprintf( 
-_esc( 'Logging the MD5 hash value of the files into %s' ), 
-str_replace( 
-array( ROOT_PATH, LOG_DIR ), 
-array( 'ROOT' . DIRECTORY_SEPARATOR, 'LOGDIR' . DIRECTORY_SEPARATOR ), 
-$log_filename ) ), 
-BULLET, 
-1 );
-$bf = new BackupFilesFilter( $log_filename, $ref_log_filename );
-$callbacks = array( 
-array( $this, 'chkProcessSignal' ), 
-array( $this, 'onProgress' ), 
-array( $this, 'logOutputTimestamp' ) );
-$bf->setCallback( 
-$callbacks[0], 
-$callbacks[1], 
-BACKUP_MODE_FULL != $this->getBackupMode() ? $callbacks[2] : null );
-if ( false === ( $file_count = $bf->filter( $temp_file, $last_timestamp, $mode ) ) ) {
-$e = error_get_last();
-unlink( $temp_file );
-throw new MyException( $e['message'], $e['type'] );
-}
-if ( ! ( $sections_temp_file = createFileListBySections( $temp_file, $wp_components ) ) ) {
-$this->outputError();
-} else {
+sprintf( _esc( "<b>Creating the backup file list </b> (%s)" ), shorten_path( $src_dir ) ) );
+if ( $array = $this->_loadFileList( $temp_file, $src_dir, $excl_dirs ) ) {
+$file_count = $array[0];
+$sections_temp_file = $array[1];
 $this->logOutputTimestamp( sprintf( _esc( "%d file(s) scheduled to be backed up" ), $file_count ), BULLET );
 $this->logOutputTimestamp( 
 sprintf( 
 _esc( "%d archive(s) scheduled to be created" ), 
 $file_count ? count( $sections_temp_file ) : 0 ), 
 BULLET );
+$this->getProgressManager()->cleanUp();
 $section_done = 0;
 if ( $file_count ) {
 $os_tool_status = testOSTools( 
@@ -735,14 +843,14 @@ $this->getExcludedExt(),
 $this->getBZipVersion(), 
 $this->getCygwin() );
 foreach ( $sections_temp_file as $section_temp_file => $file_section_info ) {
-if ( file_exists( $section_temp_file ) ) {
+if ( _file_exists( $section_temp_file ) ) {
 if ( ! $this->chkProcessSignal() ) {
 $archive_name = sprintf( 
 "%s%s", 
 $this->getBackupName(), 
 ! empty( $file_section_info['section'] ) ? '-' .
 basename( $file_section_info['section'] ) : '' );
-file_exists( $archive_name ) && @unlink( $archive_name );
+_file_exists( $archive_name ) && @unlink( $archive_name );
 $fcount = 0;
 $fsize = 0;
 if ( $tar_limit > 0 )
@@ -760,14 +868,18 @@ $dir_path = $src_dir;
 $filter = str_replace( $src_dir, '', $file_section_info['section'] );
 $dir = getWPSourceDirList( $src_dir, $filter );
 isset( $dir[$filter] ) && $dir_hint = '<blockquote>' . $dir[$filter][1] . '</blockquote>';
-$dir_hint .= $file_section_info['section'];
+$dir_hint .= normalize_path( $file_section_info['section'] );
 if ( isset( $dir[$filter] ) ) {
 $dir = $dir[$filter][0];
-$dir_hint = "<b>" . normalize_path( $dir ) . "</b><br>" . $dir_hint;
+$dir_hint = "<b>" . $dir . "</b><br>" . $dir_hint;
 } else
 $dir = '';
+empty( $dir ) && $dir = $src_dir;
 $dir_path = $file_section_info['section'];
 }
+$dir_size = getDirSizeFromCache( $dir_path, true );
+$dir_hint .= '<p>' . _esc( 'Directory size' ) . ': ' .
+getHumanReadableSize( $dir_size ? $dir_size : PHP_INT_MAX ) . '</p>';
 if ( in_array( addTrailingSlash( $dir_path ), $excl_dirs ) ) {
 $this->logOutputTimestamp( 
 sprintf( 
@@ -776,7 +888,7 @@ sprintf(
 count( $sections_temp_file ), 
 $dir_path ) );
 0 != $section_done && $this->logSeparator();
-file_exists( $section_temp_file ) && @unlink( $section_temp_file );
+_file_exists( $section_temp_file ) && @unlink( $section_temp_file );
 continue;
 }
 0 == $section_done && $this->logSeparator();
@@ -785,13 +897,14 @@ sprintf(
 _esc( "<b>[%d/%d] Backing up the source folder</b> (%s%s)" ), 
 $section_done + 1, 
 count( $sections_temp_file ), 
-"<a class='help' onclick=" . getHelpCall( "'$dir_hint'" ) . ">" . $dir . "</a>", 
+"<a class='help' onclick=" . getHelpCall( "'$dir_hint'" ) . ">" .
+shorten_path( $dir ) . "</a>", 
 $multi_vol ) );
 if ( $file_section_info['lines'] ) {
 if ( 'extern' == $this->getTool() && false !== $os_tool_status ) {
 if ( is_array( $wp_components ) ) {
 foreach ( $wp_components as $wp_comp ) {
-if ( delTrailingSlash( $dir_path ) != delTrailingSlash( $wp_comp ) &&
+if ( delTrailingSlash( $dir_path ) != $wp_comp &&
 false !== strpos( $wp_comp, $dir_path ) )
 ! in_array( $wp_comp, $excl_dirs ) && $excl_dirs[] = $wp_comp;
 }
@@ -816,22 +929,28 @@ if ( is_array( $arcs ) ) {
 $i = 1;
 $this->addVolCount( count( $arcs ) );
 asort( $arcs );
-foreach ( $arcs as $arc )
-if ( file_exists( $arc['name'] ) ) {
+foreach ( $arcs as $arc ) {
+if ( ! $arc['queued'] && _file_exists( $arc['name'] ) ) {
 $this->onNewArc( $arc['name'], $arc['bytes'], $arc['arcsize'], $i++ );
+$arc['queued'] = true;
+}
 $arclist[] = $arc['name'];
 $fcount += $arc['count'];
 $fsize += $arc['bytes'];
 }
 }
-if ( file_exists( $section_temp_file ) ) {
+if ( _file_exists( $section_temp_file ) ) {
 $this->addtFileCount( getFileLinesCount( $section_temp_file ) );
 $this->logOutput( 
 sprintf( 
-_esc( "<br><b>SUBTOTAL</b> : %s files added (%s) from %s" ), 
+_esc( "<br><b>%s</b> : %s" ), 
+_esc( 'SUBTOTAL' ), 
+sprintf( 
+'%s files added (%s%s) from %s', 
 getSpan( $fcount, '#fff', 'bold' ), 
 getHumanReadableSize( $fsize ), 
-$dir_path ) );
+count( $arcs ) > 1 ? sprintf( ', %d vols', count( $arcs ) ) : '', 
+shorten_path( $dir_path ) ) ) );
 $this->logSeparator();
 }
 $total_fcount += $fcount;
@@ -850,7 +969,7 @@ getSpan( $total_fcount, '#fff', 'bold' ),
 getHumanReadableSize( $total_fsize ), 
 $section_done, 
 $file_count, 
-$src_dir ) );
+shorten_path( $src_dir ) ) );
 if ( $total_fcount != $file_count && $total_fcount > 0 ) {
 $diff_hint = _esc( 
 'The estimated/scheduled file count may include some reference to folders, links or other items that should normally be discarded. This is rather a bug although it is NOT harmfull.<br>Don`t worry, be happy!' );
@@ -862,8 +981,8 @@ if ( ! $this->getTargetCount() || ( $this->uploaded < $section_done * $this->get
 $this->logOutput( 
 '<red>' . sprintf( 
 sprintf( 
-_esc( 'WARNING: %s. Check the messages above and try to fix the cause.' ), 
-! $this->uploaded ? _esc( 'No even a single archive was uploaded' ) : _esc( 
+_esc( 'WARNING : %s. Check the messages above and try to fix the cause.' ), 
+! $this->uploaded ? _esc( 'Not even a single archive was uploaded' ) : _esc( 
 'Only %d archives were successfully uploaded (of %d sections x %d targets)' ) ), 
 $this->uploaded, 
 $section_done, 
@@ -890,7 +1009,7 @@ $vol_count = $archive_limit > 0 ? ceil( $archive_size / $archive_limit ) : 0;
 $this->startCompress( $archive_path );
 if ( $this->chkProcessSignal() )
 return $this->processAbortSignal( SRCFILE_SOURCE, OPER_COMPRESS_EXTERN );
-$this->onProgress( TMPFILE_SOURCE, $this->getSourceDir(), 0, $archive_size, 3, - 1 );
+$this->onProgress( TMPFILE_SOURCE, $this->getSourceDir(), 0, $archive_size, PT_COMPRESS, - 1 );
 $result = unixTarNZip( 
 $src_dir, 
 $archive_path, 
@@ -903,14 +1022,14 @@ $excl_dirs,
 $this->getExcludedExt(), 
 $this->getBZipVersion(), 
 $this->getCygwin() );
-$this->onProgress( TMPFILE_SOURCE, $this->getSourceDir(), $archive_size, $archive_size, 3, - 1 );
+$this->onProgress( TMPFILE_SOURCE, $this->getSourceDir(), $archive_size, $archive_size, PT_COMPRESS, - 1 );
 if ( is_array( $result ) && count( $result ) > 0 )
 foreach ( $result as $arc )
-if ( ! is_dir( $arc ) ) {
+if ( ! _is_dir( $arc ) ) {
 $fs = filesize( $arc );
 if ( preg_match( '/(.+\.tar)\.[^.]+$/', $arc, $matches ) ) {
 $tar = $matches[1];
-if ( file_exists( $tar ) ) {
+if ( _file_exists( $tar ) ) {
 $fs = filesize( $tar );
 unlink( $tar );
 }
@@ -921,7 +1040,8 @@ $arcs[] = array(
 'name' => $arc, 
 'arcsize' => $fs, 
 'count' => ( 0 == count( $arcs ) ? $fcount : 0 ), 
-'bytes' => $fs );
+'bytes' => $fs, 
+'queued' => false );
 }
 if ( $vol_count > 1 )
 $this->logOutputTimestamp( 
@@ -944,14 +1064,15 @@ private function _runInternCompressTool( $archive_path, $archive_limit, $temp_fi
 global $COMPRESSION_ARCHIVE;
 $arcs = array();
 $fcount = 0;
-$fsize = 0;
-$archive_classname = __NAMESPACE__ . '\\' . $COMPRESSION_ARCHIVE[$this->getCompressionMethod()];
+$arc_class = $COMPRESSION_ARCHIVE[$this->getCompressionMethod()];
+$archive_classname = __NAMESPACE__ . '\\' . $arc_class;
 if ( ! class_exists( $archive_classname ) )
 throw new MyException( 
 sprintf( 
 _esc( 'Cannot compress using the archive type %s.' ) . '<br>' . _esc( 'Class %s does not exist' ), 
 $this->getCompressionName(), 
 $archive_classname ) );
+$ptype = 'MyPclZipArchive' == $arc_class ? PT_ENQUEUE : PT_ADDFILE;
 $archive = new $archive_classname( $archive_path, TMPFILE_SOURCE );
 $archive->setCPUSleep( $this->getCPUSleep() );
 $archive->onAbortCallback = array( $this, 'chkProcessSignal' );
@@ -960,16 +1081,25 @@ $archive->onStdOutput = array( $this, 'logOutputTimestamp' );
 $volumes = array();
 $volumes[] = $archive_path;
 $arcname = null;
+$eol_len = strlen( PHP_EOL );
 $handle = fopen( $temp_file, "r" );
 while ( ( $file = fgets( $handle ) ) !== false ) {
-$reset_timer = false;
-$file = str_replace( array( PHP_EOL, '\n' ), '', $file );
-if ( ! file_exists( $file ) || $this->chkProcessSignal() ) 
+if ( $this->chkProcessSignal() ) 
 continue;
+$reset_timer = false;
+$has_eol = PHP_EOL == substr( $file, - $eol_len );
+$has_eol && $file = substr( $file, 0, - $eol_len );
+if ( ! _file_exists( $file ) ) {
+$use_cache_preloader = BACKUP_MODE_FULL == $this->getOptions( 'mode', BACKUP_MODE_FULL ) &&
+strToBool( $this->getOptions( 'use_cache_preload', false ) );
+$err_msg = _esc( '[!] Skipping file %s due to it does not exist.' );
+$use_cache_preloader && $err_msg .= ' ' . _esc( 'Perhaps the file list cache is obsolete.' );
+$this->outputError( $err_msg );
+}
 $archive_size = $archive->getFileSize();
 $fs = filesize( $file );
 if ( $archive_limit > 0 && $archive_size + $fs > $archive_limit && $fcount > 0 ) {
-$this->onProgress( SRCFILE_SOURCE, $temp_file, $fcount, $file_count, 2, 0 );
+$this->onProgress( SRCFILE_SOURCE, $temp_file, $fcount, $file_count, $ptype, 0 );
 $this->logOutputTimestamp( 
 sprintf( 
 _esc( "dumping %s of buffered stream to %s" ), 
@@ -978,9 +1108,18 @@ basename( $archive_path ) ),
 "[" . count( $volumes ) . "]" );
 $this->startCompress( $archive_path );
 $arcname = $archive->compress( $this->getCompressionMethod(), $this->getCompressionLevel() );
+$archive->close(); 
+$arcs[] = array( 
+'name' => $arcname, 
+'arcsize' => $archive->getFileSize(), 
+'count' => $archive->getFileCount(), 
+'bytes' => $archive->getUncompressedSize(), 
+'queued' => false );
+if ( NONE != $this->getCompressionMethod() )
 $archive->unlink();
 if ( ! ( false === $arcname || empty( $arcname ) ) ) {
 $this->onNewArc( $arcname, $archive_size, filesize( $arcname ), count( $volumes ) + 1 );
+$arcs[count( $arcs ) - 1]['queued'] = true;
 }
 $archive_path = sprintf( "%s-%d", $this->getBackupName(), count( $volumes ) );
 $volumes[] = $archive_path;
@@ -1001,26 +1140,26 @@ $alias,
 empty( $this->nocompress ) ||
 ! preg_match( '/.*\.(' . implode( '|', $this->nocompress ) . ')$/', $file ) ) ) {
 $fcount++;
-$fsize += $fs;
 }
 }
-$this->onProgress( SRCFILE_SOURCE, $temp_file, $fcount, $file_count, 2, 1, $reset_timer );
+$this->onProgress( SRCFILE_SOURCE, $temp_file, $fcount, $file_count, $ptype, 1, $reset_timer );
 }
 isset( $reset_timer ) &&
-$this->onProgress( SRCFILE_SOURCE, $temp_file, $file_count, $file_count, 2, 1, $reset_timer );
+$this->onProgress( SRCFILE_SOURCE, $temp_file, $file_count, $file_count, $ptype, 1, $reset_timer );
 fclose( $handle );
 if ( false !== $arcname ) {
 if ( count( $volumes ) > 1 ) {
 $this->logOutputTimestamp( 
 sprintf( 
-_esc( "dumping %s of buffered stream to %s" ), 
+_esc( "dumping %s of buffered stream (%d files) to %s" ), 
 getHumanReadableSize( $archive_size ), 
+$fcount, 
 basename( $archive_path ) ), 
 "[" . count( $volumes ) . "]" );
 } else
 $this->logOutputTimestamp( 
 sprintf( 
-_esc( "archive %s created successfully (%d files, %d volumes)" ), 
+_esc( "archive %s created successfully (%d files, %d volume)" ), 
 getSpan( basename( $archive_path ), 'cyan' ), 
 $fcount, 
 count( $volumes ) ), 
@@ -1033,7 +1172,8 @@ $arcs[] = array(
 'name' => $arcname, 
 'arcsize' => $archive->getFileSize(), 
 'count' => $archive->getFileCount(), 
-'bytes' => $archive->getUncompressedSize() );
+'bytes' => $archive->getUncompressedSize(), 
+'queued' => false );
 }
 }
 $archive->close(); 
@@ -1059,7 +1199,7 @@ $targets_priority = array(
 'MAIL_TARGET' => '_upload2Email',  
 'DISK_TARGET' => '_move2Disk' ); 
 if ( ! empty( $arc ) ) {
-$fs = is_file( $arc ) ? filesize( $arc ) : false;
+$fs = _is_file( $arc ) ? filesize( $arc ) : false;
 if ( false === $fs ) {
 $this->outputError( 
 sprintf( 
@@ -1067,12 +1207,12 @@ sprintf(
 basename( $arc ) ), 
 false, 
 $err_params );
-return;
+return false;
 }
 try {
-if ( $fs > 0 ) {
-$options = $this->getOptions();
-if ( ! empty( $options['encryption'] ) && ( $out = $this->encrypt( $arc ) ) ) {
+if ( $fs ) {
+$encryption = $this->getOptions( 'encryption', null );
+if ( ! empty( $encryption ) && ( $out = $this->encrypt( $arc ) ) ) {
 unlink( $arc ); 
 $arc = $out;
 $fs = filesize( $arc );
@@ -1092,6 +1232,7 @@ $err_params['METRIC_OPERATION'] = $oper_send;
 $sent = $this->$target_func( 
 $arc, 
 $target, 
+$uncompressed_size, 
 ! in_array( 
 $target, 
 array( 
@@ -1112,20 +1253,23 @@ $err_params );
 }
 $this->uploaded += $saved;
 }
-$sufix = $saved ? _esc( 'although you have enabled at least one' ) : _esc( '(no target specified)' );
+$sufix = $saved ? _esc( 'although you have enabled at least one' ) : _esc( 
+'(no valid target specified)' );
 if ( ! $saved && ( null !== ( $job_id = $this->getCurrentJobId() ) || $job_id >= 0 ) &&
 0 == $this->getTargetCount() )
 $this->outputError( 
-'<red>' . sprintf( _esc( "%s has not been copied to any location %s." ), $arc, $sufix ) .
-'</red> Please do it manually.' );
+'<red>' . sprintf( 
+_esc( "[!] %s has not been copied to any location %s." ), 
+basename( $arc ), 
+$sufix ) . '</red> ' . _esc( 'Please do it manually.' ) );
 else 
-if ( file_exists( $arc ) && NONE != $this->getCompressionMethod() ) {
+if ( _file_exists( $arc ) && NONE != $this->getCompressionMethod() ) {
 $result = true;
 unlink( $arc );
 }
 } else
 $this->outputError( 
-sprintf( _esc( "%s skipped due to null filesize" ), basename( $arc ) ), 
+sprintf( _esc( "%s skipped due to null file size" ), basename( $arc ) ), 
 false, 
 $err_params );
 } catch ( MyException $e ) {
@@ -1177,17 +1321,23 @@ $ok_status = _esc( 'successfully' );
 $status = _esc( 'unknown' );
 $prefix = '';
 $sufix = '';
+$aborted = false;
 if ( is_cli() )
 $this->logSeparator();
+$file_ok = true;
+$sql_ok = true;
+$exit_unexpectedly = false;
 try {
 if ( $this->getTarget( MYSQL_SOURCE )->isEnabled() ) {
 $arc = $this->_createMySqlBackup();
 if ( is_array( $arc ) )
 $arclist = array_merge( $arclist, $arc );
+else
+$sql_ok = false;
 $this->getProgressManager()->cleanUp();
 }
 $arc = $this->_createFileBackup();
-if ( false !== $arc ) {
+if ( ! ( $aborted = $this->_is_job_aborted( $aborted ) ) && false !== $arc ) {
 $arclist = array_merge( $arclist, $arc );
 $do_cleanup = false;
 for ( $i = DISK_TARGET; $i <= SSH_TARGET; $i++ )
@@ -1203,15 +1353,34 @@ $cleaned += $this->_cleanUpOldArchives( $target );
 }
 $status = $ok_status;
 $this->setError( null );
-}
+} else
+$file_ok = false;
 } catch ( MyException $e ) {
 $status = _esc( 'with errors:<br>' ) . $e->getMessage();
 $this->setError( $e );
 $arclist = false;
+$exit_unexpectedly = true;
 }
+$file_count = count( $arclist );
+$aborted = $this->_is_job_aborted( $aborted );
 $elapsed_time = time() - $start;
-if ( count( $arclist ) > 0 ) {
-$this->onJobEnds( array( 'duration' => $elapsed_time, 'avg_cpu' => get_system_load( $elapsed_time ) ) );
+$job_status = 'JOB_STATUS_FINISHED';
+if ( $sql_ok && $file_ok ) {
+$aborted && $job_status = 'JOB_STATUS_ABORTED';
+$job_state = ! ( $aborted || $exit_unexpectedly ) && $file_count ? 'JOB_STATE_COMPLETED' : 'JOB_STATE_PARTIAL';
+} else {
+$job_state = $file_count && ! $exit_unexpectedly ? 'JOB_STATE_PARTIAL' : 'JOB_STATE_FAILED';
+}
+$this->_job_state = constant( __NAMESPACE__ . '\\' . $job_state );
+$this->_job_status = constant( __NAMESPACE__ . '\\' . $job_status );
+if ( $file_count ) {
+$this->onJobEnds( 
+array( 
+'duration' => $elapsed_time, 
+'avg_cpu' => get_system_load( $elapsed_time ), 
+'job_status' => $job_status, 
+'job_state' => $job_state, 
+'files_count' => $file_count ) );
 if ( $ok_status != $status ) {
 $prefix = '<red>';
 $sufix = '</red>';
@@ -1220,7 +1389,7 @@ $prefix = '<white>';
 $sufix = '</white>';
 }
 }
-if ( $this->chkProcessSignal() ) {
+if ( $aborted ) {
 $status = _esc( 'with abort signal.' );
 $prefix = '<yellow>';
 $sufix = '</yellow>';
@@ -1252,7 +1421,7 @@ $this->addMessage(
 $ok_status == $status ? MESSAGE_TYPE_NORMAL : MESSAGE_TYPE_WARNING, 
 sprintf( _esc( 'New backup job run by %s (%s)' ), $this->getSender(), $status ), 
 empty( $job_id ) ? 0 : $job_id );
-return 0 === count( $arclist ) ? false : $arclist;
+return 0 === $file_count ? false : $arclist;
 }
 public function runMySQLMaintenance() {
 $job_id = JOB_MYSQL_MAINT;

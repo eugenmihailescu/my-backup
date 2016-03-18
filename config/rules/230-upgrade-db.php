@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : 230-upgrade-db.php $
  * 
- * @id      : 230-upgrade-db.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : 230-upgrade-db.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -40,12 +40,29 @@ $registered_db_upgrades[$db_ver_230] = array( 'db_upgrade_230' );
 function db_upgrade_230( $statistics_manager ) {
 global $db_ver_230;
 $errors = array();
+if ( ! is_object( $statistics_manager ) )
+return true;
+$conn_settings = $statistics_manager->getSettings();
+if ( ! ( isset( $conn_settings['history_enabled'] ) && strToBool( $conn_settings['history_enabled'] ) ) ) {
+return true;
+}
+if ( isset( $conn_settings['historydb'] ) ) {
+if ( 'mysql' == $conn_settings['historydb'] ) {
+if ( ! ( isset( $conn_settings['mysql_enabled'] ) && strToBool( $conn_settings['mysql_enabled'] ) ) )
+return true;
+} else
+return true;
+} else
+return true;
 $alter_bigint_cols = function ( $table, $cols ) use(&$statistics_manager ) {
 $col_list = array();
 foreach ( $cols as $col )
 $col_list[] = ' MODIFY COLUMN ' . $col . ' BIGINT';
-if ( false === $statistics_manager->queryData( 'ALTER TABLE ' . $table . implode( ',', $col_list ) ) )
-return sprintf( _esc( 'Error upgrading table %s' ), $table );
+if ( false === $statistics_manager->queryData( 'ALTER TABLE ' . $table . implode( ',', $col_list ) ) ) {
+$message = sprintf( _esc( 'Error upgrading table %s' ), $table );
+add_alert_message( $message, null, MESSAGE_TYPE_WARNING );
+return $message;
+}
 return true;
 };
 if ( true !== ( $e = $alter_bigint_cols( 

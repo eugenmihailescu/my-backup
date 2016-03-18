@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : backupjob-expert.php $
  * 
- * @id      : backupjob-expert.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : backupjob-expert.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -66,7 +66,8 @@ echoHelp( $help_1 );
 </tr>
 <?php
 }
-if ( 2 == $this->settings['compression_type'] && 'extern' == $this->settings['toolchain'] ) {
+if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) && 2 == $this->settings['compression_type'] &&
+'extern' == $this->settings['toolchain'] ) {
 ?>
 <tr>
 <td><label for="bzipver"><?php _pesc('BZIP version');?></label></td>
@@ -110,7 +111,8 @@ echoHelp( $help_9 );
 <tr>
 <td><label for="max_exec_time"><?php _pesc('Max. execution time (s)');?></label></td>
 <td><input type="number" name="max_exec_time" id="max_exec_time"
-value="<?php echo $this->settings["max_exec_time"];?>"
+<?php echo $safe_mode?' disabled ':'';?>
+value="<?php echo $safe_mode?ini_get('max_execution_time'):$this->settings["max_exec_time"];?>"
 min="<?php echo $max_exec_time_min;?>" max="<?php echo $max_exec_time_max;?>"><a
 class='help' onclick=<?php
 echoHelp( $help_7 );

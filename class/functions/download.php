@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : download.php $
  * 
- * @id      : download.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : download.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -103,7 +103,7 @@ return;
 if ( ! ( empty( $service ) || empty( $filename ) ) ) {
 $unlink = in_array( $service, array( 'google', 'dropbox', 'ftp', 'webdav', 'test' ) );
 $mime_type = 'application/octet-stream';
-$tmpfile = ! empty( $filename ) ? addTrailingSlash( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() ) .
+$tmpfile = ! empty( $filename ) ? addTrailingSlash( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir() ) .
 basename( $filename ) : null;
 switch ( $service ) {
 case 'dropbox' :
@@ -125,7 +125,7 @@ default :
 echo sprintf( _esc( "Download method '%s' not implemented" ), $service );
 break;
 }
-if ( isset( $tmpfile ) && file_exists( $tmpfile ) && ! empty( $mime_type ) ) {
+if ( isset( $tmpfile ) && _file_exists( $tmpfile ) && ! empty( $mime_type ) ) {
 if ( $download ) {
 redirectFileDownload( $tmpfile, $mime_type );
 if ( $unlink )

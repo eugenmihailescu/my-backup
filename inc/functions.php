@@ -24,21 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : functions.php $
  * 
- * @id      : functions.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : functions.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-define( 
-__NAMESPACE__.'\\JS_INJECT_COMMENT', 
-PHP_EOL . '/* inject our runtime generated local (%s) functions into the global application namespace */' . PHP_EOL );
-! defined( __NAMESPACE__.'\\SORT_NATURAL' ) && define( __NAMESPACE__.'\\SORT_NATURAL', SORT_STRING );
 function getDashboardTabs() {
 global $dashboard_tabs, $TARGET_NAMES, $registered_targets;
 $result = array();
@@ -109,7 +105,7 @@ $auth_str,
 $thanks_str );
 $java_scripts[] = sprintf( 'parent.popupError("%s","%s");', $title, $body );
 } else {
-if ( file_exists( $license_file ) )
+if ( _file_exists( $license_file ) )
 unlink( $license_file );
 del_session_var( 'license_activated' );
 }
@@ -120,7 +116,6 @@ return $license_id;
 }
 function sanitizeYAYUI() {
 global $java_scripts, $java_scripts_load, $java_scripts_beforeunload, $java_scripts_unload, $chart_script;
-file_put_contents(__FILE__.'.log', print_r($java_scripts,1).PHP_EOL);
 $array_sort_unique = function ( &$array ) {
 ksort( $array, SORT_NATURAL );
 $array = array_unique( $array );
@@ -131,7 +126,6 @@ $array_sort_unique( $java_scripts_load );
 $array_sort_unique( $java_scripts_beforeunload );
 $array_sort_unique( $java_scripts_unload );
 $array_sort_unique( $chart_script );
-file_put_contents(__FILE__.'.log', print_r($java_scripts,1).PHP_EOL,8);
 $yayui = new YayuiCompressor();
 if ( ! ( empty( $java_scripts ) && empty( $java_scripts_load ) && empty( $java_scripts_beforeunload ) &&
 empty( $java_scripts_unload ) && empty( $chart_script ) ) ) {
@@ -139,6 +133,7 @@ $js = '("undefined"==typeof parent)&&window.location.reload(true);';
 $js .= sprintf( 
 PHP_EOL . 'parent.ajaxurl=%s;' . PHP_EOL, 
 ! is_wp() ? '"' . getAsyncRunURL() . '"' : 'window.ajaxurl' );
+$js .= sprintf( PHP_EOL . 'parent.dummy="%s";' . PHP_EOL, uniqid( 'dummy_' ) );
 if ( ! empty( $chart_script ) ) {
 $js .= implode( PHP_EOL, array_values( $chart_script ) ) . PHP_EOL;
 }
@@ -258,7 +253,7 @@ insertHTMLSection( $outer_section_name, true );
 function insertTabMenus( $banner = '' ) {
 global $tab_orientation, $tab_position, $menu_shape, $settings;
 echo "<div id='tab-container' class='tab-container $tab_orientation $tab_position $menu_shape'>";
-echo '<ul id="navlist">';
+echo '<ul id="navlist" onclick="jsMyBackup.block_ui();">';
 $sel_tab = getSelectedTab();
 $visible_tabs = 0;
 foreach ( getDashboardTabs() as $tab => $name ) {

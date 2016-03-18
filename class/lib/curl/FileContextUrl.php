@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : FileContextUrl.php $
  * 
- * @id      : FileContextUrl.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : FileContextUrl.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -176,7 +176,7 @@ if ($this->_upl_throttle && $bytes_transferred) {
 $ellapsed = time () - $this->_started;
 $bps = $bytes_transferred / $ellapsed;
 $diff = $bps - 1024 * $this->_upl_throttle;
-($diff > 0) && sleep ( $diff * $ellapsed );
+($diff > 0) && _sleep ( $diff * $ellapsed );
 }
 }
 public function exec($url, $options = null, $callback_info = null) {
@@ -276,11 +276,11 @@ $response .= $buffer;
 $dlnow = strlen ( $buffer );
 }
 if (! in_array ( $response_meta ['status'] ['code'], $this->_ok_status_codes )) {
-throw new Exception ( $response_meta ['status'] ['message'], $response_meta ['status'] ['code'] );
+throw new \Exception ( $response_meta ['status'] ['message'], $response_meta ['status'] ['code'] );
 }
 } else
 return false;
-} catch ( Exception $e ) {
+} catch ( \Exception $e ) {
 }
 return isset ( $outfile ) ? file_put_contents ( $outfile, $response ) : $response;
 }

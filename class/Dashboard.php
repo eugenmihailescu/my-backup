@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : Dashboard.php $
  * 
- * @id      : Dashboard.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : Dashboard.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -75,7 +75,7 @@ $buffer );
 }
 }
 private function _insertFigletPlaceHolder() {
-if ( file_exists( INC_PATH . 'banner.txt' ) ) {
+if ( _file_exists( INC_PATH . 'banner.txt' ) ) {
 echo PHP_EOL . '<!--' . PHP_EOL . file_get_contents( INC_PATH . 'banner.txt' ) . PHP_EOL . '-->' . PHP_EOL;
 }
 }
@@ -114,7 +114,7 @@ return preg_replace( '/(http)s(:[^:]+)(:\d+)?/', '\1\2/', $str );
 };
 $lang = getSelectedLangCode();
 $cache = sprintf( LOG_PREFIX . '-banner%s.cache', empty( $lang ) ? '' : ( '-' . $lang ) );
-if ( file_exists( $cache ) ) {
+if ( _file_exists( $cache ) ) {
 $result = file_get_contents( $cache );
 if ( time() - intval( substr( $result, 0, 10 ) ) < SECDAY ) {
 $banner = json_decode( substr( $result, 10 ), true );
@@ -145,14 +145,33 @@ return $banner[$banner_key];
 return $banner;
 }
 public function getJavaScripts() {
-$this->_java_scripts[] = 'parent.read_alerts=function(){parent.asyncGetContent(parent.ajaxurl,"action=read_alert&nonce=' .
-wp_create_nonce_wrapper( 'read_alert' ) . '","notification_msg", null, -1);};parent.read_alerts();';
+ob_start();
+?>
+var ra_cookie_cache='read_alert_cache';
+parent.read_alerts=function(){
+var onready=function(xhr){
+parent.setCookie(ra_cookie_cache,xhr.responseText, '60s');
+};
+parent.asyncGetContent(parent.ajaxurl,"action=read_alert&nonce=<?php echo wp_create_nonce_wrapper( 'read_alert' );?>","notification_msg", onready, -1);
+};
+var ra_cookie_name='read_alert_timeout',ra_cookie=parent.getCookie(ra_cookie_name),ra_timestamp=Date.now(),ra_cache=parent.getCookie(ra_cookie_cache);
+if(null===ra_cookie||null===ra_cache||ra_timestamp-ra_cookie>60000){
+parent.setCookie(ra_cookie_name, ra_timestamp, '60s');
+parent.read_alerts();		
+}
+else{
+var el=document.getElementById('notification_msg');
+if(el)
+el.innerHTML=ra_cache;
+}
+<?php
+$this->_java_scripts['read_alert'] = ob_get_clean();
 return $this->_java_scripts;
 }
 public function show() {
 global $has_postbox;
 ob_start();
-{
+try {
 $this->_insertFigletPlaceHolder();
 insertHTMLSection( $this->_dashboard_section );
 if ( defined( __NAMESPACE__.'\\DEBUG_STATUSBAR' ) && DEBUG_STATUSBAR && ! defined( __NAMESPACE__.'\\INCLUDE_DEBUG_STATUSBAR' ) )
@@ -169,7 +188,9 @@ _esc(
 'In the Sandbox environment some parameters have fixed or masked values and cannot be changed for security reasons.' ), 
 sprintf( 
 _esc( 
-'The Wordpress version looks/works exactly like this one, except the <i>Backup source</i> and <i>Schedule</i> tabs which are adapted to Wordpress. %s.' ), 
+'The Wordpress version looks/works exactly like this one, except the <i>%s</i> and <i>%s</i> tabs which are adapted to Wordpress. %s.' ), 
+getTabTitleById( SRCFILE_SOURCE ), 
+getTabTitleById( APP_SCHEDULE ), 
 readMoreHere( selfURL( true ) . 'screenshot' ) ) );
 $sandbox_exceed = sandboxLimitExceeds();
 $sandbox_exceed && $sandbox_warning[] = sprintf( 
@@ -208,11 +229,15 @@ insertFooterBar();
 ! defined( __NAMESPACE__.'\\INCLUDE_DEBUG_STATUSBAR' ) && insertDebugScript();
 $yayui = sanitizeYAYUI();
 insertHTMLSection( $this->_dashboard_section, true );
-}
-}
 $buffer = ob_get_clean();
 $this->_sanitize( $buffer );
 $this->_insertDebugStatusbar( $buffer );
+}
+} catch ( \Exception $e ) {
+ob_end_clean();
+global $container_shape;
+$buffer = sprintf( '<div class="hintbox redcaption %s">%s</div>', $container_shape, $e->getMessage() );
+}
 echo $buffer; 
 }
 }

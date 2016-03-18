@@ -24,37 +24,35 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : mysql-expert.php $
  * 
- * @id      : mysql-expert.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : mysql-expert.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
 <tr>
-<td colspan="2"><input type="checkbox" name="mysql_maint"
-id="mysql_maint"
+<td colspan="2"><input type="checkbox" name="mysql_maint" id="mysql_maint"
 <?php
-if ($enabled)
+if ( $enabled )
 echo 'checked';
-if ($this->enabled)
-echo " onclick='jsMyBackup.toggle_mysql_maint(this,\"btn_mysql_maint," . implode ( ',', array_keys ( $mysql_maint_opts ) ) . "\");'";
+if ( $this->enabled )
+echo " onclick='jsMyBackup.toggle_mysql_maint(this,\"btn_mysql_maint," .
+implode( ',', array_keys( $mysql_maint_opts ) ) . "\");'";
 echo $this->enabled ? '' : ' disabled';
 ?>><input type="hidden" name="mysql_maint" value="0"></td>
 <td><label for="mysql_maint"><?php _pesc('MySQL Table maintenance');?></label><a
-class='help' onclick=<?php
-echoHelp ( $help_1 );
-?>> [?]</a></td>
+class='help' onclick=<?php echoHelp( $help_1 );?>> [?]</a></td>
 <td rowspan=<?php echo '"'.(1+count($mysql_maint_opts)).'"'; ?>><input
 type="button" class="button btn_mysql_maint"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Run now');?>"
-title="<?php _pesc('Run the maintenance task now');?>"
-name="mysql_maint_run" onclick="jsMyBackup.run_mysql_maint();"
-id="btn_mysql_maint" <?php echo $disabled;?>></td>
+title="<?php _pesc('Run the maintenance task now');?>" name="mysql_maint_run"
+onclick="jsMyBackup.run_mysql_maint();" id="btn_mysql_maint"
+<?php echo $disabled;?>></td>
 </tr>
 <?php echo $rows;?>
 <tr>
@@ -63,16 +61,19 @@ id="btn_mysql_maint" <?php echo $disabled;?>></td>
 <?php if(defined(__NAMESPACE__.'\\MYSQL_DUMP')){?>
 <tr>
 <td colspan="4"><label for="mysqldump_opts"><?php _pesc('mysqldump options');?></label><a
-class='help' onclick=<?php
-echoHelp ( $help_7 );
-?>> [?]</a></td>
+class='help' onclick=<?php echoHelp( $help_7 );?>> [?]</a></td>
 </tr>
 <tr>
-<td colspan="4"><textarea name="mysqldump_opts" id="mysqldump_opts"
-rows="3" cols="60" form="wpmybackup_admin_form"
+<td colspan="4"><textarea name="mysqldump_opts" id="mysqldump_opts" rows="3"
+cols="60" form="wpmybackup_admin_form"
 <?php
-if (! ($this->enabled && strToBool ( $this->settings ['mysqldump'] )))
+if ( ! ( $this->enabled && strToBool( $this->settings['mysqldump'] ) ) )
 echo ' disabled';
 ?>></textarea></td>
 </tr>
 <?php }?>
+<tr>
+<td colspan="4"><label for="mysql_ext"><?php _pesc('MySQL extension');?></label> <select
+name="mysql_ext" id="mysql_ext"><?php echo $mysql_ext_options;?></select><a
+class='help' onclick=<?php echoHelp( $help_8 );?>> [?]</a></td>
+</tr>

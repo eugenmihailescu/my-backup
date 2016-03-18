@@ -24,22 +24,31 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : format.php $
  * 
- * @id      : format.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : format.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
-
 function timeFormat( $timestamp ) {
-$h = floor($timestamp / 3600);
-$m = floor(( $timestamp - 3600 * $h ) / 60);
+$h = floor( $timestamp / 3600 );
+$m = floor( ( $timestamp - 3600 * $h ) / 60 );
 $s = $timestamp - 3600 * $h - 60 * $m;
 return sprintf( '%02d:%02d:%02d', $h, $m, $s );
+}
+function getHumanReadableTime( $timestamp ) {
+$h = floor( $timestamp / 3600 );
+$m = floor( ( $timestamp - 3600 * $h ) / 60 );
+$s = $timestamp - 3600 * $h - 60 * $m;
+$result = array();
+$h >= 1 && $result[] = sprintf( '%d hour', $h );
+$m >= 1 && $result[] = sprintf( '%d min', $m );
+$s >= 1 && $result[] = sprintf( '%d sec', $s );
+return implode( ', ', $result );
 }
 function isNull( $array, $key, $default = null ) {
 if ( is_array( $array ) )
@@ -53,8 +62,10 @@ return $is_sqlite ? 'CAST(' . $expr . ' AS INTEGER)' : 'floor(' . $expr . ')';
 function strToBool( $str ) {
 return 1 === preg_match( '/(true|on|1|yes)/i', $str );
 }
-function boolToStr( $val ) {
-return $val ? 'true' : 'false';
+function boolToStr( $val, $yesno = false ) {
+$yesno = 1 === intval( $yesno );
+$options = array( false => array( 'false', _esc( 'no' ) ), true => array( 'true', _esc( 'yes' ) ) );
+return $options[$val][$yesno];
 }
 function formatRegEx( $pattern, $separator, $subject ) {
 $subject = str_replace( $separator, chr( 92 ) . $separator, $subject );
@@ -81,5 +92,22 @@ return _( $string );
 function _pesc( $string ) {
 echo _esc( $string );
 }
+}
+function html2Text( $str ) {
+$callback = function ( $match ) {
+$convertor = new HtmlTableConverter();
+$array = $convertor->htmlTable2Ascii( $match[0] );
+return $array[0];
+};
+$plain_str = str_replace( 
+array( '<br>', TAB, '<hr>', '&nbsp;', '&lt;', '&gt;', '&amp;', '&quot;' ), 
+array( PHP_EOL, chr( 9 ), str_repeat( BULLET, SEPARATOR_LEN ), ' ', '<', '>', '&', '"' ), 
+$str );
+foreach ( array( 'li' => BULLET . "$2" . PHP_EOL, 'p' => "$2" . PHP_EOL ) as $tag => $replacement )
+$plain_str = preg_replace( '/<\b(' . $tag . ')\b[^>]*>(.*?)<\/\1>/is', $replacement, $plain_str );
+$plain_str = preg_replace_callback( '/<\b(table)\b[^>]*>(.*?)<\/\1>/is', $callback, $plain_str );
+$plain_str = preg_replace( '/<a[\s\S]*?href\s*=\s*[\'"](.*?)[\'"][\s\S]*?>([\s\S]*?)<\/a>/', '$2 ($1)', $plain_str );
+$plain_str = strip_tags( $plain_str );
+return str_replace( PHP_EOL . PHP_EOL, PHP_EOL, $plain_str );
 }
 ?>

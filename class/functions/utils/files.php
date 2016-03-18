@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : files.php $
  * 
- * @id      : files.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : files.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -43,7 +43,7 @@ $files = array();
 while ( false !== ( $filename = readdir( $dh ) ) ) {
 $fullPath = $dir . $filename;
 if ( $filename != "." && $filename != ".." )
-if ( ! is_dir( $fullPath ) ) {
+if ( ! _is_dir( $fullPath ) ) {
 $p = strrpos( $filename, "." );
 if ( false !== $p && substr( $filename, $p + 1 ) === $include_ext )
 $files[] = $fullPath;
@@ -62,20 +62,20 @@ $output_style = false,
 $skip_files = null, 
 $skip_links = true ) {
 $dir .= DIRECTORY_SEPARATOR != substr( $dir, - 1 ) ? DIRECTORY_SEPARATOR : '';
-if ( ! file_exists( $dir ) )
+if ( ! _file_exists( $dir ) )
 throw new \Exception( sprintf( _esc( "File or directory %s does not exists" ), $dir ) );
 $dh = @opendir( $dir );
 ( $tree && $dirname = basename( $dir ) ) || $dirname = $dir;
 ( $tree && $files = array( $dirname => array() ) ) || ( $files = 2 == $output_style ? array() : array( $dirname ) );
 if ( false !== $dh ) {
+$has_skip_files = is_array( $skip_files );
 while ( false !== ( $filename = @readdir( $dh ) ) ) {
 if ( $filename == "." || $filename == ".." )
 continue;
 $fullPath = $dir . $filename;
-if ( ( is_array( $skip_files ) && in_array( $fullPath, $skip_files ) ) ||
-( $skip_links && is_link( $fullPath ) ) )
+if ( ( $has_skip_files && in_array( $fullPath, $skip_files ) ) || ( $skip_links && is_link( $fullPath ) ) )
 continue;
-if ( ! is_dir( $fullPath ) ) {
+if ( ! _is_dir( $fullPath ) ) {
 if ( 1 != $output_style && ( null == $pattern || preg_match( $pattern, $fullPath ) ) )
 ( $tree && $files[$dirname][] = $filename ) || $files[] = $dirname . $filename;
 } elseif ( $recursively ) {
@@ -116,7 +116,7 @@ return $dates;
 function getFilesSize( $files ) {
 $result = 0;
 foreach ( $files as $filename )
-is_file( $filename ) && $result += @filesize( $filename );
+! empty( $filename ) && _is_file( $filename ) && $result += @filesize( $filename );
 return $result;
 }
 function createFileList( 
@@ -132,12 +132,12 @@ if ( is_array( $dir ) ) {
 $preg_separator = '/';
 $excluded_prefixes = array();
 $pattern = '';
-$preg_esc = function ( &$array, $is_dir = false, $escape = false ) use(&$preg_separator ) {
+$preg_esc = function ( &$array, $_is_dir = false, $escape = false ) use(&$preg_separator ) {
 $array = array_unique( $array );
 array_walk( 
 $array, 
-function ( &$item ) use(&$preg_separator, &$is_dir, &$escape ) {
-$is_dir && $item = addTrailingSlash( $item );
+function ( &$item ) use(&$preg_separator, &$_is_dir, &$escape ) {
+$_is_dir && $item = delTrailingSlash( $item );
 $escape && $item = preg_quote( $item, $preg_separator );
 } );
 return true;
@@ -145,9 +145,9 @@ return true;
 $put_temp_file = function ( $path, $array ) use(&$temp_file, &$callback ) {
 $count = count( $array );
 if ( $count && file_put_contents( $temp_file, implode( PHP_EOL, $array ) . PHP_EOL, FILE_APPEND ) ) {
-if ( is_array( $callback ) && _is_callable( $callback[0] ) )
+if ( is_array( $callback ) && _is_callable( $callback[2] ) )
 _call_user_func( 
-$callback[0], 
+$callback[2], 
 sprintf( _esc( "Added %s directory (%s files)" ), $path, $count ), 
 BULLET, 
 1 );
@@ -164,6 +164,8 @@ $get_files_by_pattern = function ( $fullPath, $recursive = true ) use(
 &$put_temp_file ) {
 $is_link = is_link( $fullPath );
 $fullPath = realpath( $fullPath );
+if ( ! _file_exists( $fullPath ) )
+return 0;
 if ( ! $is_link || ! $exclude_links ) {
 $file_list = getFileListByPattern( 
 $fullPath, 
@@ -175,16 +177,18 @@ false,
 $exclude_files, 
 $exclude_links );
 $count = count( $file_list );
-} elseif ( is_array( $callback ) && _is_callable( $callback[0] ) ) {
+} elseif ( is_array( $callback ) && _is_callable( $callback[2] ) ) {
 _call_user_func( 
-$callback[0], 
+$callback[2], 
 '<yellow>' . sprintf( _esc( 'Skipping the file link %s' ), $fullPath ) . '</yellow>' );
 return 0;
 }
 return ! empty( $file_list ) ? $put_temp_file( $fullPath, $file_list ) : 0;
 };
 $array_to_pattern = function ( $array ) use(&$preg_esc, &$preg_separator ) {
-asort( $array );
+uasort( $array, function ( $a, $b ) {
+return strlen( $a ) - strlen( $b );
+} );
 $pattern = '';
 $fitem = array_pop( $array );
 $root = '';
@@ -221,10 +225,10 @@ $filter_subfiles = function ( $array ) use(&$exclude_dirs ) {
 return array_filter( 
 $array, 
 function ( $item ) use(&$exclude_dirs ) {
-$keep = ! empty( $item ) && is_dir( $item );
+$keep = ! empty( $item ) && _is_dir( $item );
 if ( $keep )
 foreach ( $exclude_dirs as $d )
-if ( $item != $d && ! ( $keep = ( $p = strpos( $item, $d ) ) || false === $p ) )
+if ( $item != $d && ! ( $keep = 0 !== strpos( $item, $d ) ) )
 break;
 return $keep;
 } );
@@ -237,6 +241,11 @@ is_array( $exclude_files ) && $preg_esc( $exclude_files ) &&
 $excluded_prefixes = array_merge( $excluded_prefixes, $exclude_files );
 count( $excluded_prefixes ) && $pattern .= '^(?!(' . $array_to_pattern( $excluded_prefixes ) . '))';
 $pattern .= '.*';
+$dir = array_filter( 
+$dir, 
+function ( $item ) use(&$pattern, &$preg_separator ) {
+return preg_match( $preg_separator . $pattern . $preg_separator, $item );
+} );
 is_array( $exclude_ext ) && ! empty( $exclude_ext ) && $preg_esc( $exclude_ext ) &&
 $pattern .= '\..+(?<!.' . implode( '|', $exclude_ext ) . ')$';
 $scan_dirs = array();
@@ -250,100 +259,91 @@ break;
 }
 $scan_dirs[$dirname] = $has_children;
 }
+$p = 1;
+$max_p = count( $scan_dirs );
 foreach ( $scan_dirs as $fullPath => $has_children ) {
-if ( is_array( $callback ) && _is_callable( $callback[1] ) && _call_user_func( $callback[1] ) ) 
+if ( is_array( $callback ) && _is_callable( $callback[0] ) && _call_user_func( $callback[0] ) )
 break;
+if ( is_array( $callback ) && _is_callable( $callback[1] ) )
+_call_user_func( $callback[1], TMPFILE_SOURCE, $temp_file, $p++, $max_p, 2 );
 $fcount += $get_files_by_pattern( $fullPath, ! $has_children );
 }
 } else
 throw new MyException( _esc( 'createFileList : $dir is not array. This should never happen.' ) );
 return $fcount;
 }
-function createFileListBySections( $temp_file, $wp_components ) {
-if ( ! createFileListSections( $temp_file, $wp_components ) )
-return false;
+function createFileListBySections( $temp_file, $wp_components, $callbacks = null ) {
 if ( ! ( $fr = fopen( $temp_file, 'r' ) ) )
 return false;
+$min_len = isWin() ? 3 : strlen( DIRECTORY_SEPARATOR );
+$wp_components_old = $wp_components;
+$section_name = function ( $filename ) use(&$wp_components_old, &$min_len ) {
+_is_file( $filename ) && $filename = dirname( $filename );
+$found = false;
+while ( isset( $filename[$min_len] ) && ! ( $found = in_array( $filename, $wp_components_old ) ) )
+$filename = dirname( $filename );
+return $found ? basename( $filename ) : null;
+};
+$has_callbacks = is_array( $callbacks );
+$has_abort_callback = $has_callbacks && _is_callable( $callbacks['abort'] );
+$has_progress_callback = $has_callbacks && _is_callable( $callbacks['progress'] );
+$max_i = getFileLinesCount( $temp_file );
 $processed = array();
 $result = array();
-array_unshift( $wp_components, '' );
-rsort( $wp_components );
-foreach ( $wp_components as $section ) {
-if ( - 1 == fseek( $fr, 0, SEEK_SET ) )
-break;
-$section_temp_file = $temp_file . '.' . ( ! empty( $section ) ? basename( $section ) : uniqid() );
-if ( ! ( $fw = fopen( $section_temp_file, 'w' ) ) )
+$section_temp_files = array();
+$wp_components[''] = ''; 
+$p = 1;
+$max_p = count( $wp_components );
+$eol_len = strlen( PHP_EOL );
+$fwh = array();
+$lines = array();
+foreach ( $wp_components as $index => $section ) {
+$wp_components[$index] = basename( $section );
+$section_temp_files[$wp_components[$index]] = array( 
+'file' => $temp_file . '.' . ( empty( $section ) ? uniqid() : $wp_components[$index] ), 
+'section' => $section );
+if ( ! ( $fwh[$wp_components[$index]] = fopen( $section_temp_files[$wp_components[$index]]['file'], 'w' ) ) )
 continue;
+$lines[$wp_components[$index]] = 0;
+}
 $current_section = '';
-$lines = 0;
-while ( false !== ( $buff = fgets( $fr ) ) ) {
-$filename = str_replace( PHP_EOL, '', $buff );
+$old_perc = 0;
+$new_perc = 0.1;
+$i = 0;
+while ( false !== ( $filename = fgets( $fr ) ) ) {
+$i++;
+if ( $has_abort_callback && _call_user_func( $callbacks['abort'] ) )
+break;
+$has_eol = PHP_EOL == substr( $filename, - $eol_len );
+$has_eol && $filename = substr( $filename, 0, - $eol_len );
+if ( $has_progress_callback && $old_perc != $new_perc ) {
+_call_user_func( $callbacks['progress'], TMPFILE_SOURCE, $temp_file, $i, $max_i, 2 );
+$old_perc = $new_perc;
+}
+$new_perc = ceil( 100 * $i / $max_i );
 if ( empty( $filename ) )
 continue;
-$skip = false;
-if ( preg_match( '/\[([^\]\/]+)\]/', $filename, $matches ) ) {
-$current_section = $matches[1]; 
-$skip = true;
-}
-if ( preg_match( '/\[\/([^\]\/]+)\]/', $filename, $matches ) ) {
-$current_section = ''; 
-$skip = true;
-}
-if ( $skip )
+$current_section = $section_name( $filename );
+if ( ! in_array( $current_section, $wp_components ) )
 continue;
-$_filename = is_file( $filename ) ? dirname( $filename ) : $filename;
-if ( ( '' == $current_section && $section != '' ) || ( $section == '' && $current_section != '' ) ||
-( $section != '' && $current_section != '' && false === strpos( $_filename, $section ) ) )
-continue; 
 $crc32 = crc32( $filename );
-if ( in_array( $crc32, $processed ) ) 
+if ( in_array( $crc32, $processed ) ) {
 continue;
-$lines += false !== fwrite( $fw, $buff );
+}
+if ( $fwh[$current_section] )
+$lines[$current_section] += false !== fwrite( $fwh[$current_section], $filename . PHP_EOL );
 $processed[] = $crc32;
 }
-fclose( $fw );
-$lines && ( $result[$section_temp_file] = array( 'section' => $section, 'lines' => $lines ) ) ||
-unlink( $section_temp_file );
+$has_progress_callback && _call_user_func( $callbacks['progress'], TMPFILE_SOURCE, $temp_file, $max_i, $max_i, 2 );
+foreach ( $fwh as $section => $fw ) {
+$fw && fclose( $fw );
+$lines[$section] && ( $result[$section_temp_files[$section]['file']] = array( 
+'section' => $section_temp_files[$section]['section'], 
+'lines' => $lines[$section] ) ) || unlink( $section_temp_files[$section]['file'] );
 }
 fclose( $fr );
+ksort( $result );
 return $result;
-}
-function createFileListSections( $temp_file, $wp_components ) {
-if ( empty( $wp_components ) ) {
-return $temp_file;
-}
-rsort( $wp_components );
-$newname = $temp_file . '.section';
-if ( ! file_exists( $temp_file ) || false === ( $fr = fopen( $temp_file, 'r' ) ) ||
-false === ( $fw = fopen( $newname, 'w' ) ) )
-return false;
-$section_name = function ( $filename ) use(&$wp_components ) {
-is_file( $filename ) && $filename = dirname( $filename );
-$min_len = isWin() ? 3 : strlen( DIRECTORY_SEPARATOR );
-$found = false;
-while ( ! ( $found = in_array( $filename, $wp_components ) ) && strlen( $filename ) > $min_len )
-$filename = dirname( $filename );
-return $found ? $filename : null;
-};
-$current_section = null;
-while ( false !== ( $filename = fgets( $fr ) ) ) {
-$filename = str_replace( PHP_EOL, '', $filename );
-if ( empty( $filename ) || ! file_exists( $filename ) ) {
-continue;
-}
-$section = $section_name( $filename );
-$new_section = ! empty( $section ) && $section != $current_section && in_array( $section, $wp_components ); 
-$end_section = ! empty( $current_section ) && ( $new_section || ! in_array( $section, $wp_components ) ); 
-$end_section && fwrite( $fw, '[/' . basename( $current_section ) . ']' . PHP_EOL ); 
-$new_section && fwrite( $fw, '[' . basename( $section ) . ']' . PHP_EOL ); 
-$end_section && ! $new_section && $current_section = null;
-$new_section && $current_section = $section; 
-fwrite( $fw, $filename . PHP_EOL );
-}
-! empty( $current_section ) && fwrite( $fw, '[/' . basename( $current_section ) . ']' . PHP_EOL ); 
-fclose( $fr );
-fclose( $fw );
-return move_file( $newname, $temp_file );
 }
 function createDirList( $dir, $level = null ) {
 $dir = addTrailingSlash( $dir );
@@ -351,11 +351,11 @@ $dh = @opendir( $dir );
 if ( null != $level && $level < 0 || '/dev/' == $dir ) 
 return 0;
 $result = array();
-if ( is_dir( $dir ) && $dh ) {
+if ( _is_dir( $dir ) && $dh ) {
 while ( false !== ( $filename = readdir( $dh ) ) ) {
 $fullPath = $dir . $filename;
 if ( $filename != "." && $filename != ".." )
-if ( is_dir( $fullPath ) )
+if ( _is_dir( $fullPath ) )
 $result = array_merge( $result, createDirList( $fullPath, null != $level ? $level - 1 : $level ) );
 }
 empty( $result ) && $result[] = $dir;
@@ -364,7 +364,7 @@ closedir( $dh );
 return $result;
 }
 function getAbstractDirSize( $folder, $excl_dirs = null, $recursive = true ) {
-if ( ! is_readable( $folder ) )
+if ( ! _dir_in_allowed_path( $folder ) )
 return false;
 $files = @scandir( $folder );
 if ( ! is_array( $files ) )
@@ -375,14 +375,15 @@ foreach ( $files as $f )
 if ( '.' != substr( $f, 0, 1 ) ) {
 try {
 $currentFile = $dir . $f;
-if ( is_dir( $currentFile ) ) {
+if ( _is_dir( $currentFile ) ) {
 $match = false;
 if ( is_array( $excl_dirs ) )
 foreach ( $excl_dirs as $excl_dir )
 $match = $match || false !== strpos( $currentFile, $excl_dir );
 ! $match && $dir_size += $recursive ? getAbstractDirSize( $currentFile, $excl_dirs ) : 0;
-} else
-$dir_size += filesize( $currentFile );
+} elseif ( ! ( @is_link( $currentFile ) && '.' == @readlink( $currentFile ) ) ) {
+$dir_size += @filesize( $currentFile );
+}
 } catch ( MyException $e ) {
 }
 }
@@ -427,31 +428,33 @@ $excl_dirs );
 return unixGetDirSize( $folder, $excl_dirs );
 }
 function getDirCacheSize() {
-if ( file_exists( DIR_SIZE_CACHE_FILE ) )
+if ( _file_exists( DIR_SIZE_CACHE_FILE ) )
 return filesize( DIR_SIZE_CACHE_FILE );
 else
 return 0;
 }
 function clearDirSizeCache() {
-if ( file_exists( DIR_SIZE_CACHE_FILE ) )
+if ( _file_exists( DIR_SIZE_CACHE_FILE ) )
 unlink( DIR_SIZE_CACHE_FILE );
 }
-function getDirSizeFromCache( $folder ) {
-if ( file_exists( DIR_SIZE_CACHE_FILE ) && $files = json_decode( file_get_contents( DIR_SIZE_CACHE_FILE ), true ) )
+function getDirSizeFromCache( $folder, $cache_only = false ) {
+if ( _file_exists( DIR_SIZE_CACHE_FILE ) && $files = json_decode( file_get_contents( DIR_SIZE_CACHE_FILE ), true ) )
 if ( is_array( $files ) && isset( $files[$folder] ) && $size = $files[$folder] )
 return $size;
+if ( $cache_only )
+return 0;
 $size = getDirSize( $folder );
 $files[$folder] = $size;
 file_put_contents( DIR_SIZE_CACHE_FILE, json_encode( $files, 64 ) ); 
 return $size;
 }
 function getDirSizeByFileList( $temp_file ) {
-if ( ! file_exists( $temp_file ) || false === ( $fr = fopen( $temp_file, 'r' ) ) )
+if ( ! _file_exists( $temp_file ) || false === ( $fr = fopen( $temp_file, 'r' ) ) )
 return false;
 $result = 0;
 while ( false !== ( $filename = fgets( $fr ) ) ) {
 $filename = str_replace( PHP_EOL, '', $filename );
-file_exists( $filename ) && $result += filesize( $filename );
+_file_exists( $filename ) && $result += filesize( $filename );
 }
 fclose( $fr );
 return $result;
@@ -461,8 +464,9 @@ return ( empty( $path ) || substr( $path, - 1 ) != $separator ) ? $path .
 ( $escape_separator ? addslashes( $separator ) : $separator ) : $path;
 }
 function delTrailingSlash( $path, $separator = DIRECTORY_SEPARATOR ) {
-if ( substr( $path, - 1 ) == $separator )
-return substr( $path, 0, - 1 );
+$len = strlen( $separator );
+if ( substr( $path, - $len ) == $separator )
+return substr( $path, 0, - $len );
 else
 return $path;
 }
@@ -502,9 +506,9 @@ _pesc( 'Abort signal received. File monitoring aborted.' );
 break;
 }
 clearstatcache();
-file_exists( $filepath ) && $newSize = filesize( $filepath );
+_file_exists( $filepath ) && $newSize = filesize( $filepath );
 if ( $size == $newSize ) {
-sleep( $interval );
+_sleep( $interval );
 continue;
 }
 $fh = fopen( $filepath, "rb" );
@@ -532,18 +536,18 @@ return ! empty( $e );
 return end( $result );
 }
 function copy_folder( $src, $dst ) {
-if ( ! file_exists( $src ) )
+if ( ! _file_exists( $src ) )
 return false;
 $src = addTrailingSlash( $src );
 $dst = addTrailingSlash( $dst );
 if ( $src == $dst )
 return true;
 $result = true;
-! file_exists( $dst ) && @mkdir( $dst, 0770, true );
+! _file_exists( $dst ) && @mkdir( $dst, 0770, true );
 $dir = opendir( $src );
 while ( false !== ( $file = readdir( $dir ) ) )
 if ( ( $file != '.' ) && ( $file != '..' ) ) {
-if ( is_dir( $src . $file ) ) {
+if ( _is_dir( $src . $file ) ) {
 if ( addTrailingSlash( $src . $file ) == $dst )
 continue; 
 $result = $result && copy_folder( $src . $file, $dst . $file );
@@ -576,7 +580,7 @@ return $home;
 function splitFile( $filename, $vol_size ) {
 $volumes = array();
 $buff_size = 8192;
-if ( file_exists( $filename ) ) {
+if ( _file_exists( $filename ) ) {
 $remaining = filesize( $filename );
 $fr = fopen( $filename, 'rb' );
 if ( false !== $fr )
@@ -599,7 +603,7 @@ return $volumes;
 }
 function getFileLinesCount( $filename, $line_sep = PHP_EOL ) {
 $linecount = 0;
-if ( ! file_exists( $filename ) )
+if ( ! _file_exists( $filename ) )
 return $linecount;
 $handle = fopen( $filename, "r" );
 if ( false !== $handle )
@@ -612,7 +616,7 @@ return $linecount + 1;
 }
 function file_checksum( $filename, $attempt_os_first = false ) {
 $result = false;
-$file_exist = is_file( $filename );
+$file_exist = _is_file( $filename );
 if ( $file_exist && $attempt_os_first && ! preg_match( '/^win/i', PHP_OS ) ) {
 exec( "md5sum $filename", $output, $result );
 if ( 0 == $result && count( $output ) > 0 && preg_match( '/([\d\w]+)?/', $output[0], $matches ) )
@@ -631,12 +635,12 @@ $rename = ! $is_win || strtolower( substr( $source, 0, 1 ) ) == strtolower( subs
 return $rename ? rename( $source, $dest ) : ( copy( $source, $dest ) && unlink( $source ) );
 }
 function _rmdir( $dir, $recursive = true ) {
-if ( ! file_exists( $dir ) )
+if ( ! _file_exists( $dir ) )
 return;
 $files = getFileListByPattern( $dir, '/.+/', $recursive, true, false );
 rsort( $files );
 array_walk( $files, function ( $item, $key ) {
-is_dir( $item ) && rmdir( $item ) || unlink( $item );
+_is_dir( $item ) && rmdir( $item ) || unlink( $item );
 } );
 }
 if ( ! function_exists( '\\sanitize_file_name' ) ) {
@@ -687,5 +691,129 @@ $filename .= '.' . $part;
 $filename .= '.' . $extension;
 return $filename;
 }
+}
+function get_restricted_functions() {
+$used_functions = array( 
+'chown', 
+'curl_exec', 
+'disk_total_space', 
+'disk_free_space', 
+'exec', 
+'fputs', 
+'ftp_connect', 
+'ftp_exec', 
+'ftp_login', 
+'ftp_nb_fput', 
+'ftp_raw', 
+'ftp_rawlist', 
+'getmypid', 
+'mysql_pconnect', 
+'php_uname', 
+'popen', 
+'posix_getpwuid', 
+'proc_get_status', 
+'proc_close', 
+'proc_open', 
+'popen', 
+'putenv', 
+'set_time_limit', 
+'sleep', 
+'set_time_limit', 
+'system' );
+$disable_functions = explode( ',', ini_get( 'disable_functions' ) );
+return array_intersect( $used_functions, $disable_functions );
+}
+function function_is_restricted( $function_name ) {
+return in_array( $function_name, get_restricted_functions() );
+}
+function _disk_free_space( $directory ) {
+return function_is_restricted( 'disk_free_space' ) || ! _is_dir( $directory ) ? PHP_INT_MAX : disk_free_space( 
+$directory );
+}
+function _disk_total_space( $directory ) {
+return function_is_restricted( 'disk_total_space' ) || ! _is_dir( $directory ) ? PHP_INT_MAX : disk_total_space( 
+$directory );
+}
+function _is_dir( $filename, $function = 'is_dir' ) {
+$open_basedir = defined( __NAMESPACE__.'\\OPEN_BASEDIR' ) ? OPEN_BASEDIR : ini_get( 'open_basedir' );
+if ( empty( $open_basedir ) ) {
+return $function( $filename );
+}
+$allowed = _dir_in_allowed_path( $filename );
+if ( ! ( @is_link( $filename ) && '.' == @readlink( $filename ) ) )
+return $allowed && $function( $filename );
+return false;
+}
+function _is_file( $filename ) {
+return _is_dir( $filename, 'is_file' );
+}
+function _file_exists( $filename ) {
+return _is_dir( $filename, 'file_exists' );
+}
+function shorten_path( $path, $replace_what = ALT_ABSPATH, $with_what = 'ROOT' ) {
+return str_replace( $replace_what, $with_what . DIRECTORY_SEPARATOR, $path );
+}
+function buildFileList( 
+$temp_file, 
+$settings, 
+$src_dir, 
+$excl_dirs, 
+$excl_files, 
+$excl_ext, 
+$excl_links, 
+$verbosity, 
+$callbacks ) {
+$is_wp = is_wp();
+if ( $is_wp ) {
+include_once EDITOR_PATH . 'file-functions.php';
+$wp_dirs = getWPSourceDirList( WPMYBACKUP_ROOT );
+$wp_components = array_keys( $wp_dirs );
+array_walk( 
+$wp_components, 
+function ( &$item, $key ) {
+! empty( $item ) && $item = WPMYBACKUP_ROOT . $item;
+} );
+} else
+$wp_components = array();
+$has_output_callback = isset( $callbacks ) && isset( $callbacks['output'] ) && _is_callable( $callbacks['output'] );
+foreach ( $excl_dirs as $excl_dir ) {
+foreach ( $wp_components as $key => $wp_comp ) {
+if ( false !== strpos( $wp_comp, $excl_dir ) ) {
+$has_output_callback && _call_user_func( 
+$callbacks['output'], 
+_esc( 'excluding directory ' ) . shorten_path( $wp_components[$key] ), 
+BULLET );
+unset( $wp_components[$key] );
+}
+}
+}
+if ( isNull( $settings, 'plugin_backup', false ) )
+$dir_list = array( isNull( $settings, 'dir', '' ) );
+else {
+include_once EDITOR_PATH . 'file-functions.php';
+$dir_list = _call_user_func( 
+$is_wp ? 'getWPDirList' : 'getDirList', 
+$is_wp ? ALT_ABSPATH : $src_dir, 
+false, 
+2, 
+false );
+$dir_list = array_filter( 
+$dir_list, 
+function ( $item ) use(&$src_dir ) {
+return 0 === strpos( $item, $src_dir );
+} );
+if ( ! is_multisite_wrapper() || ( $is_wp && is_wpmu_superadmin() ) )
+$dir_list = array_merge( $dir_list, array( $src_dir ) );
+}
+$_callbacks = isset( $callbacks ) ? array( 
+$callbacks['abort'], 
+$callbacks['progress'], 
+$verbosity ? $callbacks['output'] : null ) : null;
+$file_count = createFileList( $temp_file, $dir_list, $excl_dirs, $excl_ext, $excl_files, $excl_links, $_callbacks );
+isset( $callbacks ) && isset( $callbacks['before_section'] ) && _is_callable( $callbacks['before_section'] ) &&
+_call_user_func( $callbacks['before_section'], $temp_file, $file_count, $callbacks );
+$has_output_callback &&
+_call_user_func( $callbacks['output'], _esc( "Organizing the file list into sections" ), null, 0 );
+return array( $file_count, createFileListBySections( $temp_file, $wp_components, $callbacks ) );
 }
 ?>

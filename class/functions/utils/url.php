@@ -24,18 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : url.php $
  * 
- * @id      : url.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : url.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-define( __NAMESPACE__.'\\LMGTFY_URL', 'http://lmgtfy.com/?q=' );
+defined( __NAMESPACE__.'\\LMGTFY_URL' ) || define( __NAMESPACE__.'\\LMGTFY_URL', 'http://lmgtfy.com/?q=' );
 function is_cli() {
 return ( ! ( empty( $_ENV['SHELL'] ) && empty( $_SERVER['argv'] ) ) && empty( $_SERVER["REMOTE_ADDR"] ) );
 }
@@ -136,7 +136,7 @@ global $argv;
 return realpath( $argv[0] );
 }
 $server = $_SERVER['SERVER_NAME'];
-$server = substr( $server, 0, strlen( $server ) - intval( '/' == substr( $server, - 1 ) ) ); 
+$server = delTrailingSlash( $server, '/' );
 $protocol = strtolower( $_SERVER['SERVER_PROTOCOL'] ); 
 ( $protocol = substr( $protocol, 0, strpos( $protocol, '/' ) ) ) && ( $force_ssl || isSSL() ) && $protocol .= 's';
 $port = ( $_SERVER['SERVER_PORT'] == '80' ) ? '' : ( ':' . $_SERVER['SERVER_PORT'] );
@@ -185,8 +185,8 @@ style="padding: 5px 10px; text-align: center; background-color: #ffc; border: 1p
 }
 function getAsyncRunURL() {
 $regaction_php = 'regactions.php';
-$file_relpath = getFileRelativePath( CLASS_PATH . $regaction_php ); 
-$file_relpath = str_replace( str_replace( '/', DIRECTORY_SEPARATOR, ALT_ABSPATH ), '', $file_relpath ); 
+$file_relpath = getFileRelativePath( CLASS_PATH . $regaction_php );
+$file_relpath = str_replace( str_replace( '/', DIRECTORY_SEPARATOR, ALT_ABSPATH ), '', $file_relpath );
 $self_url = selfURL( true );
 $file_relpath = str_replace( DIRECTORY_SEPARATOR, '/', $file_relpath );
 substr( $self_url, - 1 ) == substr( $file_relpath, 0, 1 ) &&
@@ -195,7 +195,9 @@ $lang_code = getSelectedLangCode();
 $query = false !== $lang_code ? '?lang=' . $lang_code : '';
 return sprintf( '%s%s/%s%s', $self_url, $file_relpath, $regaction_php, $query ); 
 }
+if ( ! function_exists( __NAMESPACE__ . '\\lmgtfy' ) ) {
 function lmgtfy( $string ) {
 return LMGTFY_URL . urlencode( $string );
+}
 }
 ?>

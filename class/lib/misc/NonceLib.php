@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : NonceLib.php $
  * 
- * @id      : NonceLib.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : NonceLib.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -45,7 +45,7 @@ private function _calcNonce( $str ) {
 return crc32( $str );
 }
 private function load_nonces() {
-if ( file_exists( $this->_nonce_file ) )
+if ( _file_exists( $this->_nonce_file ) )
 $nonces = json_decode( file_get_contents( $this->_nonce_file ), true );
 else
 return array();
@@ -73,7 +73,7 @@ file_put_contents( $this->_nonce_file, json_encode( $nonces ) );
 }
 function __construct( $user_id, $nonce_file = null, $lifespan = WPMYBAK_NONCE_LIFESPAN ) {
 $this->_user_id = $user_id;
-$this->_nonce_file = empty( $nonce_file ) ? ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir() ) .
+$this->_nonce_file = empty( $nonce_file ) ? ( defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir() ) .
 DIRECTORY_SEPARATOR . get_class( $this ) . '-nonces.log' : $nonce_file;
 $this->_nonce_lifespan = $lifespan;
 }

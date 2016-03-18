@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : AbstractJob.php $
  * 
- * @id      : AbstractJob.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : AbstractJob.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -59,7 +59,6 @@ private $level;
 private $toolchain;
 private $cpusleep;
 private $_process_signal;
-private $_alert_message_obj;
 private $_volumes_count;
 private $_files_count;
 private $_failed_count;
@@ -77,10 +76,15 @@ protected $_statistics_manager;
 protected $sender;
 protected $options;
 protected $is_cli;
+protected $_job_type;
 protected $_jobs_id;
+protected $_job_state;
+protected $_job_status;
 protected $process_data;
 protected $nocompress;
 function __construct( $opts = null, $sender = null ) {
+$this->_job_state = 2;
+$this->_job_status = 0;
 $this->_job_starttime = time();
 $this->quiet = false;
 $this->options = $opts;
@@ -101,7 +105,7 @@ $this->show_output = $this->show_dirs || getParam( $opts, "verbose", null ) == V
 $this->is_cli = is_cli();
 $this->_jobs_id = null;
 $this->_mode = getParam( $opts, 'mode', BACKUP_MODE_FULL );
-$this->_wrkdir = getParam( $opts, 'wrkdir', sys_get_temp_dir() );
+$this->_wrkdir = getParam( $opts, 'wrkdir', _sys_get_temp_dir() );
 $this->_wrkdir = addTrailingSlash( $this->_wrkdir );
 $this->bzipver = getParam( $opts, 'bzipver' );
 $this->method = $this->_getTarFilter();
@@ -124,7 +128,6 @@ if ( $this->_history_enabled ) {
 $this->_statistics_manager = getJobsStatManager( $opts );
 } else
 $this->_statistics_manager = null;
-$this->_alert_message_obj = new MessageHandler( MESSAGES_LOGFILE );
 $this->_progress_manager = new ProgressManager( PROGRESS_LOGFILE );
 $this->_progress_manager->setLazyWrite( PROGRESS_LAZYWRITE );
 $this->setOptions( $opts );
@@ -159,14 +162,10 @@ global $COMPRESSION_NAMES, $exclude_files_factory;
 $this->_request_timeout = isNull( $opts, 'request_timeout', 30 );
 $this->dir = getParam( $opts, 'dir', __DIR__ );
 $this->dir = addTrailingSlash( $this->dir );
-$this->exclude_dirs = array();
-$this->exclude_ext = array();
-$this->exclude_files = array();
 $this->exclude_dirs = ( $o = getParam( $opts, "excludedirs" ) ) ? explode( ",", $o ) : array();
-array_walk( 
-$this->exclude_dirs, 
-function ( &$value ) {
-! empty( $value ) && DIRECTORY_SEPARATOR != substr( $value, - 1 ) && $value .= DIRECTORY_SEPARATOR;
+$this->exclude_dirs = array_map( __NAMESPACE__ . '\\delTrailingSlash', $this->exclude_dirs );
+$this->exclude_dirs = array_filter( $this->exclude_dirs, function ( $item ) {
+return ! empty( $item );
 } );
 $this->exclude_ext = ( $o = getParam( $opts, "excludeext", implode( ',', $COMPRESSION_NAMES ) ) ) ? explode( 
 ",", 
@@ -185,7 +184,7 @@ $this->size = 0;
 if ( isset( $opts['google_path_id'] ) && preg_match_all( '/[\w\d]+/', $opts['google_path_id'], $file_id ) )
 $opts['google'] = end( $file_id[0] );
 $target_defs = array( 
-'mysql' => array( 'tables', 'mysql_format' ), 
+'mysql' => array( 'tables', 'mysql_format', 'mysql_db' ), 
 'dropbox' => null, 
 'google' => null, 
 'disk' => null, 
@@ -219,7 +218,7 @@ $options_params = array(
 'mysqldump' => false, 
 'cygwin' => null, 
 'ftpdirsep' => null, 
-'logdir' => defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir(), 
+'logdir' => defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir(), 
 'logrotate' => false, 
 'logsize' => 1 );
 foreach ( $options_params as $op_key => $op_value )
@@ -298,7 +297,7 @@ $opstr,
 $secure_str, 
 getSpan( basename( $filename ), 'cyan' ), 
 getSpan( $protocol . '://', 'mangenta' ), 
-$path );
+shorten_path( $path ) );
 return sprintf( 
 '%s %s %s (%s) %s %s%s', 
 $opstr, 
@@ -307,11 +306,11 @@ getSpan( basename( $filename ), 'cyan' ),
 getHumanReadableSize( $filesize < 0 ? filesize( $filename ) : $filesize ), 
 $download ? 'from' : 'to', 
 getSpan( $protocol . '://', 'magenta' ), 
-$path );
+shorten_path( $path ) );
 }
 private function getTransferEndStr( $operation, $filename, $filesize = -1, $start, $end ) {
 $sec = $end - $start;
-$filesize < 0 && file_exists( $filename ) && $filesize = filesize( $filename );
+$filesize < 0 && _file_exists( $filename ) && $filesize = filesize( $filename );
 $rate = $sec > 0 ? $filesize / $sec : - 1;
 switch ( $operation ) {
 case OPER_CLEANUP_OLDIES :
@@ -357,7 +356,7 @@ return $jobs_log->getLastJobId();
 }
 private function _lockSession() {
 $this->can_unlock = false;
-if ( file_exists( $this->flock_file ) )
+if ( _file_exists( $this->flock_file ) )
 $ftime = filemtime( $this->flock_file );
 else
 $ftime = 0;
@@ -370,7 +369,7 @@ $last_job_id = $this->_getLastJobId();
 $last_job_str = false !== $last_job_id ? 'job id #' . $last_job_id[2] : _esc( 'last job' );
 $last_job_timestamp = false !== $last_job_id ? strtotime( $last_job_id[1] ) : $ftime;
 $msg = sprintf( 
-_esc( "Access denied due to concurent job (%s started %d seconds ago)" ), 
+_esc( "Access denied due to concurrent job (%s started %d seconds ago)" ), 
 $last_job_str, 
 time() - $last_job_timestamp );
 file_put_contents( JOBS_LOGFILE, sprintf( "[%s] $msg" . PHP_EOL, date( DATETIME_FORMAT ) ), FILE_APPEND );
@@ -381,12 +380,13 @@ $this->can_unlock = true;
 }
 protected function getLastJob( $mode = BACKUP_MODE_FULL, $job_type = JOB_BACKUP ) {
 if ( null !== $this->_statistics_manager ) {
-$rst = $this->_statistics_manager->queryData( 
+if ( $rst = $this->_statistics_manager->queryData( 
 'SELECT id,started_time FROM ' . TBL_PREFIX . TBL_JOBS . ' WHERE job_type=' . $job_type .
-( false !== $mode ? ' AND mode=' . $mode : '' ) . ' ORDER BY started_time DESC LIMIT 1;' );
+( false !== $mode ? ' AND mode=' . $mode : '' ) . ' ORDER BY started_time DESC LIMIT 1;' ) ) {
 $row = $this->_statistics_manager->fetchArray( $rst );
 $this->_statistics_manager->freeResult( $rst );
 return $row[0];
+}
 }
 return false;
 }
@@ -483,26 +483,6 @@ return $this->_email;
 protected function getNamePattern() {
 return $this->_name_pattern;
 }
-protected function _stripHTMLTags( $str ) {
-$callback = function ( $match ) {
-$convertor = new HtmlTableConverter();
-$array = $convertor->htmlTable2Ascii( $match[0] );
-return $array[0];
-};
-$plain_str = str_replace( 
-array( '<br>', TAB, '<hr>', '&nbsp;', '&lt;', '&gt;', '&amp;', '&quot;' ), 
-array( PHP_EOL, chr( 9 ), str_repeat( BULLET, SEPARATOR_LEN ), ' ', '<', '>', '&', '"' ), 
-$str );
-foreach ( array( 'li' => BULLET . "$2" . PHP_EOL, 'p' => "$2" . PHP_EOL ) as $tag => $replacement )
-$plain_str = preg_replace( '/<\b(' . $tag . ')\b[^>]*>(.*?)<\/\1>/is', $replacement, $plain_str );
-$plain_str = preg_replace_callback( '/<\b(table)\b[^>]*>(.*?)<\/\1>/is', $callback, $plain_str );
-$plain_str = preg_replace( 
-'/<a[\s\S]*?href\s*=\s*[\'"](.*?)[\'"][\s\S]*?>([\s\S]*?)<\/a>/', 
-'$2 ($1)', 
-$plain_str );
-$plain_str = strip_tags( $plain_str );
-return str_replace( PHP_EOL . PHP_EOL, PHP_EOL, $plain_str );
-}
 protected function logSeparator() {
 $this->logOutput( "<hr>" );
 }
@@ -580,8 +560,8 @@ $stat_data = array(
 'METRIC_UNCOMPRESSED' => $uncompressed, 
 'METRIC_RATIO' => $ratio, 
 'METRIC_TIME' => $duration, 
-'METRIC_SIZE' => ( is_file( $filename ) ? @filesize( $filename ) : 0 ), 
-'METRIC_DISK_FREE' => disk_free_space( $this->getWorkDir() ), 
+'METRIC_SIZE' => ( _is_file( $filename ) ? @filesize( $filename ) : 0 ), 
+'METRIC_DISK_FREE' => _disk_free_space( $this->getWorkDir() ), 
 'JOBTBL_FILE_CHECKSUM' => file_checksum( $filename ), 
 'METRIC_SOURCE' => SRCFILE_SOURCE, 
 'METRIC_SOURCEPATH' => $decompress ? dirname( $filename ) : $this->getSourceDir() );
@@ -632,7 +612,9 @@ return $result;
 protected function _getTarFilter() {
 global $COMPRESSION_APPS;
 foreach ( $COMPRESSION_APPS as $filter => $name ) {
-if ( null !== getParam( $this->options, $name ) )
+$opt = getParam( $this->options, 'compression_type' );
+if ( ! empty( $name ) && ( null === $opt && null !== getParam( $this->options, $name ) ) ||
+( null !== $opt && $filter == $opt ) )
 return $filter;
 }
 return NONE;
@@ -689,7 +671,12 @@ $this->error = $error;
 protected function getOptions( $option_name = '', $default = '' ) {
 return empty( $option_name ) ? $this->options : isNull( $this->options, $option_name, $default );
 }
-protected function stopTransfer( $operation, $filename, $filesize, $action = 'METRIC_ACTION_TRANSFER' ) {
+protected function stopTransfer( 
+$operation, 
+$filename, 
+$filesize, 
+$uncompressed = 0, 
+$action = 'METRIC_ACTION_TRANSFER' ) {
 $end = time();
 $duration = $end - $this->transfer_start;
 $this->logOutputTimestamp( 
@@ -702,7 +689,10 @@ $stat_data = array(
 'METRIC_OPERATION' => $operation, 
 'METRIC_FILENAME' => $filename, 
 'METRIC_TIME' => $duration, 
-'METRIC_SIZE' => $filesize );
+'METRIC_SIZE' => $filesize, 
+'METRIC_DISK_FREE' => _disk_free_space( $this->getWorkDir() ) );
+$filesize && $stat_data['METRIC_RATIO'] = $uncompressed / $filesize;
+$uncompressed && $stat_data['METRIC_UNCOMPRESSED'] = $uncompressed;
 isset( $stat_data['JOBTBL_FILE_CHECKSUM'] ) || $stat_data['JOBTBL_FILE_CHECKSUM'] = file_checksum( 
 $filename );
 is_array( $this->process_data ) && $stat_data = array_merge( $stat_data, $this->process_data );
@@ -710,12 +700,17 @@ $this->_statistics_manager->addJobData( $this->_jobs_id, $stat_data );
 }
 return $duration;
 }
-protected function getProgressManager() {
+public function getProgressManager() {
 return $this->_progress_manager;
+}
+protected function _is_job_aborted( $aborted = false, $target = TMPFILE_SOURCE, $operation = OPER_RESTORE ) {
+if ( $aborted = $aborted || $this->chkProcessSignal() )
+$this->processAbortSignal( $target, $operation );
+return $aborted;
 }
 protected function _chkOAuthSession( $target_name, &$session, $err_params, $bullet = null, $multiplier = 1 ) {
 $auth_path = ROOT_OAUTH_FILE . "$target_name.auth";
-if ( file_exists( $auth_path ) ) {
+if ( _file_exists( $auth_path ) ) {
 if ( ! $session->initFromFile( $auth_path ) ) {
 $this->outputError( 
 sprintf( 
@@ -759,7 +754,7 @@ $download = false,
 $action = 'METRIC_ACTION_TRANSFER' ) {
 $result = array( 'METRIC_FILENAME' => $filename, 'METRIC_ACTION' => $action, 'METRIC_OPERATION' => $operation );
 ( ! $download || $filesize >= 0 ) &&
-$result['METRIC_SIZE'] = $filesize >= 0 ? $filesize : ( file_exists( $filename ) ? filesize( $filename ) : 0 );
+$result['METRIC_SIZE'] = $filesize >= 0 ? $filesize : ( _file_exists( $filename ) ? filesize( $filename ) : 0 );
 return $result;
 }
 protected function initCloudStorage( $target, $filename, $filesize = -1, $download = false ) {
@@ -767,7 +762,7 @@ list( $target_name, $oper_send, $oper_sent ) = $this->getTargetOperConsts( $targ
 if ( $this->chkProcessSignal() )
 return $this->processAbortSignal( $target, $oper_send );
 if ( ! $this->getTarget( $target )->isEnabled() || empty( $filename ) ||
-! ( $download || file_exists( $filename ) ) )
+! ( $download || _file_exists( $filename ) ) )
 return true;
 ! $download && $filesize = filesize( $filename );
 $metadata = array();
@@ -817,7 +812,7 @@ list( $target_name, $oper_send, $oper_sent ) = $this->getTargetOperConsts( $targ
 if ( $this->chkProcessSignal() )
 return $this->processAbortSignal( $target, $oper_send );
 if ( ! $this->getTarget( $target )->isEnabled() || empty( $filename ) ||
-! ( $download || file_exists( $filename ) ) )
+! ( $download || _file_exists( $filename ) ) )
 return true;
 $obj_params = $this->getTarget( $target )->getParams();
 $path = $this->getTarget( $target )->getPath();
@@ -834,6 +829,7 @@ $api->onAbortCallback = array( $this, 'chkProcessSignal' );
 return $api;
 }
 protected function run( $job_type = JOB_BACKUP ) {
+$this->_job_type = $job_type;
 if ( empty( $this->options ) ) {
 ob_start();
 printHelp();
@@ -858,7 +854,8 @@ if ( isset( $cipher_def['items'][$this->options['encryption']] ) ) {
 $class = $cipher_class;
 break;
 }
-file_exists( CRYPT_PATH . "$class.php" ) && include_once CRYPT_PATH . "$class.php";
+_file_exists( CRYPT_PATH . "$class.php" ) && include_once CRYPT_PATH . "$class.php";
+$class = __NAMESPACE__ . '\\' . $class;
 if ( class_exists( $class ) &&
 preg_match( '/([a-z]\w*)(-(\w*))?(-(\w*))?/i', $this->options['encryption'], $matches ) ) {
 $cipher = $matches[1];
@@ -887,7 +884,7 @@ sprintf(
 _esc( '%s the file %s with %s' ), 
 $encrypt ? _esc( 'encrypting' ) : _esc( 'decrypting' ), 
 $filename, 
-get_class( $enc ) ), 
+str_replace( __NAMESPACE__ . '\\', '', get_class( $enc ) ) ), 
 BULLET );
 $out = $enc->encryptFile( $filename, null, $encrypt );
 $this->logOutputTimestamp( false !== $out ? _esc( 'succeeded' ) : _esc( 'failed' ), BULLET, 2 );
@@ -914,7 +911,7 @@ if ( $new_line )
 $str .= "<br>";
 foreach ( $colors as $color )
 $str = preg_replace( '/<(' . $color . '*)\b[^>]*>(.*?)<\/\1>/i', getSpan( '$2', $color ), $str );
-$plain_str = $this->_stripHTMLTags( $str );
+$plain_str = html2Text( $str );
 if ( $this->is_cli )
 $str = $plain_str;
 $this->_logfile->writeLog( $plain_str );
@@ -959,7 +956,7 @@ public function getBZipVersion() {
 return $this->bzipver;
 }
 public function getCompressionMethod() {
-return $this->method;
+return intval( $this->method );
 }
 public function setCompressionMethod( $method ) {
 $this->method = $method;
@@ -967,24 +964,32 @@ $this->method = $method;
 public function getCompressionLevel() {
 return $this->level;
 }
+public function getJobTypeStr() {
+return JOB_BACKUP == $this->_job_type ? _esc( 'Backup' ) : ( - 4 == $this->_job_type ? _esc( 'Restore' ) : _esc( 
+'unknown' ) );
+}
 public function printJobSettings( $job_type = JOB_BACKUP ) {
+global $COMPRESSION_NAMES;
 $memory_limit = getMemoryLimit();
 $memory_usage = memory_get_usage( true );
-if ( is_dir( $this->getWorkDir() ) )
-$disk_free_space = disk_free_space( $this->getWorkDir() );
+if ( _is_dir( $this->getWorkDir() ) )
+$disk_free_space = _disk_free_space( $this->getWorkDir() );
 else
 $disk_free_space = - 1;
 $bzipver = $this->getBZipVersion();
+$mysq_ext = $this->getOptions( 'mysql_ext', 'mysql' );
 $this->logOutputTimestamp( 
 sprintf( 
-'<b><yellow>' . _esc( "Job started with %s interface (%s)" ) . '</yellow></b>', 
+'<b><yellow>' . _esc( "%s job started with %s interface (%s)" ) . '</yellow></b>', 
+$this->getJobTypeStr(), 
 ! empty( $this->sender ) ? $this->sender : ( is_cli() ? "CLI" : "WP-Admin" ), 
 APP_VERSION_ID ) );
 $this->logOutputTimestamp( _esc( 'OS/PHP' ) . " : " . PHP_OS . '/' . PHP_VERSION, '*', 1 );
-$this->logOutputTimestamp( _esc( "Working directory" ) . " : " . $this->getWorkDir(), '*', 1 );
+$this->logOutputTimestamp( _esc( "ROOT" ) . " : " . ALT_ABSPATH, '*', 1 );
+$this->logOutputTimestamp( _esc( "Website URL" ) . " : " . selfURL( true ), '*', 1 );
+$this->logOutputTimestamp( _esc( "Working directory" ) . " : " . shorten_path( $this->getWorkDir() ), '*', 1 );
 $this->logOutputTimestamp( 
-_esc( "Log directory" ) . " : " .
-str_replace( ROOT_PATH, '&lt;root&gt;' . DIRECTORY_SEPARATOR, getBranchedFileName( LOG_DIR ) ), 
+_esc( "Log directory" ) . " : " . shorten_path( getBranchedFileName( LOG_DIR ) ), 
 '*', 
 1 );
 if ( JOB_BACKUP == $job_type ) {
@@ -993,6 +998,10 @@ $this->logOutputTimestamp( _esc( "Toolchain" ) . " : " . $this->_getToolchain(),
 $this->logOutputTimestamp( _esc( "Compression type" ) . " : " . $this->getCompressionName(), '*', 1 );
 if ( BZ2 === $this->getCompressionMethod() && 'intern' != $this->getTool() )
 $this->logOutputTimestamp( _esc( 'version' ) . " : " . $bzipver, BULLET, 2 );
+if ( defined( __NAMESPACE__.'\\PCLZIP' ) && PCLZIP === $this->getCompressionMethod() )
+$this->logOutputTimestamp( _esc( 'version' ) . " : " . $COMPRESSION_NAMES[PCLZIP], BULLET, 2 );
+if ( defined( __NAMESPACE__.'\\ZIP' ) && ZIP === $this->getCompressionMethod() )
+$this->logOutputTimestamp( _esc( 'version' ) . " : " . $COMPRESSION_NAMES[ZIP], BULLET, 2 );
 $this->logOutputTimestamp( _esc( "Compression level" ) . " : " . $this->getCompressionLevel(), '*', 1 );
 $enc = $this->getEncryption();
 $this->logOutputTimestamp( 
@@ -1017,6 +1026,10 @@ _esc( 'available' ) ),
 '*', 
 1 );
 $this->logOutputTimestamp( _esc( "Exec time limit" ) . " : " . ini_get( "max_execution_time" ) . 's', '*', 1 );
+$this->logOutputTimestamp( 
+_esc( "MySQL extension" ) . " : " . ( empty( $mysq_ext ) ? _esc( 'best available' ) : $mysq_ext ), 
+'*', 
+1 );
 $this->logOutputTimestamp( 
 _esc( "Disk free space" ) . " : " . getHumanReadableSize( $disk_free_space ), 
 '*', 
@@ -1063,6 +1076,9 @@ break;
 case OPER_MAINT_MYSQL :
 $opstr = _esc( 'table maintenance' );
 break;
+case OPER_RESTORE :
+$opstr = _esc( 'restore' );
+break;
 default :
 $opstr = _esc( 'transfer' );
 break;
@@ -1084,7 +1100,7 @@ $error_get_last['message'],
 basename( $error_get_last['file'] ), 
 $error_get_last['line'] );
 else
-return; 
+return;
 } else
 $msg = $str;
 if ( ! $no_timestamp )
@@ -1098,7 +1114,7 @@ if ( null !== $this->_statistics_manager )
 $this->_statistics_manager->addJobData( $this->_jobs_id, $metrics );
 $this->addMessage( 
 false !== strpos( $str, '<yellow>' ) ? MESSAGE_TYPE_WARNING : MESSAGE_TYPE_ERROR, 
-$this->_stripHTMLTags( $msg ), 
+html2Text( $msg ), 
 empty( $this->_jobs_id ) ? 0 : $this->_jobs_id );
 }
 public function startTransfer( $operation, $filename, $path, $protocol = '', $secure = false, $filesize = -1, $array = null ) {
@@ -1113,28 +1129,127 @@ $this->_jobs_id,
 array( 'METRIC_OPERATION' => $operation, 'METRIC_MEDIAPATH' => $path ) );
 }
 public function onBytesSent( $provider, $filename, $bytes, $total_bytes ) {
-$this->_progress_manager->setProgress( $provider, $filename, $bytes, $total_bytes, 1 );
+$this->_progress_manager->setProgress( $provider, $filename, $bytes, $total_bytes, PT_UPLOAD );
 }
 public function onBytesReceived( $provider, $filename, $bytes, $total_bytes ) {
-$this->_progress_manager->setProgress( $provider, $filename, $bytes, $total_bytes, 0 );
+$this->_progress_manager->setProgress( $provider, $filename, $bytes, $total_bytes, PT_DOWNLOAD );
 }
 public function un_lockSession() {
 if ( $this->can_unlock && null != $this->flock ) {
 flock( $this->flock, LOCK_UN );
-file_exists( $this->flock_file ) && @unlink( $this->flock_file );
+_file_exists( $this->flock_file ) && @unlink( $this->flock_file );
 }
 }
 public function sendEmailReport( $msg = null ) {
+$format_datetime = function ( $str ) {
+return preg_replace( 
+'/(\[\d{4}\-\d{2}\-\d{2} \d{2}:\d{2}:\d{2}\])/', 
+'<span style="color:#777">$1</span>', 
+$str );
+};
+$format_hr = function ( $str ) {
+return preg_replace( '/^(\-+)$/m', '<hr>', $str );
+};
+$format_warnings = function ( $str ) {
+return preg_replace( 
+'/(' . _esc( 'WARNING' ) . '\s*:)(.*)/mi', 
+'<span style="background-color:#FFB600;color:#FFF;font-weight:bold">$1</span>$2', 
+$str );
+};
+$format_errors = function ( $str ) {
+return preg_replace( '/(\[!\].+)$/m', '<span style="background-color:#FFC0B5">$1</span>', $str );
+};
+$format_totals = function ( $str ) {
+return preg_replace( 
+'/((' . _esc( 'SUBTOTAL' ) . '|' . _esc( 'GRAND TOTAL' ) . ')\s*:)(.*)/im', 
+'<span style="background-color:#FCFCAF;color:#000"><strong>$1</strong>$3</span>', 
+$str );
+};
+$format_steps = function ( $str ) {
+return preg_replace( 
+'/(\[\d+\/\d+\])/', 
+'<span style="background-color:#00ADEE;color:#FFF">$1</span>', 
+$str );
+};
+$format_target = function ( $str ) {
+global $BACKUP_TARGETS;
+return preg_replace( 
+'/((' . implode( '|', $BACKUP_TARGETS ) . '):\/\/)/', 
+'<span style="background-color:#FFB2FF">$1</span>', 
+$str );
+};
+$format_crlf = function ( $str ) {
+return preg_replace( '/^(.*)(?<!<hr>)$/m', '$1<br>', $str );
+};
+$format_job = function ( $str ) {
+return preg_replace( '/(\[\/?job_id:\d+\])/', '<strong>$1</strong>', $str );
+};
+$job_alerts = function ( $job_id ) {
+$result = array();
+$mhdl = new MessageHandler( MESSAGES_LOGFILE );
+$items = $mhdl->getMessagesByKeys( 
+array( 'ref_id', 'type' ), 
+array( $job_id, array( MESSAGE_TYPE_WARNING, MESSAGE_TYPE_ERROR ) ) );
+foreach ( $items as $msg_id => $msg_item ) {
+$value = preg_replace( '/\[[\d\-\s:]+\][\s\-]*/', '', str_replace( PHP_EOL, '', $msg_item->text ) );
+in_array( $value, $result ) || $result[] = $value;
+}
+if ( $count = count( $result ) )
+return '<table style="font-family:fixed;font-size:10px;color:#000;width:100%;border:1px solid tomato;border-radius:5px;margin-top:5px;margin-bottom:5px"><tr style="background-color:tomato;color:#FFF"><td style="padding:5px">' .
+sprintf( _esc( 'The job generated the following %d alert messages' ), $count ) .
+'</td></tr><tr><td>' . implode( '</td></tr><tr><td>', $result ) . '</td></tr></table>';
+return '';
+};
 $sender = str_replace( ' ', '', strtolower( WPMYBACKUP ) );
 if ( null !== $this->getNotificationEmail() )
 if ( preg_match( "/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}$/i", $this->getNotificationEmail() ) ) {
 $this->logOutput( 
 sprintf( _esc( 'Sending this report via e-mail to [%s]' ), $this->getNotificationEmail() ) );
-if ( ! @mail( 
-$this->getNotificationEmail(), 
-sprintf( _esc( '%s backup of %s' ), WPMYBACKUP, $this->getBackupName() ), 
-empty( $msg ) ? $this->getLogBuffer() : $msg, 
-sprintf( 'From: %s <%s@%s>', WPMYBACKUP, $sender, $this->getBackupName() ) ) )
+$status_color = '#00BD46';
+$status = _esc( 'SUCCESS' );
+if ( 1 == $this->_job_state ) {
+$status_color = '#FFB600';
+$status = _esc( 'PARTIAL' );
+} elseif ( 2 == $this->_job_state || 1 == $this->_job_status ) {
+$status_color = 'tomato';
+$status = 2 == $this->_job_state ? _esc( 'FAILED' ) : _esc( 'ABORTED' );
+}
+$from = sprintf( '%s@%s', $sender, $this->getBackupName() );
+$to = $this->getNotificationEmail();
+$subject = sprintf( 
+'%s - %s %s', 
+WPMYBACKUP, 
+strtolower( $this->getJobTypeStr() ), 
+preg_replace( '/.*(\/)\1([^\1]+)/', '$2', get_home_url_wrapper() ) );
+$plain_text = empty( $msg ) ? $this->getLogBuffer() : $msg;
+$title = sprintf( 
+_esc( 'Below is the %s log for the %s job #%s (%s)' ), 
+WPMYBACKUP, 
+strtolower( $this->getJobTypeStr() ), 
+$this->_jobs_id, 
+selfURL( true ) );
+$body = '<div>';
+$body .= '<p style="font-size:16px;font-family: Verdana,Georgia,serif !important;">' . $title . '</p>';
+$body .= '<p><span style="background-color:' . $status_color .
+';color:white;font-weight:bold;padding:3px;">' . _esc( 'Status' ) . ': ' . $status . '</span></p>';
+$body_text = ltrim( $plain_text );
+foreach ( array( 
+$format_job, 
+$format_steps, 
+$format_hr, 
+$format_warnings, 
+$format_errors, 
+$format_totals, 
+$format_target, 
+$format_datetime, 
+$format_crlf ) as $lambda ) {
+$body_text = call_user_func( $lambda, $body_text );
+}
+$body .= $job_alerts( $this->_jobs_id ) .
+'<table style="font-family:fixed;font-size:10px;color:#000;border:1px solid #00adee;border-radius:5px"><tr><td>' .
+$body_text . '</td></tr></table>';
+$body .= '</div>';
+if ( ! sendHtmlFormattedMail( $from, $to, $subject, $body, $plain_text, 3, $this->getOptions() ) )
 $this->outputError( sprintf( '<red>%s.</red>', _esc( 'Mail send failed' ) ), true );
 } else
 $this->outputError( 
@@ -1143,7 +1258,7 @@ sprintf(
 $this->getNotificationEmail() ), 
 true );
 }
-public function onProgress( $provider, $filename, $bytes, $total_bytes, $ptype = 0, $running = 1, $reset_timer = false ) {
+public function onProgress( $provider, $filename, $bytes, $total_bytes, $ptype = PT_DOWNLOAD, $running = 1, $reset_timer = false ) {
 $this->getProgressManager()->setProgress( 
 $provider, 
 $filename, 
@@ -1165,7 +1280,7 @@ strtoupper( $this->getCompressionName() ) ),
 BULLET );
 }
 public function addMessage( $type, $text, $ref_id = null, $status = MESSAGE_ITEM_UNREAD ) {
-null != $this->_alert_message_obj && $this->_alert_message_obj->addMessage( $type, $text, $ref_id, $status );
+add_alert_message( $text, $ref_id, $type, $status );
 }
 public function onShutdown() {
 $this->un_lockSession();

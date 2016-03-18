@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : DiskTargetEditor.php $
  * 
- * @id      : DiskTargetEditor.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : DiskTargetEditor.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -40,7 +40,7 @@ parent::initTarget ();
 $this->hasInfoBanner = defined(__NAMESPACE__.'\\FILE_EXPLORER');
 }
 protected function hideEditorContent() {
-return ! (is_dir ( $this->root ) && $this->enabled);
+return ! (_is_dir ( $this->root ) && $this->enabled);
 }
 protected function onGenerateEditorContent() {
 $java_scripts = echoFolder ( $this->target_name, $this->root, $this->root, $this->ext_filter, $this->function_name, DIRECTORY_SEPARATOR, null, $this->folder_style, false, null, $this->settings );

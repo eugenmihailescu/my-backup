@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : BackupFilesFilter.php $
  * 
- * @id      : BackupFilesFilter.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : BackupFilesFilter.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -44,20 +44,20 @@ $this->_md5_cache->onAbortCallback = $this->onAbortCallback;
 $this->_md5_cache->onProgressCallback = $this->onProgressCallback;
 $this->_md5_cache->onOutputCallback = $this->onOutputCallback;
 }
-function __construct($log_filename, $ref_log_filename) {
-$this->_md5_cache = new LocalFilesMD5 ( $log_filename, $ref_log_filename );
-$this->setCallback ();
-$this->_setCacheCallbacks ();
+function __construct( $log_filename, $ref_log_filename ) {
+$this->_md5_cache = new LocalFilesMD5( $log_filename, $ref_log_filename );
+$this->setCallback();
+$this->_setCacheCallbacks();
 }
-public function setCallback($clbk_abort = null, $clbk_progress = null, $clbk_output = null) {
+public function setCallback( $clbk_abort = null, $clbk_progress = null, $clbk_output = null ) {
 $this->onAbortCallback = $clbk_abort;
 $this->onProgressCallback = $clbk_progress;
 $this->onOutputCallback = $clbk_output;
 }
-public function filter($filename, $timestamp) {
-$this->_setCacheCallbacks ();
-$result = $this->_md5_cache->diff ( $filename, $timestamp );
-$this->_md5_cache->changed () && $this->_md5_cache->write ();
+public function filter( $filename, $timestamp ) {
+$this->_setCacheCallbacks();
+$result = $this->_md5_cache->diff( $filename, $timestamp );
+$this->_md5_cache->changed() && $this->_md5_cache->write();
 return $result;
 }
 }

@@ -24,24 +24,24 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : forward-target-tabs.php $
  * 
- * @id      : forward-target-tabs.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : forward-target-tabs.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 $registered_forward_map = array( 
-'WP_SOURCE' => array( is_multisite_wrapper() ? _esc( 'Site files' ) : _esc( 'WP files' ), null, - 4 ), 
-'SRCFILE_SOURCE' => array( _esc( 'Backup source' ), 'any-file-visible-to-the-wp', - 3 ), 
+'WP_SOURCE' => array( IS_MULTISITE ? _esc( 'Site files' ) : _esc( 'WP files' ), null, - 4 ), 
+'SRCFILE_SOURCE' => array( sprintf( _esc( '%s files' ), PHP_OS ), 'any-file-visible-to-the-wp', - 3 ), 
 'APP_JOB_HISTORY' => array( _esc( 'Job history' ), 'query-job-history', 8 ), 
 'APP_STATISTICS' => array( _esc( 'Statistics' ), 'backup-statistics', 10 ), 
 'APP_LICENSE' => array( _esc( 'License' ), null, 12 ), 
-'APP_LISTVIEW_TARGETS' => array( _esc( 'Target list' ), 'backup-wizard', 16 ), 
+'APP_LISTVIEW_TARGETS' => array( _esc( 'Backup jobs++' ), 'backup-wizard', 16 ), 
 'BACKUP_SETTINGS' => array( _esc( 'Settings' ), 'advanced-network-settings', 18 ), 
 'APP_EULA' => array( _esc( 'EULA' ), null, 20 ), 
 'APP_RESTORE' => array( _esc( 'Restore' ), 'restore-wizard', 21 ), 

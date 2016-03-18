@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : help.php $
  * 
- * @id      : help.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : help.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -203,7 +203,7 @@ return preg_replace( '/([\'"])/', $escape ? '\\\\' : '$1', $str );
 }
 if ( ! _function_exists( 'getAnchor' ) ) {
 function getAnchor( $name, $anchor, $target = null, $escape = false, $popup = false ) {
-$target = empty( $target ) ? '_blank' : ( '_self' == $target ? '' : $target );
+$target = empty( $target ) ? '_blank' : $target;
 return $popup ? getPopup( $name, '&quot;' . $anchor . '&quot;' ) : escape_quotes( 
 '<a href="' . $anchor . '" target="' . $target . '">' . $name . '</a>', 
 $escape );

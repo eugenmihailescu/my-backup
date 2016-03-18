@@ -24,19 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-8 $
- * @commit  : 010da912cb002abdf2f3ab5168bf8438b97133ea $
- * @author  : Eugen Mihailescu eugenmihailescux@gmail.com $
- * @date    : Tue Feb 16 21:44:02 2016 UTC $
+ * @version : 0.2.3-27 $
+ * @commit  : 10d36477364718fdc9b9947e937be6078051e450 $
+ * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @date    : Fri Mar 18 10:06:27 2016 +0100 $
  * @file    : random.php $
  * 
- * @id      : random.php | Tue Feb 16 21:44:02 2016 UTC | Eugen Mihailescu eugenmihailescux@gmail.com $
+ * @id      : random.php | Fri Mar 18 10:06:27 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 function isRandomWordsFile() {
-return defined( __NAMESPACE__.'\\BENCHMARK_RANDWORDS_FILE' ) && file_exists( BENCHMARK_RANDWORDS_FILE ) &&
+return defined( __NAMESPACE__.'\\BENCHMARK_RANDWORDS_FILE' ) && _file_exists( BENCHMARK_RANDWORDS_FILE ) &&
 filesize( BENCHMARK_RANDWORDS_FILE );
 }
 function createRandomFile( $path, $size, $cbk_progress = null, $cbk_abort = null ) {
@@ -44,8 +44,8 @@ if ( $size <= 0 )
 return false;
 $bs = $size > MB ? MB : ( $size > 8192 ? 8192 : 1 );
 if ( null == $path )
-$path = defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : sys_get_temp_dir();
-if ( ! file_exists( $path ) || ( file_exists( $path ) && ! is_dir( $path ) ) )
+$path = defined( __NAMESPACE__.'\\LOG_DIR' ) ? LOG_DIR : _sys_get_temp_dir();
+if ( ! _file_exists( $path ) || ( _file_exists( $path ) && ! _is_dir( $path ) ) )
 mkdir( $path, 0770, true );
 $tmp_file = tempnam( addTrailingSlash( $path ), 'tmp_' );
 if ( isRandomWordsFile() )
@@ -54,7 +54,7 @@ elseif ( isWin() )
 $f = createRandomFileWin( $tmp_file, $size, $bs, $cbk_progress, $cbk_abort );
 else
 $f = createRandomFileUnix( $tmp_file, $size, $bs, $cbk_progress );
-return file_exists( $f ) ? $f : false;
+return _file_exists( $f ) ? $f : false;
 }
 function createRandomWordsFile( $tmp_file = null, $size = 0, $bs = 0, $cbk_progress = null, $cbk_abort = null ) {
 $rw = file( BENCHMARK_RANDWORDS_FILE );
@@ -64,8 +64,7 @@ $fh = fopen( $tmp_file, 'wb' );
 $abort_signal_received = false;
 if ( $fh ) {
 while ( $fs < $size ) {
-if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) &&
-( $abort_signal_received = $abort_signal_received ||
+if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) && ( $abort_signal_received = $abort_signal_received ||
 false !== _call_user_func( $cbk_abort[0], $cbk_abort[1], $cbk_abort[2] ) ) )
 break;
 $bfs = 0;
@@ -83,6 +82,8 @@ fclose( $fh );
 return $tmp_file;
 }
 function createRandomFileUnix( $tmp_file = null, $size = 0, $bs = 0 ) {
+if ( ! _dir_in_allowed_path( '/dev' ) )
+return createRandomFileWin( $tmp_file, $size, $bs );
 $cmd = 'dd if=/dev/urandom of=' . $tmp_file . ' bs=' . $bs . ' count=' . ceil( $size / $bs );
 ( $io = popen( $cmd, 'r' ) ) && fgets( $io, 4096 ) && pclose( $io );
 return $tmp_file;
@@ -95,8 +96,7 @@ $buffer .= chr( rand( 1, 255 ) );
 $remaining = $size;
 $handle = fopen( $tmp_file, 'wb' );
 while ( $remaining > 0 ) {
-if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) &&
-( $abort_signal_received = $abort_signal_received ||
+if ( is_array( $cbk_abort ) && _is_callable( $cbk_abort[0] ) && ( $abort_signal_received = $abort_signal_received ||
 false !== _call_user_func( $cbk_abort[0], $cbk_abort[1], $cbk_abort[2] ) ) )
 break;
 $remaining -= fwrite( $handle, str_shuffle( $buffer ) );
