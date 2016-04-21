@@ -10,11 +10,10 @@ MyBackup allows you to restore with ease any backup created by it thanks to an i
 In order to help you understand how it works and/or diagnose a particular issue it includes enhanced debugging functionalities. The backup and restore jobs, the HTTP communication, the PHP and Ajax calls as well as well as the SMTP and SQL statements, all are logged into separated detailed log files.
 Major features supported* by MyBackup:
 
-* Support for WordPress multisite/network
 * Support for creating full (complete), incremental and differential backups
 * Support for splitting a large backup into multiple archive volumes
-* Allows you to select what components (such as plugins, themes, WP core, etc) to include, how to store and where to store the backups
-* Allows a complete backup of the system (not only your WordPress files) by giving you access to the whole file system
+* Allows you to select the files and folders to include/exclude, how to store and where to store the backups
+* Allows a complete backup of the system by giving you access to the whole file system
 * Comes with support for backing up any remote MySQL database
 * Additionally, allows MySQL backups via the local mysqldump toolchain including custom options support
 * Allows the usage of External OS compression toolchain (additionally to its default built-in compression toolchain)
@@ -23,7 +22,7 @@ Major features supported* by MyBackup:
 * Allows backup execution from command line via a complete CLI interface
 * Support for restoring a full, increment or differential backup set created by itself
 * Allows definition of multiple backup and restore jobs via an user-friendly Wizard
-* Allows backup schedule at WordPress level and at the OS level where the backup job is run via the CLI interface
+* Allows backup schedule at the OS level where the backup job is run via the CLI interface
 
 Other features you will love:
 
@@ -34,5 +33,3 @@ Other features you will love:
 * The file explorer allows direct operations on the local and cloud storages such as direct downloads, delete, rename or directory creation
 * Keeps the track of what is doing in separate debug log files: backup/restore jobs, HTTP communication, PHP errors/back-traces and Ajax calls, SMTP communication, SQL statements, etc.
 * Automatic log archiving and rotation
-
-
