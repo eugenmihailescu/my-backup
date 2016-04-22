@@ -1,5 +1,5 @@
 # MyBackup
-An OS independent backup application
+An OS independent backup application. Pure PHP/JavaScript code without any external dependency (eg. jQuery, PHP frameworks, vendor libs).
 
 MyBackup is a web application that enables blog authors and system administrators to backup their blog and/or system files with ease. It allows you to create a full, differential or incremental backups of both files and your MySQL databases. Furthermore it secures the backup by uploading it to the local disk, Ftp(s), Scp, SFtp, Dropbox, Google Drive, Webdav or sent via SMTP within a single/multiple e-mail messages as attachments.
 
