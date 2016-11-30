@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : options.php $
  * 
- * @id      : options.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : options.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -182,6 +182,7 @@ define ( __NAMESPACE__.'\\YAYUI_COMPRESS', strToBool ( $settings ['yayui_on'] ) 
 define ( __NAMESPACE__.'\\STATISTICS_DEBUG', strToBool ( $settings ['stats_debug_on'] ) ); 
 define ( __NAMESPACE__.'\\DEBUG_STATUSBAR', strToBool ( $settings ['debug_statusbar_on'] ) ); 
 define ( __NAMESPACE__.'\\SMTP_DEBUG', strToBool ( $settings ['smtp_debug_on'] ) ); 
+define ( __NAMESPACE__.'\\RESTORE_DEBUG', strToBool ( $settings ['restore_debug_on'] ) ); 
 if (! $ajax) {
 isset ( $_COOKIE ['cookie_accept'] ) && $settings ['cookie_accept_on'] = strToBool ( $_COOKIE ['cookie_accept'] );
 $format = "setCookie('cookie_accept','%s',%s,true);";
@@ -219,8 +220,7 @@ return $java_scripts;
 }
 function _reset_SSL_cache($old_settings, $new_settings) {
 $reset_cert_cache = array ('webdav_ssl_cert_info' => array ('webdavhost','webdav_cainfo','ssl_cainfo','ssl_ver','ssl_chk_peer','ssl_chk_host' ),
-'ftp_ssl_cert_info' => array ('ftphost','ftpport','ftppasv','ftpproto','ftp_cainfo','ftp_ssl_chk_peer','ssl_cainfo','ssl_ver','ssl_chk_peer','ssl_chk_host' ),
-'ftp_ssh_cert_info' => array ('sshhost','sshproto','sshport','ssh_publickey_file','ssh_privkey_file','ssh_privkey_pwd' ) );
+'ftp_ssl_cert_info' => array ('ftphost','ftpport','ftppasv','ftpproto','ftp_cainfo','ftp_ssl_chk_peer','ssl_cainfo','ssl_ver','ssl_chk_peer','ssl_chk_host' ),'ftp_ssh_cert_info' => array ('sshhost','sshproto','sshport','ssh_publickey_file','ssh_privkey_file','ssh_privkey_pwd' ) );
 foreach ( $reset_cert_cache as $cache_key => $value ) {
 if (isset ( $_SESSION [$cache_key] ) && settings_changed ( $value, $old_settings, $new_settings ))
 del_session_var ( $cache_key );

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : job-history-functions.php $
  * 
- * @id      : job-history-functions.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : job-history-functions.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -734,6 +734,7 @@ echo $html_rows;
 <?php
 }
 function flushJobHistory( $settings ) {
+require_once MISC_PATH . 'StatisticsManager.php';
 $stat_mngr = getJobsStatManager( $settings );
 $result = $stat_mngr->flushData();
 if ( $result )
@@ -746,6 +747,7 @@ echo '<br>' . _esc( 'Try do it manually by removing that file.' );
 }
 }
 function deleteJobHistory( $settings, $job_id ) {
+require_once MISC_PATH . 'StatisticsManager.php';
 $stat_mngr = getJobsStatManager( $settings );
 $sql_stmts = array( 
 'DELETE FROM ' . TBL_PREFIX . TBL_JOBS . ' where id=' . $job_id, 

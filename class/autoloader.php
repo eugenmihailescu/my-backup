@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : autoloader.php $
  * 
- * @id      : autoloader.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : autoloader.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 
@@ -41,7 +41,6 @@ $classes_path_668264596 = array (
 'AbstractOAuthClient' => OAUTH_PATH . 'AbstractOAuthClient.php',
 'AbstractTarget' => CLASS_PATH . 'AbstractTarget.php',
 'AbstractTargetEditor' => EDITOR_PATH . 'AbstractTargetEditor.php',
-'ActionHandler' => CLASS_PATH . 'ActionHandler.php',
 'AjaxRequests' => CLASS_PATH . 'AjaxRequests.php',
 'Array2XML' => MISC_PATH . 'Array2XML.php',
 'BackupFilesFilter' => CLASS_PATH . 'BackupFilesFilter.php',
@@ -54,7 +53,6 @@ $classes_path_668264596 = array (
 'CurlOptsCodes' => CURL_PATH . 'CurlOptsCodes.php',
 'CurlOptsParamsCodes' => CURL_PATH . 'CurlOptsParamsCodes.php',
 'CurlSSHWrapper' => CURL_PATH . 'CurlSSHWrapper.php',
-'CurlWrapper' => CURL_PATH . 'CurlWrapper.php',
 'Dashboard' => CLASS_PATH . 'Dashboard.php',
 'DashboardEditor' => EDITOR_PATH . 'DashboardEditor.php',
 'DiskSourceEditor' => EDITOR_PATH . 'DiskSourceEditor.php',
@@ -63,7 +61,6 @@ $classes_path_668264596 = array (
 'DropboxOAuth2Client' => OAUTH_PATH . 'DropboxOAuth2Client.php',
 'DropboxTargetEditor' => EDITOR_PATH . 'DropboxTargetEditor.php',
 'FacebookOAuth2Client' => OAUTH_PATH . 'FacebookOAuth2Client.php',
-'FileContextUrl' => CURL_PATH . 'FileContextUrl.php',
 'FtpStatusCodes' => CURL_PATH . 'FtpStatusCodes.php',
 'FtpTargetEditor' => EDITOR_PATH . 'FtpTargetEditor.php',
 'GenericArchive' => CLASS_PATH . 'GenericArchive.php',
@@ -76,12 +73,9 @@ $classes_path_668264596 = array (
 'HtmlTableConverter' => MISC_PATH . 'HtmlTableConverter.php',
 'HttpStatusCodes' => CURL_PATH . 'HttpStatusCodes.php',
 'LocalFilesMD5' => CLASS_PATH . 'LocalFilesMD5.php',
-'LogFile' => LIB_PATH . 'LogFile.php',
-'LogsEditor' => EDITOR_PATH . 'LogsEditor.php',
 'MailTargetEditor' => EDITOR_PATH . 'MailTargetEditor.php',
 'MessageHandler' => MISC_PATH . 'MessageHandler.php',
 'MessageItem' => MISC_PATH . 'MessageItem.php',
-'MyException' => LIB_PATH . 'MyException.php',
 'MyFtpWrapper' => CURL_PATH . 'MyFtpWrapper.php',
 'MySQLBackupHandler' => CLASS_PATH . 'MySQLBackupHandler.php',
 'MySQLErrorException' => MISC_PATH . 'MySQLWrapper.php',
@@ -98,9 +92,7 @@ $classes_path_668264596 = array (
 'SSHTargetEditor' => EDITOR_PATH . 'SSHTargetEditor.php',
 'ScheduleEditor' => EDITOR_PATH . 'ScheduleEditor.php',
 'SimpleLogin' => MISC_PATH . 'SimpleLogin.php',
-'StatisticsManager' => MISC_PATH . 'StatisticsManager.php',
 'SupportCategories' => STORAGE_PATH . 'SupportCategories.php',
-'SupportEditor' => EDITOR_PATH . 'SupportEditor.php',
 'TarArchive' => CLASS_PATH . 'TarArchive.php',
 'TargetCollection' => EDITOR_PATH . 'TargetCollection.php',
 'TargetCollectionItem' => EDITOR_PATH . 'TargetCollectionItem.php',

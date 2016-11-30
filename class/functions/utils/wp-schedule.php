@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : wp-schedule.php $
  * 
- * @id      : wp-schedule.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-schedule.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -135,8 +135,8 @@ get_active_wpcrons( '/' . WPCRON_SCHEDULE_HOOK_NAME . '|' . WPMYBACKUP_LOGS . '_
 function change_schedule( $_logfile, $recurrance, $activate = true, $cron_hook = WPCRON_SCHEDULE_HOOK_NAME, $timestamp = null, $return_js = true ) {
 check_wpcron();
 $opstr = $activate ? _esc( 'scheduled' ) : ( getSpanE( _esc( 'removed' ), 'red' ) );
-$_logfile instanceof LogFile && $_logfile->writeLog( 
-sprintf( _esc( "[%s] %s Cron schedule %s" ) . PHP_EOL, date( DATETIME_FORMAT ), WPMYBACKUP, $opstr ) );
+$_logfile instanceof LogFile && $_logfile->writelnLog( 
+sprintf( _esc( "[%s] %s Cron schedule %s" ) , date( DATETIME_FORMAT ), WPMYBACKUP, $opstr ) );
 if ( false !== ( $timestamp = _call_user_func( 
 ( $activate ? 'activate' : 'deactivate' ) . '_schedule', 
 $_logfile, 

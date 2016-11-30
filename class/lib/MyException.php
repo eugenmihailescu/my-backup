@@ -24,36 +24,41 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : MyException.php $
  * 
- * @id      : MyException.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : MyException.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
-class MyException extends \Exception {
-protected function _trigger_exception($message, $code = null, $previous = null) {
-if (defined ( __NAMESPACE__.'\\PHP_DEBUG_ON' ) && PHP_DEBUG_ON)
-if (defined ( __NAMESPACE__.'\\TRACE_DEBUG_LOG' )) {
+
+require_once 'LogFile.php';
+class MyException extends \Exception
+{
+protected function _trigger_exception($message, $code = null, $previous = null)
+{
+if (defined(__NAMESPACE__.'\\PHP_DEBUG_ON') && PHP_DEBUG_ON)
+if (defined(__NAMESPACE__.'\\TRACE_DEBUG_LOG')) {
 global $settings;
-$log_file = new LogFile ( TRACE_DEBUG_LOG, $settings );
-$log_file->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );
-$log_file->writeLog ( sprintf ( '[%s] %s (%s: %d)' . PHP_EOL, date ( DATETIME_FORMAT ), $message, _esc ( 'code' ), $code ) );
-$log_file->writeLog ( str_repeat ( '-', 80 ) . PHP_EOL );
-$trace_str = $this->getTraceAsString ();
-if (! empty ( $trace_str ))
-$log_file->writeLog ( $trace_str . PHP_EOL );
+$log_file = new LogFile(TRACE_DEBUG_LOG, $settings);
+$log_file->writeSeparator();
+$log_file->writelnLog(sprintf('[%s] %s (%s: %d)', date(DATETIME_FORMAT), $message, _esc('code'), $code));
+$log_file->writeSeparator();
+$trace_str = $this->getTraceAsString();
+if (! empty($trace_str))
+$log_file->writelnLog($trace_str);
 } else
-trigger_error ( _esc ( 'This should never happen. PHP_DEBUG_ON is on but TRACE_DEBUG_LOG is not defined. This is strange!' ), E_USER_WARNING );
+trigger_error(_esc('This should never happen. PHP_DEBUG_ON is on but TRACE_DEBUG_LOG is not defined. This is strange!'), E_USER_WARNING);
 $this->message = $message;
 $this->code = $code;
-parent::__construct ( $message, $code, $previous );
+parent::__construct($message, $code, $previous);
 }
-public function __construct($message, $code = null, $previous = null) {
-$this->_trigger_exception ( $message, $code, $previous );
+public function __construct($message, $code = null, $previous = null)
+{
+$this->_trigger_exception($message, $code, $previous);
 }
 }
 ?>

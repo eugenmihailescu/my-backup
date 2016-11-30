@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : 99-cleanup.php $
  * 
- * @id      : 99-cleanup.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 99-cleanup.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -39,6 +39,7 @@ function unlockLongRunningJob($settings, $forced = false, $job_id = null)
 {
 if (! _is_file(JOBS_LOCK_FILE))
 return array();
+include_once LIB_PATH . 'LogFile.php';
 if (! $last_job_timestamp = @filemtime(JOBS_LOCK_FILE)) {
 $jobs_log = new LogFile(JOBS_LOGFILE, $settings);
 $last_job_id = $jobs_log->getLastJobId($job_id);

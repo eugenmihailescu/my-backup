@@ -24,181 +24,209 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : utils.php $
  * 
- * @id      : utils.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : utils.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-date_default_timezone_set( "UTC" );
-define( __NAMESPACE__."\\WPMYBACKUP_AUTHOR", '@author:		Eugen Mihailescu <eugenmihailescux@gmail.com> $' );
-$utils_includes = array( 
-'arrays.php', 
-'php.php', 
-'wp-schedule.php', 
-'cli-options.php', 
-'options.php', 
-'wp-wrappers.php', 
-'files.php', 
-'random.php', 
-'url.php', 
-'mail.php', 
-'html-mail.php', 
-'nonce.php', 
-'signals.php', 
-'session.php', 
-'sys.php', 
-'sys-tools.php', 
-'help.php', 
-'ui.php', 
-'history.php', 
-'ftp.php', 
-'format.php', 
-'vat.php', 
-'mysql.php', 
-'pdo_mysql.php', 
-'help.php' );
-foreach ( $utils_includes as $include_file )
-file_exists( UTILS_PATH . $include_file ) && include_once UTILS_PATH . $include_file;
-function getDatesByAge( $dates, $days, $filter_by ) {
-$compare = strtotime( "-$days days", time() );
+date_default_timezone_set("UTC");
+define(__NAMESPACE__."\\WPMYBACKUP_AUTHOR", '@author:		Eugen Mihailescu <eugenmihailescux@gmail.com> $');
+$utils_includes = array(
+'arrays.php',
+'php.php',
+'wp-schedule.php',
+'cli-options.php',
+'options.php',
+'wp-wrappers.php',
+'files.php',
+'random.php',
+'url.php',
+'mail.php',
+'html-mail.php',
+'nonce.php',
+'signals.php',
+'session.php',
+'sys.php',
+'sys-tools.php',
+'help.php',
+'ui.php',
+'history.php',
+'ftp.php',
+'format.php',
+'vat.php',
+'mysql.php',
+'pdo_mysql.php',
+'help.php'
+);
+foreach ($utils_includes as $include_file)
+file_exists(UTILS_PATH . $include_file) && include_once UTILS_PATH . $include_file;
+function getDatesByAge($dates, $days, $filter_by)
+{
+$compare = strtotime("-$days days", time());
 $result = array();
-foreach ( $dates as $d )
-if ( array_search( $filter_by, array( 0, sign( $d - $compare ) ) ) )
+foreach ($dates as $d)
+if (array_search($filter_by, array(
+0,
+sign($d - $compare)
+)))
 $result[] = $d;
 return $result;
 }
-function getHumanReadableSize( $size, $precision = 2, $return_what = 0 ) {
-if ( PHP_INT_MAX == $size )
-return _esc( 'unknown' );
-$units = array( 'B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB' );
-for ( $i = 0; abs( $size ) >= 1024; $i++ )
+function getHumanReadableSize($size, $precision = 2, $return_what = 0)
+{
+if (PHP_INT_MAX == $size)
+return _esc('unknown');
+$units = array(
+'B',
+'KiB',
+'MiB',
+'GiB',
+'TiB',
+'PiB'
+);
+for ($i = 0; abs($size) >= 1024; $i ++)
 $size /= 1024;
-$i = $i + 1 > count( $units ) ? count( $units ) - 1 : $i;
-if ( $return_what == 1 )
+$i = $i + 1 > count($units) ? count($units) - 1 : $i;
+if ($return_what == 1)
 return $i;
-elseif ( $return_what == 2 )
+elseif ($return_what == 2)
 return $units[$i];
 else
-return sprintf( '%.' . $precision . 'f %s', $size, $units[$i] );
+return sprintf('%.' . $precision . 'f %s', $size, $units[$i]);
 }
-function getTransferSpeed( $start, $end ) {
-$sec = $start->diff( $end )->format( '%s' );
-if ( $sec > 0 && file_exists( $part ) )
-$rate = filesize( $part ) / $sec;
+function getTransferSpeed($start, $end)
+{
+$sec = $start->diff($end)->format('%s');
+if ($sec > 0 && file_exists($part))
+$rate = filesize($part) / $sec;
 else
 $rate = - 1;
-return sprintf( '%s/s', getHumanReadableSize( $rate ) );
+return sprintf('%s/s', getHumanReadableSize($rate));
 }
-function getPluginAuthorEmail() {
-$result = preg_match( '/^@author:\s*[\w\s]*\s*\<([\w\@\.]*)\>\s*\$$/', WPMYBACKUP_AUTHOR, $author_email_matches ) ? $author_email_matches[1] : '';
-return trim( $result );
+function getPluginAuthorEmail()
+{
+$result = preg_match('/^@author:\s*[\w\s]*\s*\<([\w\@\.]*)\>\s*\$$/', WPMYBACKUP_AUTHOR, $author_email_matches) ? $author_email_matches[1] : '';
+return trim($result);
 }
-function getPluginAuthorName() {
-$result = preg_match( '/^@author:\s*([\w\s]*)\s*/', WPMYBACKUP_AUTHOR, $author_matches ) ? $author_matches[1] : '';
-return trim( $result );
+function getPluginAuthorName()
+{
+$result = preg_match('/^@author:\s*([\w\s]*)\s*/', WPMYBACKUP_AUTHOR, $author_matches) ? $author_matches[1] : '';
+return trim($result);
 }
-function getPluginVersion( $full_version = true ) {
-return sprintf( '%s%s', APP_VERSION_ID, $full_version ? ', ' . APP_VERSION_DATE : '' );
+function getPluginVersion($full_version = true)
+{
+return sprintf('%s%s', APP_VERSION_ID, $full_version ? ', ' . APP_VERSION_DATE : '');
 }
-function isJobRunning( $settings = null ) {
+function isJobRunning($settings = null)
+{
 global $_branch_id;
 $lock_file = JOBS_LOCK_FILE;
 $last_job_id = false;
 $is_running = false;
-$f = fopen( $lock_file, 'wb' );
-if ( ! $f || ! flock( $f, LOCK_EX | LOCK_NB ) ) {
+$f = fopen($lock_file, 'wb');
+if (! $f || ! flock($f, LOCK_EX | LOCK_NB)) {
 $is_running = true;
-if ( null != $settings ) {
-$jobs_log = new LogFile( JOBS_LOGFILE, $settings );
+if (null != $settings) {
+$jobs_log = new LogFile(JOBS_LOGFILE, $settings);
 $last_job_id = $jobs_log->getLastJobId();
 }
 }
-if ( ! $is_running )
-flock( $f, LOCK_UN );
-fclose( $f );
-return array( 
-$is_running, 
-getSpanE( 
-sprintf( _esc( 'Backup seems to be %s now' ), $is_running ? "RUNNING" : "IDLE" ), 
-$is_running ? 'red' : '#2ea2cc', 
-$is_running ? 'bold' : 'normal' ), 
-$last_job_id );
+if (! $is_running)
+flock($f, LOCK_UN);
+fclose($f);
+return array(
+$is_running,
+getSpanE(sprintf(_esc('Backup seems to be %s now'), $is_running ? "RUNNING" : "IDLE"), $is_running ? 'red' : '#2ea2cc', $is_running ? 'bold' : 'normal'),
+$last_job_id
+);
 }
-function getLogfileByType( $log_type ) {
-switch ( $log_type ) {
-case 'jobs' :
+function getLogfileByType($log_type)
+{
+switch ($log_type) {
+case 'jobs':
 $log = JOBS_LOGFILE;
 break;
-case 'full' :
+case 'full':
 $log = OUTPUT_LOGFILE;
 break;
-case 'debug' :
+case 'debug':
 $log = TRACE_DEBUG_LOG;
 break;
-case 'curldebug' :
+case 'curldebug':
 $log = CURL_DEBUG_LOG;
 break;
-case 'statsdebug' :
+case 'statsdebug':
 $log = STATISTICS_DEBUG_LOG;
 break;
-case 'traceaction' :
+case 'traceaction':
 $log = TRACE_ACTION_LOGFILE;
 break;
-case 'errors' :
+case 'errors':
 $log = ERROR_LOG;
 break;
-case 'smtpdebug' :
+case 'smtpdebug':
 $log = SMTP_DEBUG_LOG;
 break;
-default :
+case 'restoredebug':
+$log = RESTORE_DEBUG_LOG;
+break;
+default:
 $log = false;
 break;
 }
 return $log;
 }
-function std_dev( $array ) {
-$n = count( $array );
-if ( 0 == $n )
+function std_dev($array)
+{
+$n = count($array);
+if (0 == $n)
 return 0;
-$mean = array_sum( $array ) / $n;
+$mean = array_sum($array) / $n;
 $carry = 0.0;
-foreach ( $array as $val )
-$carry += ( $d = ( (double) $val ) - $mean ) * $d;
-return array( sqrt( $carry / $n ), $mean );
+foreach ($array as $val)
+$carry += ($d = ((double) $val) - $mean) * $d;
+return array(
+sqrt($carry / $n),
+$mean
+);
 }
-function swap_items( &$item1, &$item2 ) {
+function swap_items(&$item1, &$item2)
+{
 $tmp = $item1;
 $item1 = $item2;
 $item2 = $tmp;
 return true;
 }
-function add_alert_message( $message, $job_id = null, $type = MESSAGE_TYPE_WARNING, $status = MESSAGE_ITEM_UNREAD, $interval = SECDAY ) {
-is_array( $message ) || $message = array( $message );
-$mhdl = new MessageHandler( MESSAGES_LOGFILE );
+function add_alert_message($message, $job_id = null, $type = MESSAGE_TYPE_WARNING, $status = MESSAGE_ITEM_UNREAD, $interval = SECDAY)
+{
+is_array($message) || $message = array(
+$message
+);
+$mhdl = new MessageHandler(MESSAGES_LOGFILE);
 $result = array();
-foreach ( $message as $str ) {
-$last_msg = $mhdl->getLastMessageByType( $type, MESSAGE_ITEM_READ | MESSAGE_ITEM_UNREAD, $str );
-if ( ! ( $last_msg && ( time() - $last_msg->timestamp < $interval ) ) ) {
-$msg_item = $mhdl->addMessage( $type, $str, $job_id, $status );
+foreach ($message as $str) {
+$last_msg = $mhdl->getLastMessageByType($type, MESSAGE_ITEM_READ | MESSAGE_ITEM_UNREAD, $str);
+if (! ($last_msg && (time() - $last_msg->timestamp < $interval))) {
+$msg_item = $mhdl->addMessage($type, $str, $job_id, $status);
 $result[] = $msg_item->msg_id;
 }
 }
-if ( ! empty( $result ) && defined( __NAMESPACE__.'\\NOTIFICATION_EMAIL' ) && NOTIFICATION_EMAIL ) {
+if (! empty($result) && defined(__NAMESPACE__.'\\NOTIFICATION_EMAIL') && NOTIFICATION_EMAIL) {
 global $java_scripts;
 $timeout = 10000;
 $action = 'send_email';
-$params = array( 
-'action' => $action, 
-'nonce' => wp_create_nonce_wrapper( $action ), 
-'msg_ids' => implode( '|', $result ) );
-$java_scripts[$action] = "setTimeout(function(){parent.asyncGetContent(parent.ajaxurl,'" .
-http_build_query( $params ) . "',parent.dummy);},$timeout);";
+$params = array(
+'action' => $action,
+'nonce' => wp_create_nonce_wrapper($action),
+'msg_ids' => implode('|', $result)
+);
+$java_scripts[$action] = "setTimeout(function(){parent.asyncGetContent(parent.ajaxurl,'" . http_build_query($params) . "',parent.dummy);},$timeout);";
 }
 }
 ?>

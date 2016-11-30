@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : TarArchive.php $
  * 
- * @id      : TarArchive.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : TarArchive.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -43,6 +43,7 @@ define( __NAMESPACE__.'\\TAR_EXTHEADER_LEN', 512 );
 define( __NAMESPACE__.'\\TAR_BUFFER_LENGTH', 8192 );
 define( __NAMESPACE__.'\\TAR_LONGLINK', '././@LongLink' );
 define( __NAMESPACE__.'\\BZ_OK', 0 );
+require_once LIB_PATH . 'MyException.php';
 class TarArchive extends GenericArchive {
 function __construct( $filename, $provider = null, $auto_ext = true ) {
 parent::__construct( $filename . ( $auto_ext ? '.tar' : '' ), $provider );

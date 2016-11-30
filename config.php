@@ -24,19 +24,22 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-33 $
- * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
+ * @version : 0.2.3-34 $
+ * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Nov 29 16:33:58 2016 +0100 $
+ * @date    : Wed Nov 30 15:38:35 2016 +0100 $
  * @file    : config.php $
  * 
- * @id      : config.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 !defined(__NAMESPACE__."\\JS_NAMESPACE") && define ( __NAMESPACE__."\\JS_NAMESPACE" , "jsMyBackup" );
 !defined(__NAMESPACE__.'\\ROOT_PATH') && define(__NAMESPACE__.'\\ROOT_PATH',dirname(__FILE__).DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\CONFIG_PATH') && define(__NAMESPACE__.'\\CONFIG_PATH',ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\ADDONS_PATH') && define(__NAMESPACE__.'\\ADDONS_PATH',CONFIG_PATH.'addons'.DIRECTORY_SEPARATOR);
+!defined(__NAMESPACE__.'\\RULES_PATH') && define(__NAMESPACE__.'\\RULES_PATH',CONFIG_PATH.'rules'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\TMP_PATH') && define(__NAMESPACE__.'\\TMP_PATH',ROOT_PATH.'tmp'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\LOGS_PATH') && define(__NAMESPACE__.'\\LOGS_PATH',TMP_PATH.'logs'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\INC_PATH') && define(__NAMESPACE__.'\\INC_PATH',ROOT_PATH.'inc'.DIRECTORY_SEPARATOR);
@@ -52,9 +55,6 @@ namespace MyBackup;
 !defined(__NAMESPACE__.'\\OAUTH_PATH') && define(__NAMESPACE__.'\\OAUTH_PATH',LIB_PATH.'oauth'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\STORAGE_PATH') && define(__NAMESPACE__.'\\STORAGE_PATH',LIB_PATH.'storage'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\VIEWER_PATH') && define(__NAMESPACE__.'\\VIEWER_PATH',LIB_PATH.'viewer'.DIRECTORY_SEPARATOR);
-!defined(__NAMESPACE__.'\\CONFIG_PATH') && define(__NAMESPACE__.'\\CONFIG_PATH',ROOT_PATH.'config'.DIRECTORY_SEPARATOR);
-!defined(__NAMESPACE__.'\\ADDONS_PATH') && define(__NAMESPACE__.'\\ADDONS_PATH',CONFIG_PATH.'addons'.DIRECTORY_SEPARATOR);
-!defined(__NAMESPACE__.'\\RULES_PATH') && define(__NAMESPACE__.'\\RULES_PATH',CONFIG_PATH.'rules'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\CSS_PATH') && define(__NAMESPACE__.'\\CSS_PATH',ROOT_PATH.'css'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\CUSTOM_PATH') && define(__NAMESPACE__.'\\CUSTOM_PATH',ROOT_PATH.'custom'.DIRECTORY_SEPARATOR);
 !defined(__NAMESPACE__.'\\SAMPLE_PATH') && define(__NAMESPACE__.'\\SAMPLE_PATH',CUSTOM_PATH.'sample'.DIRECTORY_SEPARATOR);
