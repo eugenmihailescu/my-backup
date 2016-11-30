@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : file-functions.php $
  * 
- * @id      : file-functions.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : file-functions.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -180,7 +180,7 @@ $path = key( $path );
 $path = addTrailingSlash( $path );
 $dh = @opendir( $path );
 $dirs = array();
-if ( $level > 0 && _is_dir( $path ) && $dh ) {
+if ( $level > 0 && $dh && _is_dir( $path ) ) {
 while ( false !== ( $filename = readdir( $dh ) ) ) {
 $fullPath = $path . $filename;
 if ( $filename != "." && $filename != ".." )
@@ -251,7 +251,7 @@ _esc( 'WordPress installed Plugins' ),
 sprintf( 
 _esc( 
 'This folder includes %d installed WordPress plugins. It is always a good idea to backup these files.' ), 
-count( wp_get_plugins( \current_user_can( 'activate_plugins' ) ? 'all' : 'active' ) ) ) ) );
+count( wp_get_plugins(\current_user_can( 'activate_plugins' ) ? 'all' : 'active' ) ) ) ) );
 ( ! ( $is_multisite && is_administrator() ) || is_wpmu_superadmin() ) &&
 $wp_dirs = $wp_dirs +
 array( 
@@ -295,7 +295,7 @@ false ),
 }
 }
 $t_size = 0;
-$plugins = wp_get_plugins(\current_user_can( 'activate_plugins' ) ? 'all' : 'active' );
+$plugins = wp_get_plugins( \current_user_can( 'activate_plugins' ) ? 'all' : 'active' );
 foreach ( $plugins as $plugin_relpath => $plugin_info ) {
 $plugin_abspath = addTrailingSlash( $plugins_path ) .
 ( false === strpos( $plugin_relpath, DIRECTORY_SEPARATOR ) ? '' : dirname( $plugin_relpath ) );

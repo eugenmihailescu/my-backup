@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : Xml2Array.php $
  * 
- * @id      : Xml2Array.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : Xml2Array.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -66,9 +66,7 @@ foreach ( $node->childNodes as $child )
 $occurance[$child->nodeName] = isset( $occurance[$child->nodeName] ) ? $occurance[$child->nodeName] + 1 : 1;
 if ( $node->nodeType == XML_TEXT_NODE )
 $result = html_entity_decode( 
-htmlentities( $node->nodeValue, ENT_COMPAT, 'UTF-8' ), 
-ENT_COMPAT, 
-'ISO-8859-15' );
+htmlentities( $node->nodeValue ));
 else {
 if ( $node->hasChildNodes() ) {
 $children = $node->childNodes;
@@ -80,7 +78,7 @@ $result[$child->nodeName][] = $this->_xmlNode2Array( $child );
 else
 $result[$child->nodeName] = $this->_xmlNode2Array( $child );
 } else 
-if ( WEBDAV_TEXT_KEY == $child->nodeName ) {
+{
 $text = trim( $this->_xmlNode2Array( $child ) );
 if ( ! empty( $text ) )
 $result[$child->nodeName] = $this->_xmlNode2Array( $child );

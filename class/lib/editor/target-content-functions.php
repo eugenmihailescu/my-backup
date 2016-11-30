@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : target-content-functions.php $
  * 
- * @id      : target-content-functions.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : target-content-functions.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -64,12 +64,19 @@ getSpanE( $root ) . "</td>";
 if ( $dir_show_size )
 echo '<td>' . getHumanReadableSize( getDirSizeFromCache( $root ) ) . '</td>';
 echo '</tr>';
+if ( _is_dir( $root ) ) {
 if ( isset( $method['file_function'] ) && _is_callable( $method['file_function'] ) )
 $files = _call_user_func( $method['file_function'], $root, $dir_show_size );
 else
 $files = array();
 ksort( $files );
 getFileListContent( $files, $dir_show_size, $method['sender'], 1, $root_id, $settings );
+} else {
+printf( 
+'<tr><td class="redcaption"%s>%s</td></tr>', 
+$dir_show_size ? ' colspan="2"' : '', 
+sprintf( _esc( 'The %s is not directory or access denied' ), basename( $root ) ) );
+}
 echo "</table>";
 }
 function _dir_is_excluded( $dir, &$excludedirs ) {

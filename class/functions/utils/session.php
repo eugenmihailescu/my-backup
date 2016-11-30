@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : session.php $
  * 
- * @id      : session.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : session.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -43,7 +43,7 @@ $result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
 else
 $result = session_id() === '' ? FALSE : TRUE;
 }
-! $result && $auto_start && ! headers_sent() && session_start();
+! $result && $auto_start && ! headers_sent() && !isset($_SESSION) && session_start();
 return $result;
 }
 function check_is_logged() {

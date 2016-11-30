@@ -9,7 +9,7 @@
 # Each line stores a `username:password-hash:email:secret-hash` record where:
 # - username: is the user name in clear
 # - password-hash: is the hash string of the password (can be generated with the aid of PHP `password_hash` function)
-# - email: is the email associated with the username
+# - email: is the email associated with the username (it will be used to recover/renew the user's password)
 # - secret-hash: is the hash string of the secret phrase (can be generated with the aid of PHP `password_hash` function)
 #
 # [!] Observe that the field separator is the colon, ie. `:` symbol.
@@ -17,16 +17,37 @@
 #########################################################################################################################
 
 #########################################################################################################################
+# You may use the following code to generate your user-passwords records:
 #
-# NOTE: 
+#		$user='username';
+#		$password='str0ng p@ssw0rd';
+#		$email='email@domain.org';
+#		$secret='password recovery secret';
+#		$algorithm=PASSWORD_DEFAULT;
+#		$pwd_hash=password_hash($password,$algorithm);
+#		$sec_hash=password_hash($secret,$algorithm);
+#		echo "$user:$pwd_hash:$email:$sec_hash";
 #
-# The `demo` user has the password and secret set to `demo@mybackup`
-# The default email address is set to `youremail@yourdomain.com`. Set your own password instead.
-# USE THESE DEMO USER|PASSWORDS ONLY ON A TEST ENVIRONMENT 
+#
+# You may also use the above code snippet in a PHP sandbox (in case you don't have access to a PHP console):
+# http://sandbox.onlinephpfunctions.com/code/1d0b1d4f06568edb3a1e209aa76a8c74d395ac51
 #########################################################################################################################
 
-#####################################################
-# !!! THIS IS A DEMO USER FOR TEST PURPOSE ONLY !!!
-#####################################################
+#########################################################################################################################
+#
+# PASSWORD NOTE: 
+#
+# The `demo` user has the initial password and secret set to `demo@mybackup`. Overwrite it by (1) setting a valid email
+# then (2) by requesting a new password (see `Forgot you password?` on Login page).
+#
+# The default email address is set to `youremail@yourdomain.com`. Set your own e-mail address instead.
+#
+# !!! USE THESE DEMO USER|PASSWORDS ONLY ON A TEST ENVIRONMENT !!!
+# 
+#########################################################################################################################
+
+#########################################################################################################################
+# !!! THIS IS A DEMO USER FOR TEST PURPOSE ONLY !!! Comment the line below to disable the use of this `demo` user.
+#########################################################################################################################
 
 demo:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.:youremail@yourdomain.com:$2y$10$lH2nt11dHAmQJwFjJK/8GucP2kxQBMtVh1nmoAtvvqLmCTVCgcVI.

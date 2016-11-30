@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : sys-tools.php $
  * 
- * @id      : sys-tools.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : sys-tools.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,6 +38,7 @@ namespace MyBackup;
 function getTarExclusionPattern( $root_dir, $exclude_files = null, $exclude_dirs = null, $exclude_ext = null ) {
 $pattern = ' ';
 $inerquot = "'";
+$e_pattern = '--exclude=%s%s%s ';
 if ( is_array( $exclude_files ) ) {
 $items = array();
 foreach ( $exclude_files as $f )
@@ -53,7 +54,11 @@ foreach ( $exclude_ext as $e )
 if ( ! empty( $e ) ) {
 $items[] = $e;
 }
-empty( $items ) || $pattern .= sprintf( "--exclude=%s*.%s%s ", $inerquot, gcdArrayGlob( $items ), $inerquot );
+empty( $items ) || $pattern .= sprintf( 
+$e_pattern, 
+$inerquot . '*.', 
+implode( $inerquot . ' --exclude=' . $inerquot . '*.', gcdArrayGlob1( $items ) ), 
+$inerquot );
 }
 if ( is_array( $exclude_dirs ) ) {
 $items = array();
@@ -61,7 +66,11 @@ foreach ( $exclude_dirs as $d )
 if ( ! empty( $d ) && false !== strpos( $d, $root_dir ) ) {
 $items[] = delTrailingSlash( $d );
 }
-empty( $items ) || $pattern .= sprintf( "--exclude=%s%s%s ", $inerquot, gcdArrayGlob( $items ), $inerquot );
+empty( $items ) || $pattern .= sprintf( 
+$e_pattern, 
+$inerquot, 
+implode( $inerquot . ' --exclude=' . $inerquot, gcdArrayGlob1( $items ) ), 
+$inerquot );
 }
 return $pattern;
 }
@@ -86,6 +95,7 @@ $vol_size = 0,
 $exclude_files = null, 
 $exclude_dirs = null, 
 $exclude_ext = null, 
+$exclude_links = null, 
 $bzip_version = null, 
 $cygwin = null ) {
 return getUnixCmd( 
@@ -97,6 +107,7 @@ $vol_size,
 $exclude_files, 
 $exclude_dirs, 
 $exclude_ext, 
+$exclude_links, 
 $bzip_version, 
 $cygwin );
 }
@@ -109,6 +120,7 @@ $vol_size = 0,
 $exclude_files = null, 
 $exclude_dirs = null, 
 $exclude_ext = null, 
+$exclude_links = null, 
 $bzip_version = null, 
 $cygwin = null, 
 $html = false ) {
@@ -124,6 +136,9 @@ if ( $method <= BZ2 ) {
 $cmd = "tar";
 if ( $vol_size >= 1 )
 $cmd .= " -ML " . $vol_size;
+$exclude_links || $cmd .= ' -h';
+$cmd .= ' --transform=s:' .
+preg_quote( preg_replace( '/.*?\\' . DIRECTORY_SEPARATOR . '(.*)/', '$1', ALT_ABSPATH ), ':' ) . '::';
 $excl_pattern = getTarExclusionPattern( 
 _is_dir( $src_filename ) ? $src_filename : dirname( $src_filename ), 
 $exclude_files, 
@@ -169,6 +184,7 @@ $remove_source = false,
 $exclude_files = null, 
 $exclude_dirs = null, 
 $exclude_ext = null, 
+$exclude_links = null, 
 $bzip_version = null, 
 $cygwin = null ) {
 global $COMPRESSION_NAMES;
@@ -186,9 +202,10 @@ $vol_size,
 $exclude_files, 
 $exclude_dirs, 
 $exclude_ext, 
+$exclude_links, 
 $bzip_version, 
 $cygwin );
-$io = @popen( $cmd, 'r' );
+$io = popen( $cmd, 'r' );
 if ( $io ) {
 while ( ( fgets( $io, 4096 ) ) !== false )
 ; 
@@ -243,6 +260,7 @@ true,
 $exclude_files, 
 $exclude_dirs, 
 $exclude_ext, 
+true, 
 $bzip_version, 
 $cygwin );
 if ( is_array( $result ) && count( $result ) > 0 ) {

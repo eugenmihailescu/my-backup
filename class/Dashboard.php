@@ -24,19 +24,20 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : Dashboard.php $
  * 
- * @id      : Dashboard.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : Dashboard.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 require_once INC_PATH . 'globals.php';
 require_once FUNCTIONS_PATH . 'utils.php';
+require_once CLASS_PATH . 'WPBackupHandler.php';
 require_once FUNCTIONS_PATH . 'settings.php';
 require_once INC_PATH . 'functions.php';
 class Dashboard {

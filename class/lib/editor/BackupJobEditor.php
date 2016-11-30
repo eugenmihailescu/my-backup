@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : BackupJobEditor.php $
  * 
- * @id      : BackupJobEditor.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupJobEditor.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -126,6 +126,7 @@ MB * $this->settings['size'],
 $excl_files, 
 explode( ',', $this->settings['excludedirs'] ), 
 explode( ',', $this->settings['excludeext'] ), 
+strToBool( $this->settings['excludelinks'] ), 
 $this->settings['bzipver'], 
 $this->settings['cygwin'] );
 $intern_checked = ( 'intern' == $compression_tool || ! $os_tool_ok ) ? 'checked' : '';

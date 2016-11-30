@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : backupjob.php $
  * 
- * @id      : backupjob.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -127,7 +127,7 @@ if ( defined( __NAMESPACE__.'\\JOB_BENCHMARK' ) && $os_tool_ok ) {
 ?><td><input type="button" class="button"
 value="&nbsp;&nbsp;&nbsp;<?php _pesc('Benchmark');?>" id="btn_benchmark"
 title="<?php _pesc('Run a toolchain benchmark test now');?>"
-<?php if(0==feature_is_licensed('benchmark',$this->license[$this->license_id]))echo 'disabled';?>
+<?php defined(__NAMESPACE__.'\\OPER_COMPRESS_EXTERN')||print(' disabled ');?>
 onclick="<?php
 echo "jsMyBackup.popupConfirm('" . _esc( 'Choose what to test' ) . "','" . sprintf( 
 _esc( 

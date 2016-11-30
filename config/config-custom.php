@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : config-custom.php $
  * 
- * @id      : config-custom.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-custom.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -69,8 +69,8 @@ define( __NAMESPACE__.'\\SSL_ENFORCE', false );
 define( __NAMESPACE__.'\\DEFAULT_BACKUP_LIFESPAN', 5 ); 
 define( __NAMESPACE__.'\\RESTORE_MIN_EXECUTION_TIME', 100 ); 
 define( __NAMESPACE__.'\\GIT_BRANCH_TYPE', '' ); 
-define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-30' ); 
-define( __NAMESPACE__.'\\APP_VERSION_TYPE', 'nightly build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-30 - nightly build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-03-18' ); 
+define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-33' ); 
+define( __NAMESPACE__.'\\APP_VERSION_TYPE', 'stable build' ); 
+define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-33 - stable build' ); 
+define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-11-29' ); 
 ?>

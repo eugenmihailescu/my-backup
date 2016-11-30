@@ -24,64 +24,63 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : 99-cleanup.php $
  * 
- * @id      : 99-cleanup.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : 99-cleanup.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-function unlockLongRunningJob( $settings, $forced = false, $job_id = null ) {
-if ( ! _is_file( JOBS_LOCK_FILE ) )
+function unlockLongRunningJob($settings, $forced = false, $job_id = null)
+{
+if (! _is_file(JOBS_LOCK_FILE))
 return array();
-$jobs_log = new LogFile( JOBS_LOGFILE, $settings );
-$last_job_id = $jobs_log->getLastJobId( $job_id );
-$last_job_timestamp = false !== $last_job_id ? strtotime( $last_job_id[1] ) : @filemtime( JOBS_LOCK_FILE );
+if (! $last_job_timestamp = @filemtime(JOBS_LOCK_FILE)) {
+$jobs_log = new LogFile(JOBS_LOGFILE, $settings);
+$last_job_id = $jobs_log->getLastJobId($job_id);
+$last_job_timestamp = false !== $last_job_id ? strtotime($last_job_id[1]) : false;
+}
 $diff = time() - $last_job_timestamp;
-if ( $forced || ( $diff > SECDAY ) ) {
-if ( $flock = fopen( JOBS_LOCK_FILE, 'r' ) ) {
-@flock( $flock, LOCK_UN );
-@unlink( JOBS_LOCK_FILE ) && add_alert_message( 
-sprintf( 
-_esc( 'Unlocked the job lock file (created %s sec ago) forcebly' ), 
-getHumanReadableTime( $diff ) ), 
-$job_id );
+if ($forced || ($diff > SECDAY)) {
+if ($flock = fopen(JOBS_LOCK_FILE, 'r')) {
+@flock($flock, LOCK_UN);
+fclose($flock);
+@unlink(JOBS_LOCK_FILE) && add_alert_message(sprintf(_esc('Unlocked the job lock file (created %s sec ago) forcebly'), getHumanReadableTime($diff)), $job_id);
 }
 }
 return array();
 }
-function cleanTransitoryBackupFiles( $settings, $job_id = null ) {
-$wrkdir = addTrailingSlash( getParam( $settings, 'wrkdir', _sys_get_temp_dir() ) );
-$files = glob( $wrkdir . WPMYBACKUP_LOGS . '_*' );
-$arc_name = getParam( $settings, 'name' );
-$url = getParam( $settings, 'url', 'backup' );
-if ( null == $arc_name || TRUE === $arc_name ) {
-$arc_name = sprintf( "%s-%s-%s", $url, str_repeat( '?', 8 ), str_repeat( '?', 6 ) );
+function cleanTransitoryBackupFiles($settings, $job_id = null)
+{
+$wrkdir = addTrailingSlash(getParam($settings, 'wrkdir', _sys_get_temp_dir()));
+$files = glob($wrkdir . WPMYBACKUP_LOGS . '_*');
+$arc_name = getParam($settings, 'name');
+$url = getParam($settings, 'url', 'backup');
+if (null == $arc_name || TRUE === $arc_name) {
+$arc_name = sprintf("%s-%s-%s", $url, str_repeat('?', 8), str_repeat('?', 6));
 }
-$arcs = glob( $wrkdir . $arc_name . '*' );
+$arcs = glob($wrkdir . $arc_name . '*');
 $files || $files = $arcs;
-$files && $arcs && $files = array_merge( $files, $arcs );
-if ( ! empty( $files ) ) {
-foreach ( $files as $filename )
-@unlink( $filename );
-add_alert_message( 
-sprintf( _esc( 'Found and deleted %d redidual files (%s*) from %s' ), count( $files ), $arc_name, $wrkdir ), 
-$job_id );
+$files && $arcs && $files = array_merge($files, $arcs);
+if (! empty($files)) {
+foreach ($files as $filename)
+@unlink($filename);
+add_alert_message(sprintf(_esc('Found and deleted %d redidual files (%s*) from %s'), count($files), $arc_name, $wrkdir), $job_id);
 }
 return array();
 }
-if ( ! _is_file( JOBS_LOCK_FILE ) ) {
+if (! _is_file(JOBS_LOCK_FILE)) {
 is_session_started();
 $session_key = 'mynix_cleanup_check';
-if ( ! isset( $_SESSION[$session_key] ) || ( time() - $_SESSION[$session_key] > SECDAY ) ) {
-add_session_var( $session_key, time() );
-register_settings( 'cleanTransitoryBackupFiles' );
+if (! isset($_SESSION[$session_key]) || (time() - $_SESSION[$session_key] > SECDAY)) {
+add_session_var($session_key, time());
+register_settings('cleanTransitoryBackupFiles');
 }
 } else {
-register_settings( 'unlockLongRunningJob' );
+register_settings('unlockLongRunningJob');
 }
 ?>

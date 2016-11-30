@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : arrays.php $
  * 
- * @id      : arrays.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : arrays.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -103,17 +103,25 @@ $minlen = min( $a );
 $maxlen = max( $a );
 $count = count( $array );
 for ( $i = 0; $i < $minlen; $i++ ) {
-$ok = true;
-$xxx = array();
+$same = true; 
+$diff = array(); 
 for ( $j = 1; $j < $count; $j++ ) {
-$ok &= $array[$j - 1][$i] == $array[$j][$i];
-$ok || ( ( $xxx[] = $array[$j - 1][$i] ) && $xxx[] = $array[$j][$i] );
+$same &= $array[$j - 1][$i] == $array[$j][$i];
+$same || ( ( $diff[] = $array[$j - 1][$i] ) && $diff[] = $array[$j][$i] );
 }
-$gcd .= $ok ? $array[0][$i] : ( '[' .
-str_replace( array( '!', '-' ), array( '\\!', '\\-' ), implode( '', array_unique( $xxx ) ) ) . ']' );
+$gcd .= $same ? $array[0][$i] : ( '[' .
+str_replace( array( '!', '-' ), array( '\\!', '\\-' ), implode( '', array_unique( $diff ) ) ) . ']' );
 }
-$d = $maxlen - $minlen;
+$d = $maxlen - $minlen; 
 $gcd .= $d > 1 ? '*' : ( $d ? '?' : '' );
 return $gcd;
+}
+function gcdArrayGlob1( $array ) {
+$result = array();
+foreach ( $array as $item ) {
+$len = strlen( $item );
+isset( $result[$len] ) && ( $result[$len][] = $item ) || ( $result[$len] = array( $item ) );
+}
+return array_map( __NAMESPACE__ . '\\gcdArrayGlob', $result );
 }
 ?>

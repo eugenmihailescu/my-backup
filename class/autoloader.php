@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : autoloader.php $
  * 
- * @id      : autoloader.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : autoloader.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 
@@ -104,7 +104,6 @@ $classes_path_668264596 = array (
 'TarArchive' => CLASS_PATH . 'TarArchive.php',
 'TargetCollection' => EDITOR_PATH . 'TargetCollection.php',
 'TargetCollectionItem' => EDITOR_PATH . 'TargetCollectionItem.php',
-'WPBackupHandler' => CLASS_PATH . 'WPBackupHandler.php',
 'WPSourceEditor' => EDITOR_PATH . 'WPSourceEditor.php',
 'WebDAVParser' => STORAGE_PATH . 'WebDAVParser.php',
 'WebDAVResource' => STORAGE_PATH . 'WebDAVResource.php',

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : AbstractJob.php $
  * 
- * @id      : AbstractJob.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractJob.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -410,16 +410,16 @@ return $result;
 protected function getVolumeSize() {
 return $this->size;
 }
-protected function getExcludedDirs() {
+public function getExcludedDirs() {
 return $this->exclude_dirs;
 }
-protected function getExcludedExt() {
+public function getExcludedExt() {
 return $this->exclude_ext;
 }
-protected function getExcludedFiles() {
+public function getExcludedFiles() {
 return $this->exclude_files;
 }
-protected function getExcludedLinks() {
+public function getExcludedLinks() {
 return $this->exclude_links;
 }
 protected function getExtractForcebly() {
@@ -611,8 +611,8 @@ return $result;
 }
 protected function _getTarFilter() {
 global $COMPRESSION_APPS;
-foreach ( $COMPRESSION_APPS as $filter => $name ) {
 $opt = getParam( $this->options, 'compression_type' );
+foreach ( $COMPRESSION_APPS as $filter => $name ) {
 if ( ! empty( $name ) && ( null === $opt && null !== getParam( $this->options, $name ) ) ||
 ( null !== $opt && $filter == $opt ) )
 return $filter;
@@ -854,7 +854,7 @@ if ( isset( $cipher_def['items'][$this->options['encryption']] ) ) {
 $class = $cipher_class;
 break;
 }
-_file_exists( CRYPT_PATH . "$class.php" ) && include_once CRYPT_PATH . "$class.php";
+defined( __NAMESPACE__.'\\CRYPT_PATH' ) && _file_exists( CRYPT_PATH . "$class.php" ) && include_once CRYPT_PATH . "$class.php";
 $class = __NAMESPACE__ . '\\' . $class;
 if ( class_exists( $class ) &&
 preg_match( '/([a-z]\w*)(-(\w*))?(-(\w*))?/i', $this->options['encryption'], $matches ) ) {
@@ -964,9 +964,26 @@ $this->method = $method;
 public function getCompressionLevel() {
 return $this->level;
 }
-public function getJobTypeStr() {
-return JOB_BACKUP == $this->_job_type ? _esc( 'Backup' ) : ( - 4 == $this->_job_type ? _esc( 'Restore' ) : _esc( 
-'unknown' ) );
+public function getJobType() {
+return $this->_job_type;
+}
+public function getJobTypeStr( $job_type = null ) {
+( null == $job_type ) && $job_type = $this->_job_type;
+switch ( $job_type ) {
+case JOB_BACKUP :
+$result = _esc( 'Backup' );
+break;
+case - 4 :
+$result = _esc( 'Restore' );
+break;
+case - 1 :
+$result = _esc( 'Benchmark' );
+break;
+default :
+$result = _esc( 'unknown' );
+break;
+}
+return $result;
 }
 public function printJobSettings( $job_type = JOB_BACKUP ) {
 global $COMPRESSION_NAMES;
@@ -981,7 +998,7 @@ $mysq_ext = $this->getOptions( 'mysql_ext', 'mysql' );
 $this->logOutputTimestamp( 
 sprintf( 
 '<b><yellow>' . _esc( "%s job started with %s interface (%s)" ) . '</yellow></b>', 
-$this->getJobTypeStr(), 
+$this->getJobTypeStr( $job_type ), 
 ! empty( $this->sender ) ? $this->sender : ( is_cli() ? "CLI" : "WP-Admin" ), 
 APP_VERSION_ID ) );
 $this->logOutputTimestamp( _esc( 'OS/PHP' ) . " : " . PHP_OS . '/' . PHP_VERSION, '*', 1 );
@@ -1284,6 +1301,9 @@ add_alert_message( $text, $ref_id, $type, $status );
 }
 public function onShutdown() {
 $this->un_lockSession();
+}
+public function getJobStatus() {
+return $this->_job_status;
 }
 }
 ?>

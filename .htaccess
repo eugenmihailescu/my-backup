@@ -1,17 +1,11 @@
 
 #  Added automatically by MyBackup			
-<Files ~ "\.(htaccess|php|log)$">
-  Order allow,deny
-  Deny from all
-</Files>
-<Files ~ "(index|regactions|WPMyBackup)\.php$">
-  Order allow,deny
-  Allow from all
-</Files>			
-
-# Turn off output buffering/compression
 <IfModule rewrite_module>
+	# Turn off output buffering/compression
 	RewriteRule ^(.*)$ $1 [NS,E=no-gzip:1,E=dont-vary:1]
+			
+	# Denies direct access to the following files
+	RewriteRule "\.(log|simplepwd)$" "-" [F]
 </IfModule>
 
 

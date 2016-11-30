@@ -1,19 +1,17 @@
-// Generated automatically at 2016-03-18 06:32 PM
+// Generated automatically at 2016-11-30 10:01 AM
 
-			Here are written the .log files.
+The MyBackup .log files are written at wp-content/uploads/mybackup/tmp/logs.
 
-			Their aim are:
-			- to answer the simple question like `why my file hasn't been uploaded
-			to Dropbox?`
-			- to provide a trace for later debugging (yeah, sometimes a nasty bug
-			shits right on your precious file; sorry mate, I didn't that by
-			purpose :-(
-			- to provide the raw resource for what is actually displayed on screen
-			(write the log first, echo its content later)
+Their aim are:
+- to answer the simple question like `why my file hasn't been uploaded to Dropbox?`
+- to provide a trace for later debugging (yeah, sometimes a nasty bug shits right 
+  on your precious file; sorry mate, I didn't that by purpose :-(
+- to provide the raw resource for what is actually displayed on screen (write the 
+  log first, echo its content later)
 
-			The known log files and their meaning are as the following:
+The known log files and their meaning are as the following:
 
-			-files-md5.log" ); // keeps the track of files MD5 hash value
+-files-md5.log" ); // keeps the track of files MD5 hash value
 -backup-filter.log" ); // keeps the track of the last MD5 hash values for each backup mode
 -curl-debug.log" ); // all CURL operations
 -statistics-debug.log" ); // all SQL queries/JavaScripts related to statistics
@@ -34,8 +32,8 @@
 -signals.log" ); // the signals which a job can receive while running async (eg: abort job!)
 -net-usage.log" ); // used by Linux/Win System Usage charts to measure the current net usage
 
-			NOTE: please DO NOT DELETE these files. Without them you have no backup
-			log history, no statistics, no settings. It's like starting fresh for
-			the first time.
-			Anyway if that is what you REALLY want then...you are the boss, boss ;-)
+NOTE: please DO NOT DELETE these files. Without them you have no backup log history,
+      no statistics, no settings. It's like starting fresh for the first time.
+			
+Anyway if that is what you REALLY want then...you are the boss, boss ;-)
 		

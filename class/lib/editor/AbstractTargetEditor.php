@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : AbstractTargetEditor.php $
  * 
- * @id      : AbstractTargetEditor.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractTargetEditor.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -187,7 +187,7 @@ $result = ob_get_clean();
 return $result;
 }
 protected function getRefreshFolderJS() {
-return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)jsMyBackup.refreshFolderList(t.value,tid.value,jsMyBackup.isNull(sb.value,null),jsMyBackup.isNull(sa.value,null));" : ( "submitOptions(this,0);" );
+return $this->enabled && ! $this->hideEditorContent() ? "var sb=document.getElementById('sortby'),sa=document.getElementById('sortasc'),t=document.getElementById('{$this->target_name}'),tid=document.getElementById('{$this->target_name}_path_id');if(t&&tid)jsMyBackup.refreshFolderList(t.value,tid.value,jsMyBackup.isNull(sb.value,null),jsMyBackup.isNull(sa.value,null),'{$this->target_name}');" : ( "submitOptions(this,0);" );
 }
 function __construct( $target_item ) {
 if ( null == $target_item )

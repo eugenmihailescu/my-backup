@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : files.php $
  * 
- * @id      : files.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : files.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -247,7 +247,7 @@ function ( $item ) use(&$pattern, &$preg_separator ) {
 return preg_match( $preg_separator . $pattern . $preg_separator, $item );
 } );
 is_array( $exclude_ext ) && ! empty( $exclude_ext ) && $preg_esc( $exclude_ext ) &&
-$pattern .= '\..+(?<!.' . implode( '|', $exclude_ext ) . ')$';
+$pattern .= '\.?.+(?<!.' . implode( '|', $exclude_ext ) . ')$';
 $scan_dirs = array();
 foreach ( $dir as $key => $dirname ) {
 $has_children = false;
@@ -762,9 +762,10 @@ $excl_files,
 $excl_ext, 
 $excl_links, 
 $verbosity, 
-$callbacks ) {
+$callbacks, 
+$force_path = false ) {
 $is_wp = is_wp();
-if ( $is_wp ) {
+if ( ! $force_path && $is_wp ) {
 include_once EDITOR_PATH . 'file-functions.php';
 $wp_dirs = getWPSourceDirList( WPMYBACKUP_ROOT );
 $wp_components = array_keys( $wp_dirs );
@@ -792,8 +793,8 @@ $dir_list = array( isNull( $settings, 'dir', '' ) );
 else {
 include_once EDITOR_PATH . 'file-functions.php';
 $dir_list = _call_user_func( 
-$is_wp ? 'getWPDirList' : 'getDirList', 
-$is_wp ? ALT_ABSPATH : $src_dir, 
+$is_wp && ! $force_path ? 'getWPDirList' : 'getDirList', 
+$is_wp && ! $force_path ? ALT_ABSPATH : $src_dir, 
 false, 
 2, 
 false );
@@ -802,7 +803,7 @@ $dir_list,
 function ( $item ) use(&$src_dir ) {
 return 0 === strpos( $item, $src_dir );
 } );
-if ( ! is_multisite_wrapper() || ( $is_wp && is_wpmu_superadmin() ) )
+if ( $force_path || ! is_multisite_wrapper() || ( $is_wp && is_wpmu_superadmin() ) )
 $dir_list = array_merge( $dir_list, array( $src_dir ) );
 }
 $_callbacks = isset( $callbacks ) ? array( 

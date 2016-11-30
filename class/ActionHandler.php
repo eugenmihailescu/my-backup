@@ -24,16 +24,18 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-30 $
- * @commit  : 11b68819d76b3ad1fed1c955cefe675ac23d8def $
+ * @version : 0.2.3-33 $
+ * @commit  : 8322fc3e4ca12a069f0821feb9324ea7cfa728bd $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Fri Mar 18 17:18:30 2016 +0100 $
+ * @date    : Tue Nov 29 16:33:58 2016 +0100 $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Fri Mar 18 17:18:30 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ActionHandler.php | Tue Nov 29 16:33:58 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+
+require_once CLASS_PATH . 'WPBackupHandler.php';
 define( __NAMESPACE__.'\\ADMIN_ASYNC_IFNAME', 'WP-Admin-Async' );
 class ActionHandler {
 private $functions;
@@ -47,7 +49,7 @@ function __construct( $settings ) {
 $this->functions = array();
 $this->logfile = new LogFile( TRACE_ACTION_LOGFILE, $settings );
 $this->settings = $settings;
-$this->params = getArgFromOptions( $this->settings );
+$this->params = $this->settings;
 $this->method = $_REQUEST;
 $fixed_settings = getFixedSettings();
 foreach ( $this->method as $key => $value )
