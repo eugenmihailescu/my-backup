@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : config-custom.php $
  * 
- * @id      : config-custom.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config-custom.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -55,7 +55,7 @@ define( __NAMESPACE__.'\\LOG_CHECK_TIMEOUT', 10000 );
 define( __NAMESPACE__.'\\LONG_RUNNING_JOB_TIMEOUT', 1000 ); 
 if ( ! function_exists( '\\add_management_page' ) ) {
 $set_db = function ( $name, $value ) {
-null !== @constant( $name ) || define( $name, $value );
+(null !== @constant( $name )) || define( $name, $value );
 $_dummy = ''; 
 };
 $set_db( 'DB_NAME', '' );
@@ -69,8 +69,8 @@ define( __NAMESPACE__.'\\SSL_ENFORCE', false );
 define( __NAMESPACE__.'\\DEFAULT_BACKUP_LIFESPAN', 5 ); 
 define( __NAMESPACE__.'\\RESTORE_MIN_EXECUTION_TIME', 100 ); 
 define( __NAMESPACE__.'\\GIT_BRANCH_TYPE', '' ); 
-define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-34' ); 
+define( __NAMESPACE__.'\\APP_VERSION_NO', '0.2.3-36' ); 
 define( __NAMESPACE__.'\\APP_VERSION_TYPE', 'stable build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-34 - stable build' ); 
-define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-11-30' ); 
+define( __NAMESPACE__.'\\APP_VERSION_ID', '0.2.3-36 - stable build' ); 
+define( __NAMESPACE__.'\\APP_VERSION_DATE', '2016-12-01' ); 
 ?>

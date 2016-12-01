@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : backupjob.php $
  * 
- * @id      : backupjob.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : backupjob.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -39,19 +39,21 @@ namespace MyBackup;
 <td><label for="name"><?php _pesc('Backup name');?></label></td>
 <td><input type="text" name="name" id='name'
 value=<?php echo '"' . $this->settings['name'] . '" '; ?>
-onchange="jsMyBackup.toggle_backup_name(this);" onkeypress="this.onchange();"
-size="30"><a class='help' onclick=<?php echo echoHelp($help_1); ?>>[?]</a></td>
+onchange="jsMyBackup.toggle_backup_name(this);"
+onkeypress="this.onchange();" size="30"><a class='help'
+onclick=<?php echo echoHelp($help_1); ?>>[?]</a></td>
 </tr>
 <tr>
 <td><label for="url"><?php _pesc('Backup prefix');?></label></td>
 <td><input type="text" name="url" id='url'
 value=<?php echo '"' . $this->settings['url'] . '" '; ?>
-onchange="jsMyBackup.toggle_backup_name(this);" onkeypress="this.onchange();"
-size="30"><a class='help' onclick=<?php echo echoHelp($help_2); ?>>[?]</a></td>
+onchange="jsMyBackup.toggle_backup_name(this);"
+onkeypress="this.onchange();" size="30"><a class='help'
+onclick=<?php echo echoHelp($help_2); ?>>[?]</a></td>
 </tr>
 <tr>
 <?php
-if ( IS_MULTISITE ) {
+if (IS_MULTISITE && ! SANDBOX) {
 $wrkdir_name = 'blog_wrkdir';
 $wrkdir_prefix = $wpmu_dir_url;
 } else {
@@ -67,7 +69,7 @@ id="<?php echo $wrkdir_name;?>"
 value="<?php echo $this->settings[$wrkdir_name] ; ?>" size="30"
 <?php echo $this->enabled_tag;?>><a class='help'
 onclick=<?php
-echoHelp( $help_3 );
+echoHelp($help_3);
 ?>>[?]</a>
 </td>
 </tr>
@@ -91,9 +93,9 @@ onchange="jsMyBackup.submitOptions(this,0);" style='width: 100%'>
 <td><label for="toolchain_grp"><?php _pesc('Compression tool');?></label></td>
 <td><table id="toolchain_grp">
 <tr>
-<td><input type="radio" name="toolchain" id="toolchain_int" value="intern"
-<?php echo $intern_checked; ?> onclick="jsMyBackup.submitOptions(this,0);"><label
-for="toolchain_int"><?php echo WPMYBACKUP; ?></label></td>
+<td><input type="radio" name="toolchain" id="toolchain_int"
+value="intern" <?php echo $intern_checked; ?>
+onclick="jsMyBackup.submitOptions(this,0);"><label for="toolchain_int"><?php echo WPMYBACKUP; ?></label></td>
 <td><?php if(defined(__NAMESPACE__.'\\OPER_COMPRESS_EXTERN')){?>
 <table>
 <tr>
@@ -102,19 +104,16 @@ value="extern"
 <?php echo ' '.$extern_checked . ' '.$extern_enabled.' '; ?>
 onclick="jsMyBackup.submitOptions(this,0);">
 <?php
-if ( isWin() ) {
+if (isWin()) {
 ?><a class='help' onclick=<?php echo echoHelp ( $help_7 ); ?>>[?]</a><?php
 }
-echo "<label for='toolchain_ext'>" . sprintf( _esc( 'Local %s' ), PHP_OS ) . "</label>";
+echo "<label for='toolchain_ext'>" . sprintf(_esc('Local %s'), PHP_OS) . "</label>";
 ?>
 </td>
 <td>
 <?php
-if ( $extern_enabled && ! $extern_toolchain_status )
-printf( 
-'<img src="%s" title="%s">', 
-$this->getImgURL( 'unchecked.png' ), 
-sprintf( _esc( 'External toolchain doesn`t seem to work on local %s' ), PHP_OS ) );
+if ($extern_enabled && ! $extern_toolchain_status)
+printf('<img src="%s" title="%s">', $this->getImgURL('unchecked.png'), sprintf(_esc('External toolchain doesn`t seem to work on local %s'), PHP_OS));
 ?>
 </td>
 </tr>
@@ -123,32 +122,26 @@ sprintf( _esc( 'External toolchain doesn`t seem to work on local %s' ), PHP_OS )
 }
 ?></td>
 <?php
-if ( defined( __NAMESPACE__.'\\JOB_BENCHMARK' ) && $os_tool_ok ) {
+if (defined(__NAMESPACE__.'\\JOB_BENCHMARK') && $os_tool_ok) {
 ?><td><input type="button" class="button"
-value="&nbsp;&nbsp;&nbsp;<?php _pesc('Benchmark');?>" id="btn_benchmark"
+value="&nbsp;&nbsp;&nbsp;<?php _pesc('Benchmark');?>"
+id="btn_benchmark"
 title="<?php _pesc('Run a toolchain benchmark test now');?>"
 <?php defined(__NAMESPACE__.'\\OPER_COMPRESS_EXTERN')||print(' disabled ');?>
 onclick="<?php
-echo "jsMyBackup.popupConfirm('" . _esc( 'Choose what to test' ) . "','" . sprintf( 
-_esc( 
-"This will create a %s random file and will try to use both (<b>%s</b> and <b>%s</b>) compression tools to measure/compair their performance. Its aim is to assist you deciding which tool to use and why.<br>On the other hand perhaps you might want to test some real-life data, namely those files you selected on the <b>%s</b> tab. So what is going to be?" ), 
-getHumanReadableSize( BENCHMARK_FILE_SIZE * MB ), 
-WPMYBACKUP, 
-PHP_OS, 
-getTabTitleById( SRCFILE_SOURCE ) ) . "',null,{'" . _esc( 'Random file' ) .
-"':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(1);','" . _esc( 'My files' ) .
-"':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(0);','" . _esc( 'Cancel' ) . "':null});";
+echo "jsMyBackup.popupConfirm('" . _esc('Choose what to test') . "','" . sprintf(_esc("This will create a %s random file and will try to use both (<b>%s</b> and <b>%s</b>) compression tools to measure/compair their performance. Its aim is to assist you deciding which tool to use and why.<br>On the other hand perhaps you might want to test some real-life data, namely those files you selected on the <b>%s</b> tab. So what is going to be?"), getHumanReadableSize(BENCHMARK_FILE_SIZE * MB), WPMYBACKUP, PHP_OS, getTabTitleById(SRCFILE_SOURCE)) . "',null,{'" . _esc('Random file') . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(1);','" . _esc('My files') . "':'jsMyBackup.removePopupLast();jsMyBackup.do_benchmark(0);','" . _esc('Cancel') . "':null});";
 ?>"></td>
 <td><a class="help" onclick=<?php
-echo echoHelp( $help_8 );
+echo echoHelp($help_8);
 ?>> [?]</a></td><?php } ?></tr>
 </table></td>
 </tr>
 <?php
-if ( defined( __NAMESPACE__.'\\OPER_COMPRESS_EXTERN' ) && 'extern' == $compression_tool ) {
+if (defined(__NAMESPACE__.'\\OPER_COMPRESS_EXTERN') && 'extern' == $compression_tool) {
 ?>
 <tr>
-<td class='caption'><label for="hintbox <?php echo $this->container_shape;?>"><?php printf( _esc('%s command'),PHP_OS); ?></label></td>
+<td class='caption'><label
+for="hintbox <?php echo $this->container_shape;?>"><?php printf( _esc('%s command'),PHP_OS); ?></label></td>
 <td><table>
 <tr>
 <td>
@@ -168,10 +161,7 @@ title='<?php _pesc('Click to copy to clipboard');?>'>
 src=<?php echo '"' . $this->getImgURL($os_tool_ok?'check.png':'unchecked.png') . '"'; ?>
 alt="checked"
 title=<?php
-printf( 
-"'" . _esc( "This confirms that the command has been tested and %s on %s" ) . "'", 
-$os_tool_ok ? 'works' : 'dont`t work', 
-PHP_OS );
+printf("'" . _esc("This confirms that the command has been tested and %s on %s") . "'", $os_tool_ok ? 'works' : 'dont`t work', PHP_OS);
 ?> /></td>
 </tr>
 </table></td>
@@ -184,7 +174,7 @@ PHP_OS );
 <td><input type="number" name="size" id="size"
 value=<?php echo '"' . $this->settings['size'] . '"'; ?> min="0"> MiB<a
 class='help' onclick=<?php
-echoHelp( $help_4 );
+echoHelp($help_4);
 ?>>[?]</a></td>
 </tr>
 <tr>
@@ -197,8 +187,9 @@ echoHelp( $help_4 );
 <td><label for="email"><?php _pesc('E-mail notification');?></label></td>
 <td><input type="email" id="email" name="email"
 value=<?php echo '"' . $this->settings['email'] . '"'; ?> size="30"
-style='width: 90%'><a class='help' onclick=<?php
-echoHelp( $help_5 );
+style='width: 90%'><a class='help'
+onclick=<?php
+echoHelp($help_5);
 ?>>[?]</a></td>
 </tr>
 <tr>

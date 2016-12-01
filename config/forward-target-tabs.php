@@ -24,34 +24,88 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : forward-target-tabs.php $
  * 
- * @id      : forward-target-tabs.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : forward-target-tabs.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-$registered_forward_map = array( 
-'WP_SOURCE' => array( IS_MULTISITE ? _esc( 'Site files' ) : _esc( 'WP files' ), null, - 4 ), 
-'SRCFILE_SOURCE' => array( sprintf( _esc( '%s files' ), PHP_OS ), 'any-file-visible-to-the-wp', - 3 ), 
-'APP_JOB_HISTORY' => array( _esc( 'Job history' ), 'query-job-history', 8 ), 
-'APP_STATISTICS' => array( _esc( 'Statistics' ), 'backup-statistics', 10 ), 
-'APP_LICENSE' => array( _esc( 'License' ), null, 12 ), 
-'APP_LISTVIEW_TARGETS' => array( _esc( 'Backup jobs++' ), 'backup-wizard', 16 ), 
-'BACKUP_SETTINGS' => array( _esc( 'Settings' ), 'advanced-network-settings', 18 ), 
-'APP_EULA' => array( _esc( 'EULA' ), null, 20 ), 
-'APP_RESTORE' => array( _esc( 'Restore' ), 'restore-wizard', 21 ), 
-'APP_OS_SCHEDULE' => array( PHP_OS . '-Cron', 'wp-schedule-the-backup-via-os', 22 ), 
-'APP_WP_SCHEDULE' => array( 'WP-Cron', null, 23 ), 
-'APP_ADDONDROPIN' => array( _esc( 'Addons Drop-in' ), 'product-category/addons', 24 ), 
-'APP_DASHBOARD' => array( _esc( 'Dashboard' ), null, 26 ) );
+$registered_forward_map = array(
+'WP_SOURCE' => array(
+IS_MULTISITE && ! SANDBOX ? _esc('Site files') : _esc('WP files'),
+null,
+- 4
+),
+'SRCFILE_SOURCE' => array(
+sprintf(_esc('%s files'), PHP_OS),
+'any-file-visible-to-the-wp',
+- 3
+),
+'APP_JOB_HISTORY' => array(
+_esc('Job history'),
+'query-job-history',
+8
+),
+'APP_STATISTICS' => array(
+_esc('Statistics'),
+'backup-statistics',
+10
+),
+'APP_LICENSE' => array(
+_esc('License'),
+null,
+12
+),
+'APP_LISTVIEW_TARGETS' => array(
+_esc('Backup jobs++'),
+'backup-wizard',
+16
+),
+'BACKUP_SETTINGS' => array(
+_esc('Settings'),
+'advanced-network-settings',
+18
+),
+'APP_EULA' => array(
+_esc('EULA'),
+null,
+20
+),
+'APP_RESTORE' => array(
+_esc('Restore'),
+'restore-wizard',
+21
+),
+'APP_OS_SCHEDULE' => array(
+PHP_OS . '-Cron',
+'wp-schedule-the-backup-via-os',
+22
+),
+'APP_WP_SCHEDULE' => array(
+'WP-Cron',
+null,
+23
+),
+'APP_ADDONDROPIN' => array(
+_esc('Addons Drop-in'),
+'product-category/addons',
+24
+),
+'APP_DASHBOARD' => array(
+_esc('Dashboard'),
+null,
+26
+)
+);
 ! is_wp() && $forward_compatible_targets = array(); 
-foreach ( $registered_forward_map as $constant => $tab_info )
-$forward_compatible_targets[$tab_info[2]] = array( 
-'title' => $tab_info[0], 
-'link' => null == $tab_info[1] ? '#' : APP_ADDONS_SHOP_URI . $tab_info[1] );
+foreach ($registered_forward_map as $constant => $tab_info)
+$forward_compatible_targets[$tab_info[2]] = array(
+'title' => $tab_info[0],
+'link' => null == $tab_info[1] ? '#' : APP_ADDONS_SHOP_URI . $tab_info[1]
+);
 ?>

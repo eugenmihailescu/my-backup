@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : factory-config.php $
  * 
- * @id      : factory-config.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : factory-config.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -94,7 +94,7 @@ $temp_dir,
 _esc('Temporary working directory')
 ),
 'blog_wrkdir' => array(
-IS_MULTISITE ? wp_get_current_blog_id() : '',
+IS_MULTISITE && ! SANDBOX ? wp_get_current_blog_id() : '',
 'blog_wrkdir:',
 '',
 _esc('Blog temporary working directory')
@@ -1249,7 +1249,7 @@ $check_dir = function ($option_name, $settings) {
 isset($settings[$option_name]) && (@_is_dir($settings[$option_name]) || @mkdir($settings[$option_name], 0770, true));
 };
 $new_options = array();
-if (IS_MULTISITE) {
+if (IS_MULTISITE && _function_exists(__NAMESPACE__ . '\\get_site_option')) {
 if (! ($wpmu_wrkdir = get_site_option('wpmu_wrkdir'))) {
 $tmp_dir = _sys_get_temp_dir() . WPMYBACKUP_LOGS;
 $wpmu_wrkdir = $tmp_dir;

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : welcome.php $
  * 
- * @id      : welcome.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : welcome.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -98,7 +98,7 @@ return '???';
 isset ( $getTabAnchorByConstant ) || $getTabAnchorByConstant = function ($constant) use (&$getTabAnchor) {
 global $forward_compatible_targets, $registered_forward_map;
 $nconstant = 0 !== strpos ( $constant, __NAMESPACE__ . '\\' ) ? __NAMESPACE__ . '\\' . $constant : $constant;
-$tab = null !== @constant ( $nconstant ) ? constant ( $nconstant ) : (isset ( $registered_forward_map [$constant] ) ? $registered_forward_map [$constant] [2] : null);
+$tab = null !== @constant ( $nconstant ) ? @constant ( $nconstant ) : (isset ( $registered_forward_map [$constant] ) ? $registered_forward_map [$constant] [2] : null);
 return $getTabAnchor ( $tab, @constant ( $nconstant ) ? null : $forward_compatible_targets );
 };
 isset ( $getHumanReadableSize ) || $getHumanReadableSize = function ($size, $precision = 2, $return_what = 0) {

@@ -24,27 +24,25 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : autoloader.php $
  * 
- * @id      : autoloader.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : autoloader.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 
 namespace MyBackup;
 global $classes_path_668264596;
 $classes_path_668264596 = array (
-'AbstractJob' => CLASS_PATH . 'AbstractJob.php',
 'AbstractOAuthClient' => OAUTH_PATH . 'AbstractOAuthClient.php',
 'AbstractTarget' => CLASS_PATH . 'AbstractTarget.php',
 'AbstractTargetEditor' => EDITOR_PATH . 'AbstractTargetEditor.php',
 'AjaxRequests' => CLASS_PATH . 'AjaxRequests.php',
 'Array2XML' => MISC_PATH . 'Array2XML.php',
 'BackupFilesFilter' => CLASS_PATH . 'BackupFilesFilter.php',
-'BackupJobEditor' => EDITOR_PATH . 'BackupJobEditor.php',
 'BackupSettingsEditor' => EDITOR_PATH . 'BackupSettingsEditor.php',
 'BackupTargetsEditor' => EDITOR_PATH . 'BackupTargetsEditor.php',
 'ChangeLogEditor' => EDITOR_PATH . 'ChangeLogEditor.php',

@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : constants.php $
  * 
- * @id      : constants.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : constants.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -44,7 +44,7 @@ define(__NAMESPACE__.'\\SUPPORT_MIN_MYSQL', '5.0');
 define(__NAMESPACE__.'\\OAUTH_PROXY_URL', 'https://oauth2.mynixworld.info/');
 define(__NAMESPACE__.'\\PROXY_APP_ID', 'oauth_proxy_demo');
 define(__NAMESPACE__.'\\PROXY_UNIQ_ID', '6dbe1adbddf324dd5e6d4dff15b65bc0');
-define(__NAMESPACE__.'\\PROXY_HOST_ID', '127.0.0.1');
+define(__NAMESPACE__.'\\PROXY_HOST_ID', 'oauth2.mynixworld.info');
 define(__NAMESPACE__.'\\PROXY_OPEN_ID', 'any');
 define(__NAMESPACE__.'\\PROXY_REGISTER', 'register');
 define(__NAMESPACE__.'\\PROXY_PARAMS', sprintf('a=%s&h=%s&o=%s&u=%s&%s', PROXY_APP_ID, PROXY_HOST_ID, PROXY_OPEN_ID, PROXY_UNIQ_ID, PROXY_REGISTER));
@@ -200,7 +200,7 @@ WPMYBACKUP_LOGS,
 };
 $logs_path = $get_logs_path(); 
 $multisite = defined(__NAMESPACE__.'\\SANDBOX') && SANDBOX; 
-$multisite = $multisite || function_exists('\\is_multisite') ? \is_multisite() : false;
+$multisite = $multisite || (function_exists('\\is_multisite') ? \is_multisite() : false);
 $site_id = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown';
 if (function_exists('\\get_current_blog_id'))
 $current_site_id = \get_current_blog_id();

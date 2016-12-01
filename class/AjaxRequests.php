@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-34 $
- * @commit  : 433010d91adb8b1c49bace58fae6cd2ba4679447 $
+ * @version : 0.2.3-36 $
+ * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Nov 30 15:38:35 2016 +0100 $
+ * @date    : Thu Dec 1 04:37:45 2016 +0100 $
  * @file    : AjaxRequests.php $
  * 
- * @id      : AjaxRequests.php | Wed Nov 30 15:38:35 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AjaxRequests.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -59,7 +59,7 @@ if ( ! empty( $nonce ) ) {
 if ( ! call_user_func( $verify_nonce_func, $nonce, $action ) ) {
 $time = substr( $nonce, - 10 );
 if ( time() - intval( $time ) >
-( @constant( 'WPMYBAK_NONCE_LIFESPAN' ) ? constant( 'WPMYBAK_NONCE_LIFESPAN' ) : 3600 ) )
+( @constant( 'WPMYBAK_NONCE_LIFESPAN' ) ? @constant( 'WPMYBAK_NONCE_LIFESPAN' ) : 3600 ) )
 $err_msg .= '<br>Please try again by <a href="#" onclick="window.location.assign(window.location.href);">re-visiting again the page</a>.';
 die( $err_msg );
 }
