@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-36 $
- * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
+ * @version : 0.2.3-37 $
+ * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Thu Dec 1 04:37:45 2016 +0100 $
+ * @date    : Wed Dec 7 18:54:23 2016 +0100 $
  * @file    : BackupFilesFilter.php $
  * 
- * @id      : BackupFilesFilter.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupFilesFilter.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;

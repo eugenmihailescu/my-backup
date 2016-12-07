@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-36 $
- * @commit  : c4d8a236c57b60a62c69e03c1273eaff3a9d56fb $
+ * @version : 0.2.3-37 $
+ * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Thu Dec 1 04:37:45 2016 +0100 $
+ * @date    : Wed Dec 7 18:54:23 2016 +0100 $
  * @file    : DashboardEditor.php $
  * 
- * @id      : DashboardEditor.php | Thu Dec 1 04:37:45 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : DashboardEditor.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -132,7 +132,7 @@ wp_create_nonce_wrapper( 'cleanup_progress' ),
 wp_create_nonce_wrapper( 'abort_job' ), 
 wp_create_nonce_wrapper( 'upload_restore_file' ) );
 $this->java_scripts[] = 'parent.run_wp_restore1=function(){' . $on_restore_click1 . ';};';
-$tmp_dir = isset( $this->settings['wrkdir'] ) && ! empty( $this->settings['wrkdir'] ) ? $this->settings['wrkdir'] : _sys_get_temp_dir();
+$tmp_dir = isset( $this->settings['wrkdir'] ) && ! empty( $this->settings['wrkdir'] ) ? $this->settings['wrkdir'] : dirname(LOG_DIR);
 $tmp_dir = addTrailingSlash( $tmp_dir );
 $dropin_dir = $tmp_dir . addTrailingSlash( DROPIN_RESTORE );
 ob_start();
