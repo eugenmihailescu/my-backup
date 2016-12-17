@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogsEditor.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -48,8 +48,7 @@ $view_id = 'view_' . $log_type . '_log';
 $clear_id = 'clear_' . $log_type . '_log';
 $help_1 = "'" . sprintf(_esc('The log file %s does not seem to exist. Make sure the log option is enabled by checking the appropiate box within the `%s` on %s tab.'), '<span style=\color:red\>' . basename($logfile) . '</span>', _esc('Expert settings'), getTabAnchorE(APP_SUPPORT)) . "'";
 echo '<tr>';
-echo "<td><label for='$view_id'>" . ucwords($log_name) . " log</label></td>";
-echo '<td>:</td>';
+echo "<td><label for='$view_id'>" . ucwords($log_name) . " log</label> : </td>";
 echo '<td ' . ($log_exists ? '' : 'colspan="4"') . '>' . ($log_exists ? str_replace(LOG_DIR, '<span style="color:#00adee;cursor:help;border-width:1px;border-bottom-style:dotted;" onclick="jsMyBackup.helpROOT();">ROOT</span>' . DIRECTORY_SEPARATOR, $logfile) : sprintf('(%s) <a class="help" onclick=%s> [?]</a>', _esc('log file does not exist'), getHelpCall($help_1, true))) . '</td>';
 if ($log_exists) {
 echo "<td><input style='width: 100%;' type='button' name='$view_id' id='$view_id' value='View' class='button' onclick='jsMyBackup.post(jsMyBackup.this_url,{action:\"dwl_file\",service:\"disk\",location:\"" . (isWin() ? addslashes($logfile) : $logfile) . "\",nonce:\"" . wp_create_nonce_wrapper('dwl_file') . "\"});' title='Click to read this log file now'></td>";

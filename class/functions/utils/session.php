@@ -24,66 +24,69 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : session.php $
  * 
- * @id      : session.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : session.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-function is_session_started( $auto_start = true ) {
+function is_session_started($auto_start = true)
+{
 $result = false;
-if ( php_sapi_name() !== 'cli' ) {
-if ( version_compare( phpversion(), '5.4.0-dev', '>=' ) )
+if (php_sapi_name() !== 'cli') {
+if (version_compare(phpversion(), '5.4.0-dev', '>='))
 $result = session_status() === PHP_SESSION_ACTIVE ? TRUE : FALSE;
 else
 $result = session_id() === '' ? FALSE : TRUE;
 }
-! $result && $auto_start && ! headers_sent() && !isset($_SESSION) && session_start();
+! $result && $auto_start && ! headers_sent() && ! isset($_SESSION) && session_start();
 return $result;
 }
-function check_is_logged() {
-if ( IS_MULTISITE ) {
-return; 
-} elseif ( is_wp() )
-return; 
-if ( ! is_session_started( false ) )
-if ( ! ( isset( $_SESSION ) && isset( $_SESSION[SIMPLELOGIN_SESSION_LOGGED] ) &&
-$_SESSION[SIMPLELOGIN_SESSION_LOGGED] == true ) )
+function check_is_logged()
+{
+if (is_wp())
+return;
+if (! is_session_started(false))
+if (! (isset($_SESSION) && isset($_SESSION[SIMPLELOGIN_SESSION_LOGGED]) && $_SESSION[SIMPLELOGIN_SESSION_LOGGED] == true))
 auth_redirect_wrapper();
 }
-function get_session_varlist() {
-if ( isset( $_SESSION[SESSION_VARLIST_KEY] ) )
+function get_session_varlist()
+{
+if (isset($_SESSION[SESSION_VARLIST_KEY]))
 return $_SESSION[SESSION_VARLIST_KEY];
 else
 return array();
 }
-function add_session_var( $key, $value ) {
+function add_session_var($key, $value)
+{
 $_SESSION[$key] = $value;
 $session_vars = get_session_varlist();
-if ( ! in_array( $key, $session_vars ) ) {
+if (! in_array($key, $session_vars)) {
 $session_vars[] = $key;
 $_SESSION[SESSION_VARLIST_KEY] = $session_vars;
 session_commit();
 }
 }
-function del_session_var( $key, $commit = true ) {
-if ( isset( $_SESSION[$key] ) )
-unset( $_SESSION[$key] );
+function del_session_var($key, $commit = true)
+{
+if (isset($_SESSION[$key]))
+unset($_SESSION[$key]);
 $session_vars = get_session_varlist();
-if ( false !== ( $key = array_search( $key, $session_vars ) ) ) {
-unset( $session_vars[$key] );
+if (false !== ($key = array_search($key, $session_vars))) {
+unset($session_vars[$key]);
 $_SESSION[SESSION_VARLIST_KEY] = $session_vars;
 $commit && session_commit();
 }
 }
-function unset_session_vars() {
-foreach ( get_session_varlist() as $key )
-del_session_var( $key, false );
+function unset_session_vars()
+{
+foreach (get_session_varlist() as $key)
+del_session_var($key, false);
 session_commit();
 }
 ?>

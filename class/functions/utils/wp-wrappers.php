@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : wp-wrappers.php $
  * 
- * @id      : wp-wrappers.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : wp-wrappers.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -105,9 +105,9 @@ $timestamp => $cron_jobs[$hook]
 }
 return false;
 }
-function wp_create_nonce_wrapper($action)
+function wp_create_nonce_wrapper($action, $force_non_wp = false)
 {
-return function_exists('\\wp_create_nonce') ? wp_create_nonce($action) : create_nonce($action);
+return !$force_non_wp && function_exists('\\wp_create_nonce') ? wp_create_nonce($action) : create_nonce($action);
 }
 function wp_verify_nonce_wrapper($nonce, $action)
 {

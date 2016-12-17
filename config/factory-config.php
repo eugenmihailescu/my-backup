@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : factory-config.php $
  * 
- * @id      : factory-config.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : factory-config.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -1279,6 +1279,7 @@ return $new_options;
 }
 function checkDownload0A($settings)
 {
+if (! (isset($_REQUEST['action']) && 'test_dwl' == isset($_REQUEST['action']))) {
 if (defined(__NAMESPACE__.'\\APP_LICENSE') && function_exists(__NAMESPACE__ . '\\get_license')) {
 $license = get_license();
 if (! is_array($license))
@@ -1293,16 +1294,20 @@ $session_key = 'mynix_whitespace_check';
 if (! isset($_SESSION[$session_key]) || ($current_timestamp - $_SESSION[$session_key] > 60 * $check_interval)) {
 add_session_var($session_key, $current_timestamp);
 $service = 'test';
+$response = checkDownloadWhiteSpace($service);
+if ($response != $service) {
 $message = sprintf(_esc('Download in browser is troublesome. Expected %s, got %%s.'), '`' . $service . '`');
 $err_msg = sprintf($message, '`"+encodeURIComponent(xmlhttp.responseText)+"`') . ' ' . readMoreHereE(APP_PLUGIN_FAQ_URI . '#q7');
 $span = '<span class=\\"warning-span\\">' . $err_msg . '</span>';
 $java_scripts_load[] = 'parent.asyncGetContent(parent.ajaxurl, "action=test_dwl&service=' . $service . '&nonce=' . wp_create_nonce_wrapper('test_dwl') . '",parent.dummy,function(xmlhttp, el){if("' . $service . '" != xmlhttp.responseText){console.log("Challenging string  `' . $service . '` but got "+encodeURIComponent(xmlhttp.responseText));document.getElementById("notification_msg").innerHTML="' . $span . '";}});';
 $message = sprintf($message, '`' . _esc('something else') . '`') . ' ' . readMoreHere(APP_PLUGIN_FAQ_URI . '#q7');
-add_alert_message($message, null, MESSAGE_TYPE_WARNING, MESSAGE_ITEM_UNREAD, 3600);
+add_alert_message($message, null, MESSAGE_TYPE_WARNING, MESSAGE_ITEM_UNREAD, 60 * $check_interval);
+}
+}
 }
 }
 return array();
 }
 register_settings('initFactorySettings');
-register_settings('checkDownload0A');
+register_settings('checkDownload0A', 99);
 ?>

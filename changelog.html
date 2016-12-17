@@ -1,14 +1,18 @@
 <div class='postbox'><h3>Version Change Log</h3><div class='inside'>
+<span>1.0-2</span><ul><li><strong>[fix]</strong> fixed CPU throttle on safe_mode or `sleep` function restricted PHP environments</li></ul>
+<span>1.0-1</span><ul><li><strong>[improvement]</strong> highlight and order by the enabled backup targets tabs</li>
+<li><strong>[improvement]</strong> responsive layout (mobile devices friendly)</li>
+<li><strong>[fix]</strong> fixed the fake notice `Download in your browser is troublesome`   </li></ul>
 <span>0.2.3-37</span><ul><li><strong>[update]</strong> WordPress 4.7 compatible</li></ul>
 <span>0.2.3-35</span><ul><li><strong>[improvement]</strong> set email priority by backup/restore status</li>
 </ul>
 <span>0.2.3-34</span><ul><li><strong>[new]</strong> added Restore debug log option (see Support/Log tab)</li></ul>
 <span>0.2.3-33</span><ul><li><strong>[fix]</strong> completing backup in case of file access error</li>
-<li><strong>[fix]</strong> admin screen flickering due to .htaccess on Apache 2.4 </li>
+<li><strong>[fix]</strong> admin screen flickering due to .htaccess on Apache 2.4+</li>
 <li><strong>[fix]</strong> erroneous alert message about deleting .lock file</li>
 <li><strong>[fix]</strong> creating the WP schedule entry => scheduled backup issue</li>
 <li><strong>[improvement]</strong> moved tmp/logs to wp-content/uploads directory</li>
-<li><strong>[fix]</strong> character encoding on WebDav storage provider (default UTF8)</li></ul>
+<li><strong>[fix]</strong> character encoding on WebDav storage provider (default UTF8) </li></ul>
 <span>0.2.3-32</span><ul><li><strong>[update]</strong> WP 4.5 compatibility tests</li></ul>
 <span>0.2.3-31</span><ul><li><strong>[fix]</strong> removed some accidentally forgoten debug lines of code (Oops)</li>
 <li><strong>[tweak]</strong> show a notice when activating Pro over Free version or vice-versa</li>
@@ -41,11 +45,28 @@
 <li><strong>[change]</strong> renamed `Change log` tab name to `Version change log`</li>
 <li><strong>[update]</strong> added `tar` to the default `Exclude files by extension` list</li>
 <li><strong>[fix]</strong> fixed the backup console progress bar while compressing using the ZIP filter</li></ul>
+<span>0.2.3-9</span><ul><li><strong>[fix]</strong> export the MySQL DB as XML</li>
+<li><strong>[fix]</strong> plug-in not usable when PHP's `open_basedir` option was in effect</li>
+<li><strong>[update]</strong> changed some scrambled CURL error messages (eg: Curl error #7)</li>
+<li><strong>[new]</strong> added various alerts based on the app/system configuration </li>
+<li><strong>[tweak]</strong> several UI enhancements</li>
+</ul>
 <span>0.2.3-4</span><ul><li><strong>[fix]</strong> export MySQL DB as XML</li></ul>
-<span>0.2.3-3</span><ul><li><strong>[fix]</strong> export MySQL DB as XML</li></ul>
 <span>0.2.3-2</span><ul><li><strong>[improvement]</strong> various plug-in core libs enhancements</li></ul>
 <span>0.2.3-1</span><ul><li><strong>[improvement]</strong> added `CPU throttling` feature to overcome the `CPU Limit Exceeded` on free hosting</li>
 <li><strong>[improvement]</strong> update the `How it works` user guide</li></ul>
+<span>0.2.3</span><ul><li><strong>[improvement]</strong> added restore feature </li>
+<li><strong>[improvement]</strong> added dashboard screen (quick backup/restore/log view)</li>
+<li><strong>[improvement]</strong> automatic backup of plugins/themese/mysql on WordPress upgrade</li>
+<li><strong>[tweak]</strong> added "How it works" link to the user guide</li>
+<li><strong>[update]</strong> updated the user guide</li>
+<li><strong>[fix]</strong> CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an open_basedir is set in</li>
+<li><strong>[fix]</strong> fixed export settings option</li>
+<li><strong>[fix]</strong> the excluded directories in backup/WP source file list not shown unchecked</li>
+</ul>
+<span>0.2.2-5</span><ul>
+<li><strong>[fix]</strong> detection of valid archive for non BZip|GZip archives</li>
+<li><strong>[fix]</strong> restoring Dropbox|Google authorization + logs after version upgrade    </li></ul>
 <span>0.2.2-4</span><ul><li><strong>[fix]</strong> dashboard performance issue on WP Ajax Heartbeat (admin-ajax.php)</li>
 <li><strong>[fix]</strong> plug-in banners not shown on Chrome due to self-signed SSL certificate error (ERR_INSECURE_RESPONSE)</li>
 <li><strong>[fix]</strong> divergent count of the scheduled backup files vs actual backed up files</li>
@@ -67,14 +88,5 @@
 </ul>
 <span>0.2.2-3</span><ul><li><strong>[fix]</strong> backup plugin's tmp files on plugin update instead of framework upgrade</li>
 <li><strong>[improvement]</strong> enclosed constant definitions within namespace(prevents collision)</li>
-</ul>
-<span>0.2.3</span><ul><li><strong>[improvement]</strong> added restore feature </li>
-<li><strong>[improvement]</strong> added dashboard screen (quick backup/restore/log view)</li>
-<li><strong>[improvement]</strong> automatic backup of plugins/themese/mysql on WordPress upgrade</li>
-<li><strong>[tweak]</strong> added "How it works" link to the user guide</li>
-<li><strong>[update]</strong> updated the user guide</li>
-<li><strong>[fix]</strong> CURLOPT_FOLLOWLOCATION cannot be activated when in safe_mode or an open_basedir is set in</li>
-<li><strong>[fix]</strong> fixed export settings option</li>
-<li><strong>[fix]</strong> the excluded directories in backup/WP source file list not shown unchecked</li>
 </ul>
 </div></div>

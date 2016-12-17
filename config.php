@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : config.php $
  * 
- * @id      : config.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : config.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -59,6 +59,7 @@ defined(__NAMESPACE__.'\\CSS_PATH') || define(__NAMESPACE__.'\\CSS_PATH',ROOT_PA
 defined(__NAMESPACE__.'\\CUSTOM_PATH') || define(__NAMESPACE__.'\\CUSTOM_PATH',ROOT_PATH.'custom'.DIRECTORY_SEPARATOR);
 defined(__NAMESPACE__.'\\SAMPLE_PATH') || define(__NAMESPACE__.'\\SAMPLE_PATH',CUSTOM_PATH.'sample'.DIRECTORY_SEPARATOR);
 defined(__NAMESPACE__.'\\IMG_PATH') || define(__NAMESPACE__.'\\IMG_PATH',ROOT_PATH.'img'.DIRECTORY_SEPARATOR);
+defined(__NAMESPACE__.'\\MENU_PATH') || define(__NAMESPACE__.'\\MENU_PATH',IMG_PATH.'menu'.DIRECTORY_SEPARATOR);
 defined(__NAMESPACE__.'\\JS_PATH') || define(__NAMESPACE__.'\\JS_PATH',ROOT_PATH.'js'.DIRECTORY_SEPARATOR);
 defined(__NAMESPACE__.'\\LOCALE_PATH') || define(__NAMESPACE__.'\\LOCALE_PATH',ROOT_PATH.'locale'.DIRECTORY_SEPARATOR);
 defined(__NAMESPACE__.'\\SSL_PATH') || define(__NAMESPACE__.'\\SSL_PATH',ROOT_PATH.'ssl'.DIRECTORY_SEPARATOR);

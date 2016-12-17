@@ -24,91 +24,91 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : regactions.php $
  * 
- * @id      : regactions.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : regactions.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
-require_once dirname( __DIR__ ) . '/config.php';
+require_once dirname(__DIR__) . '/config.php';
 include_once FUNCTIONS_PATH . 'settings.php';
 include_once LOCALE_PATH . 'locale.php';
-ini_set( "error_log", ERROR_LOG );
-define( __NAMESPACE__.'\\WP_AJAX_ACTION_PREFIX', 'wp_ajax_' );
-define( __NAMESPACE__.'\\WP_MYBACKUP_ACTION_PREFIX', 'wpmybackup_' );
-define( __NAMESPACE__.'\\AJAX_DISPATCH_FUNCTION', WP_MYBACKUP_ACTION_PREFIX . 'ajax' );
-setLanguage( getSelectedLangCode() );
+include_once CLASS_PATH . 'AjaxRequests.php';
+ini_set("error_log", ERROR_LOG);
+define(__NAMESPACE__.'\\WP_AJAX_ACTION_PREFIX', 'wp_ajax_');
+define(__NAMESPACE__.'\\WP_MYBACKUP_ACTION_PREFIX', 'wpmybackup_');
+define(__NAMESPACE__.'\\AJAX_DISPATCH_FUNCTION', WP_MYBACKUP_ACTION_PREFIX . 'ajax');
+setLanguage(getSelectedLangCode());
 is_session_started(); 
-check_is_logged(); 
 $settings = loadSettings();
-if ( ! defined( __NAMESPACE__.'\\DO_NOT_AFTER_SETTINGS' ) || ! DO_NOT_AFTER_SETTINGS )
-afterSettingsLoad( $settings, true ); 
+if (! defined(__NAMESPACE__.'\\DO_NOT_AFTER_SETTINGS') || ! DO_NOT_AFTER_SETTINGS)
+afterSettingsLoad($settings, true); 
 require_once CONFIG_PATH . 'default-target-tabs.php';
 include_once CONFIG_PATH . 'ajax-actions.php';
-if ( isset( $_POST['tlid'] ) && defined( __NAMESPACE__.'\\TARGETLIST_DB_PATH' ) ) {
+if (isset($_POST['tlid']) && defined(__NAMESPACE__.'\\TARGETLIST_DB_PATH')) {
 $class = __NAMESPACE__ . 'TargetListEditor';
-$target_list = new TargetCollection( TARGETLIST_DB_PATH );
-if ( false !== ( $target_item = $target_list->getTargetItem( $_POST['tlid'] ) ) )
+$target_list = new TargetCollection(TARGETLIST_DB_PATH);
+if (false !== ($target_item = $target_list->getTargetItem($_POST['tlid'])))
 $settings = $target_item->targetSettings; 
-elseif (( isset( $_SESSION['id'] ) && $_SESSION['id'] == $_POST['tlid'] ) || isset( $_SESSION['edit_step'] ) &&
-isset( $_SESSION['edit_step']['sender'] ) && $class == $_SESSION['edit_step']['sender'] &&
-isset( $_SESSION['edit_step']['step_data'] ) ) {
-$array = json_decode( str_replace( '\"', '"', $_SESSION['edit_step']['step_data'] ), true );
-is_array( $array ) && $settings = array_merge( $settings, $array );
+elseif ((isset($_SESSION['id']) && $_SESSION['id'] == $_POST['tlid']) || isset($_SESSION['edit_step']) && isset($_SESSION['edit_step']['sender']) && $class == $_SESSION['edit_step']['sender'] && isset($_SESSION['edit_step']['step_data'])) {
+$array = json_decode(str_replace('\"', '"', $_SESSION['edit_step']['step_data']), true);
+is_array($array) && $settings = array_merge($settings, $array);
 }
 }
-$ajax_request = new AjaxRequests( $settings );
+$ajax_request = new AjaxRequests($settings);
 $actions = array();
 $is_wp = is_wp();
-if ( ! $is_wp ) {
-function add_action( $action, $callback ) {
+if (! $is_wp) {
+function add_action($action, $callback)
+{
 global $actions;
-$action = str_replace( WP_AJAX_ACTION_PREFIX . '', '', $action );
-if ( ! key_exists( $action, $actions ) )
+$action = str_replace(WP_AJAX_ACTION_PREFIX . '', '', $action);
+if (! key_exists($action, $actions))
 $actions[$action] = $callback;
 }
 }
-foreach ( get_valid_ajax_actions() as $ajax_action ) {
-add_action( WP_AJAX_ACTION_PREFIX . $ajax_action, array( $ajax_request, AJAX_DISPATCH_FUNCTION ) );
+foreach (get_valid_ajax_actions() as $ajax_action) {
+add_action(WP_AJAX_ACTION_PREFIX . $ajax_action, array(
+$ajax_request,
+AJAX_DISPATCH_FUNCTION
+));
 }
-add_action( 'admin_init', array( $ajax_request, WP_MYBACKUP_ACTION_PREFIX . 'do_action' ) );
-add_action( 'init', array( $ajax_request, WP_MYBACKUP_ACTION_PREFIX . 'do_action' ) );
-if ( ! $is_wp && isset( $_POST ) && isset( $_POST['action'] ) ) {
-$err_pattern = sprintf( 
-_esc( "Action '%%s' %%s.<br>This should never happen. Please <a href='%s'>report this issue</a>" ), 
-getReportIssueURL() ) . ".<br><a onclick='history.back();' style='cursor:pointer'>&lt;&lt; " . _esc( 'Back' ) .
-"</a>";
+add_action('admin_init', array(
+$ajax_request,
+WP_MYBACKUP_ACTION_PREFIX . 'do_action'
+));
+add_action('init', array(
+$ajax_request,
+WP_MYBACKUP_ACTION_PREFIX . 'do_action'
+));
+if (! $is_wp && isset($_POST) && isset($_POST['action'])) {
+$err_pattern = sprintf(_esc("Action '%%s' %%s.<br>This should never happen. Please <a href='%s'>report this issue</a>"), getReportIssueURL()) . ".<br><a onclick='history.back();' style='cursor:pointer'>&lt;&lt; " . _esc('Back') . "</a>";
 $action_found = false;
-foreach ( $actions as $action => $callback ) {
-if ( $action == $_POST['action'] )
-if ( method_exists( $callback[0], AJAX_DISPATCH_FUNCTION ) ) {
+foreach ($actions as $action => $callback) {
+if ($action == $_POST['action'])
+if (method_exists($callback[0], AJAX_DISPATCH_FUNCTION)) {
 try {
 $action_found = true;
-_call_user_func( $callback );
-} catch ( MyException $e ) {
-die( $e->getMessage() );
+_call_user_func($callback);
+} catch (MyException $e) {
+die($e->getMessage());
 }
 } else {
-die( 
-sprintf( 
-$err_pattern, 
-$action, 
-_esc( 'is badly constructed (where is ' ) . get_class( $callback[0] ) . '::' .
-AJAX_DISPATCH_FUNCTION . ' ?)' ) );
+die(sprintf($err_pattern, $action, _esc('is badly constructed (where is ') . get_class($callback[0]) . '::' . AJAX_DISPATCH_FUNCTION . ' ?)'));
 }
 }
-if ( isset( $actions['init'] ) )
+if (isset($actions['init']))
 try {
-$action_found = $action_found || _call_user_func( $actions['init'] );
-} catch ( MyException $e ) {
-die( $e->getMessage() );
+$action_found = $action_found || _call_user_func($actions['init']);
+} catch (MyException $e) {
+die($e->getMessage());
 }
-if ( ! $action_found )
-die( sprintf( $err_pattern, $_POST['action'], _esc( 'is not declared' ) ) );
+if (! $action_found)
+die(sprintf($err_pattern, $_POST['action'], _esc('is not declared')));
 }
 ?>

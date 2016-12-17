@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : dashboard.php $
  * 
- * @id      : dashboard.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : dashboard.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,7 +38,7 @@ namespace MyBackup;
 <tr>
 <td colspan="3" id="job_info_title" title="<?php _pesc('Refresh');?>"
 class="dashboard-stats-row" onclick="jsMyBackup.get_last_jobinfo();"></td>
-<td style="width: 100%" rowspan="10">
+<td id="dashboard_restore" style="width: 100%" rowspan="10">
 <div style="text-align: center; margin-bottom: 10px;">
 <?php
 echo _esc( 'Upload and restore an external/custom backup archive' );
@@ -74,7 +74,7 @@ class="button-primary" onclick="<?php echo $on_restore_click1;?>">
 </td>
 </tr>
 <?php echo $this->_last_job['html'];?>
-<tr>
+<tr id="dashboard-job-ctrl">
 <td><input type="button"
 class="button-primary<?php count($this->_enabled_targets)|| print(' button-red');?>"
 value="<?php echo _esc('Run Backup');?>"

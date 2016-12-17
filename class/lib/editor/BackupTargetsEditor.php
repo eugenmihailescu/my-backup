@@ -24,46 +24,59 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : BackupTargetsEditor.php $
  * 
- * @id      : BackupTargetsEditor.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : BackupTargetsEditor.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
-class BackupTargetsEditor extends AbstractTargetEditor {
-protected function initTarget() {
-parent::initTarget ();
+class BackupTargetsEditor extends AbstractTargetEditor
+{
+protected function initTarget()
+{
+parent::initTarget();
 $this->hasCustomFrame = true;
 }
-protected function getEditorTemplate() {
+protected function getEditorTemplate()
+{
 global $registered_targets, $TARGET_NAMES, $REGISTERED_BACKUP_TABS;
-$sel_tab = getSelectedTab ();
-$tab_link = getTabLink ( $sel_tab );
-$tab_link = stripUrlParams ( $tab_link, array (
-'gr' 
-) );
-$tabs = array ();
-foreach ( $REGISTERED_BACKUP_TABS as $target_type => $target_name )
-$tabs [$target_name] = $registered_targets [$target_type] ['title'];
-$tab_keys = array_keys ( $tabs );
-$group = getSelectedTabGrp ( $tab_keys [0] );
+$sel_tab = getSelectedTab();
+$tab_link = getTabLink($sel_tab);
+$tab_link = stripUrlParams($tab_link, array(
+'gr'
+));
+$active_targets = array();
+$inactive_targets = array();
+foreach ($REGISTERED_BACKUP_TABS as $target_type => $target_name) {
+$settings_key = ('email' == $target_name ? 'backup2mail' : ($target_name . '_enabled'));
+if (isset($this->settings[$settings_key]) && strToBool($this->settings[$settings_key]))
+$active_targets[$target_name] = $registered_targets[$target_type]['title'];
+else
+$inactive_targets[$target_name] = $registered_targets[$target_type]['title'];
+}
+$tabs=array_merge($active_targets,$inactive_targets);
+$tab_keys = array_keys($tabs);
+$group = getSelectedTabGrp($tab_keys[0]);
 echo '<div id="tab-container1" class="tab-container horizontal hrounded-top"><ul id="navlist1" style="width: 100%; padding-left: 20px; float: none" onclick="jsMyBackup.block_ui();">';
-foreach ( $tabs as $tab => $name ) {
+foreach ($tabs as $tab => $name) {
 $class = ($tab == $group) ? ' active' : '';
+$settings_key = ('email' == $tab ? 'backup2mail' : ($tab . '_enabled'));
+if ($tab != $group && isset($this->settings[$settings_key]) && strToBool($this->settings[$settings_key]))
+$class .= ' tab-target-enabled';
 $href = $tab_link . '&gr=' . $tab;
 echo "<li class='$class' style='margin: 0 2px;border-left:1px solid;border-right:1px solid;'><a href='" . $href . "' style='padding-top:5px;padding-bottom:5px;'>$name</a>";
 }
 echo '</ul></div>';
 echo '<div id="content-container1" class="content-container horizontal ' . $this->container_shape . '" style="min-height: 500px;">';
-if (! in_array ( $group, $REGISTERED_BACKUP_TABS )) {
-if (false !== ($include_tab_file = chkIncludeTab ( $tabs, $group, basename ( CUSTOM_PATH ) . DIRECTORY_SEPARATOR . 'targets' )))
-require_once $this->getTemplatePath ( $include_tab_file, CUSTOM_PATH );
+if (! in_array($group, $REGISTERED_BACKUP_TABS)) {
+if (false !== ($include_tab_file = chkIncludeTab($tabs, $group, basename(CUSTOM_PATH) . DIRECTORY_SEPARATOR . 'targets')))
+require_once $this->getTemplatePath($include_tab_file, CUSTOM_PATH);
 } else
-echoTargetEditor ( $group );
+echoTargetEditor($group);
 echo '</div>' . PHP_EOL;
 }
 }

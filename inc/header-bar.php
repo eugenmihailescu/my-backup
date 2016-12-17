@@ -24,20 +24,22 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : header-bar.php $
  * 
- * @id      : header-bar.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : header-bar.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
 <table style="width: 100%" id="header_bar">
 <tr>
-<td style="white-space: nowrap; vertical-align: top; width: 0"><span
+<td id="app-title">
+<div id="app-bar-menu" onclick="jsMyBackup.toggle_bar_menu(this);"></div>
+<span 
 style='font-size: 1.5em; margin: .75em 0; font-weight: bold;'><?php echo $title; ?><a
 class='help'
 onclick=<?php
@@ -70,3 +72,17 @@ echo WPMYBACKUP_LOGOFF;
 ?></td>
 </tr>
 </table>
+<?php 
+$bar_menus_on='bar-menus-on';
+ob_start();
+?>
+parent.toggle_bar_menu=function(sender){
+var el=document.getElementsByClassName('app-bar-menus')[0];
+if(el.className.indexOf('<?php echo $bar_menus_on;?>')>=0)
+el.setAttribute('class',el.className.replace('<?php echo $bar_menus_on;?>',''));
+else
+el.setAttribute('class',el.className+' <?php echo $bar_menus_on;?>');
+}
+<?php 
+$java_scripts[]=ob_get_clean();
+?>

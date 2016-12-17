@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : sys.php $
  * 
- * @id      : sys.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : sys.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -43,7 +43,7 @@ _sleep( $micro_seconds / 1e6 );
 }
 function _sleep( $seconds ) {
 if ( function_exists( '\\sleep' ) && ! ( ini_get( 'safe_mode' ) || function_is_restricted( 'sleep' ) ) )
-sleep( $micro_seconds );
+sleep( $seconds );
 }
 function isWin() {
 return preg_match( '/^win/i', PHP_OS );

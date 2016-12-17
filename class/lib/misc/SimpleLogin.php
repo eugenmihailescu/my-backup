@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : SimpleLogin.php $
  * 
- * @id      : SimpleLogin.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : SimpleLogin.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -330,7 +330,7 @@ if ($users_not_defined) {
 <td colspan="3">&nbsp;</td>
 </tr>
 <tr>
-<td colspan="3" class="highlight-box hintbox rounded-container"><?php printf(_esc('No user:password defined. Using the default %s username'),'<strong>'.SIMPLELOGIN_DEMO_USERNAME.'</strong>');?><a
+<td colspan="3" class="highlight-box hintbox rounded-container"><?php printf(_esc('No %s defined. Using the default %s username'),'<strong>user:password</strong>','<strong>'.SIMPLELOGIN_DEMO_USERNAME.'</strong>');?><a
 class='help' onclick=<?php echo echoHelp($help_simplepwd);?>> [?]</a></td>
 </tr>		
 <?php

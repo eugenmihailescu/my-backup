@@ -24,16 +24,17 @@
  * 
  * Git revision information:
  * 
- * @version : 0.2.3-37 $
- * @commit  : 56326dc3eb5ad16989c976ec36817cab63bc12e7 $
+ * @version : 1.0-2 $
+ * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Wed Dec 7 18:54:23 2016 +0100 $
+ * @date    : Tue Dec 13 06:40:49 2016 +0100 $
  * @file    : WelcomeEditor.php $
  * 
- * @id      : WelcomeEditor.php | Wed Dec 7 18:54:23 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WelcomeEditor.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
+require_once CLASS_PATH . 'CheckSetup.php';
 include_once EDITOR_PATH . 'file-functions.php';
 class WelcomeEditor extends AbstractTargetEditor {
 private $_init_error = false;
@@ -119,7 +120,7 @@ $this->_addons = array();
 $this->_init_error = false;
 empty( $this->_addons ) && $this->_init_error = $this->_initFileList( LOG_DIR . 'filelist.json' );
 $this->_getJavaScripts();
-$this->_video_ids = array( '' );
+$this->_video_ids = array( 'CmOLBfBRnrE' );
 $this->_nocheck = isset( $_GET['nocheck'] );
 }
 protected function getEditorTemplate() {
