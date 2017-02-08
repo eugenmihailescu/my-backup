@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : AjaxRequests.php $
  * 
- * @id      : AjaxRequests.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AjaxRequests.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -101,7 +101,7 @@ case 'dwl_sql_script':
 $this->_action_handler->dwl_sql_script();
 break;
 case 'clear_log':
-$this->_action_handler->clear_log($_POST['log_type']);
+$this->_action_handler->clear_log($_POST['log_type'], isset($_POST['log']) ? $_POST['log'] : null);
 break;
 case 'dwl_file':
 $this->_action_handler->dwl_file();
@@ -117,6 +117,12 @@ $this->_action_handler->edit_step();
 break;
 case 'del_target':
 $this->_action_handler->del_target();
+break;
+case 'set_branched_log':
+$this->_action_handler->set_branched_log();
+break;
+case 'del_branched_log':
+$this->_action_handler->del_branched_log();
 break;
 default:
 $action_found = false;

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : options.php $
  * 
- * @id      : options.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : options.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -255,7 +255,7 @@ $_logfile = new LogFile ( JOBS_LOGFILE, $new_settings );
 $is_activated = 'os_cron' != $cron_type && strToBool ( get_param ( 'schedule_enabled', $old_settings, $new_settings, false ) );
 if ($is_activated || false !== wp_next_scheduled ( $cron_hook ))
 $result = change_schedule ( $_logfile, $cron_schedule, $is_activated, $cron_hook, isset ( $new_settings ['schedule_wp_cron_time'] ) && ! empty ( $new_settings ['schedule_wp_cron_time'] ) ? strtotime ( $new_settings ['schedule_wp_cron_time'] ) : null, true );
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 $result = sprintf ( "parent.popupError('%s','%s');", _esc ( 'Error' ), $e->getMessage () );
 }
 false !== $result && $js_script [] = $result;

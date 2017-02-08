@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : DropboxCloudStorage.php $
  * 
- * @id      : DropboxCloudStorage.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : DropboxCloudStorage.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -95,7 +95,7 @@ try {
 $response = $this->getOAuthSession ()->curlPOST ( $this->_getURI ( $api ) . '/' . $path, $this->_getHeader ( $api ), array (
 'include_deleted' => $include_trash 
 ) );
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 $response = $this->_encodeError ( $e );
 }
 return json_decode ( $response, true );
@@ -125,7 +125,7 @@ $relative_path = '/' . $targetPath . '/' . basename ( $filename );
 $url = $this->_getURI ( $api ) . str_replace ( '//', '/', $relative_path );
 try {
 $response = $this->getOAuthSession ()->curlPOST ( $url, $this->_getHeader ( $api ), null, null, $filename, 'POST', $this->onBytesSent, $this->onAbort );
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 $response = $this->_encodeError ( $e );
 }
 return json_decode ( $response, true );
@@ -134,7 +134,7 @@ function downloadFile($filename, $outStream = null, $api_key = null) {
 $api = $this->_SERVICE_API ['download'];
 try {
 return $this->getOAuthSession ()->curlPOST ( $this->_getURI ( $api ) . '/' . $filename, $this->_getHeader ( $api ), null, $outStream, null, 'GET', $this->onBytesReceived, $this->onAbort );
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 return $this->_encodeError ( $e );
 }
 }
@@ -168,7 +168,7 @@ $api = $this->_SERVICE_API ['media'];
 try {
 $response = $this->getOAuthSession ()->curlPOST ( $this->_getURI ( $api ) . '/' . $path, $this->_getHeader ( $api ) );
 $this->_setCachedMedia ( $path, $response );
-} catch ( MyException $e ) {
+} catch ( \Exception $e ) {
 $response = $this->_encodeError ( $e );
 }
 }

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : AbstractJob.php $
  * 
- * @id      : AbstractJob.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : AbstractJob.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -84,11 +84,13 @@ protected $_job_state;
 protected $_job_status;
 protected $process_data;
 protected $nocompress;
+protected $processed_arcs;
 function __construct($opts = null, $sender = null)
 {
 $this->_job_state = 2;
 $this->_job_status = 0;
 $this->_job_starttime = time();
+$this->processed_arcs = array();
 $this->quiet = false;
 $this->options = $opts;
 $this->sender = $sender;
@@ -557,6 +559,9 @@ isset($this->options['encryption_iv']) && $keys['iv'] = $this->options['encrypti
 $this->setJobId($this->_statistics_manager->onNewJobStarts($job_type, $this->_mode, $keys, $this->_job_starttime));
 $job_id = $this->_jobs_id;
 }
+if (is_wp()) {
+do_action(WP_MYBACKUP_ACTION_PREFIX . 'before_job_starts', $job_id, $this->sender, $job_type);
+}
 file_put_contents(JOBS_LOGFILE, sprintf(_esc("[%s] Running backup %s (job_id: %d)") . PHP_EOL, date(DATETIME_FORMAT), $this->sender, $job_id), FILE_APPEND);
 $this->printJobSection();
 $this->printJobSettings($job_type, $this->_mode);
@@ -662,6 +667,9 @@ $this->_statistics_manager->onJobEnds($this->_jobs_id, $params);
 $ps = $this->getProcessSignal();
 if (! empty($ps))
 $this->_initProcessSignal($ps[0]);
+if (is_wp()) {
+do_action(WP_MYBACKUP_ACTION_PREFIX . 'after_job_ends', $this->_jobs_id, $params, $this->processed_arcs);
+}
 }
 protected function addtFileCount($count = 1)
 {
@@ -897,7 +905,7 @@ $enc = new $class($cipher, $mode);
 ! empty($this->options['encryption_key']) && $enc->setKey(hextostr($this->options['encryption_key']));
 ! empty($this->options['encryption_iv']) && $enc->setIv(hextostr($this->options['encryption_iv']));
 return $enc;
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $this->outputError('<red>[!] ' . $e->getMessage() . '</red>', false, null, BULLET, 1);
 }
 }

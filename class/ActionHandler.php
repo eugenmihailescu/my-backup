@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : ActionHandler.php $
  * 
- * @id      : ActionHandler.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : ActionHandler.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -171,7 +171,7 @@ function run_backup()
 try {
 $wpbh = new WPBackupHandler($this->params, ADMIN_ASYNC_IFNAME);
 $wpbh->run();
-} catch (MyException $e) {
+} catch (\Exception $e) {
 echo $e->getMessage();
 }
 }
@@ -206,6 +206,14 @@ echo implode('<br>', $result[$cmd]);
 else
 echo $result[$cmd];
 echo '</blockquote>';
+}
+}
+function set_branched_log()
+{}
+function del_branched_log()
+{
+if (defined(__NAMESPACE__.'\\BRANCHED_LOGS') && BRANCHED_LOGS) {
+_rmdir(LOG_DIR . $_POST['log'], true);
 }
 }
 private function _log_read_validate()
@@ -641,11 +649,16 @@ $this->rst_file();
 break;
 }
 }
-function clear_log($log_type = null)
+function clear_log($log_type = null, $log = null)
 {
+$_get_branched_log_file = function ($logfile) use (&$log) {
+if (null === $log)
+return $logfile;
+return $log . DIRECTORY_SEPARATOR . basename($logfile) . '.gz';
+};
 global $java_scripts;
 empty($log_type) && isset($_POST['log_type']) && $log_type = $_POST['log_type'];
-if (($log = getLogfileByType($log_type)) && _file_exists($log)) {
+if (($log = $_get_branched_log_file(getLogfileByType($log_type))) && _file_exists($log)) {
 $java_scripts[] = sprintf('jsMyBackup.popupWindow("%s","%s");', _esc('Notice'), sprintf(_esc('Log file <i>%s</i> %s'), normalize_path($log), @unlink($log) ? _esc('deleted successfully') : _esc('delete error')));
 }
 }
@@ -702,7 +715,7 @@ $stat_mngr->onJobEnds($this->method['id'], array(
 'job_status' => empty($this->method['job_status']) ? 'JOB_STATUS_SUSPENDED' : $this->method['job_status']
 ));
 echo 1;
-} catch (MyException $e) {
+} catch (\Exception $e) {
 echo $e->getMessage();
 }
 }

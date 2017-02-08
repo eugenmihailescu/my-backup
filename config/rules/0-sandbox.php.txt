@@ -1,0 +1,302 @@
+<?php
+! defined ( 'SANDBOX' ) && define ( 'SANDBOX', true );
+SANDBOX && define ( 'SANDBOX_CALLBACK', 'sandbox_init_js' );
+
+! defined ( 'CRYPT_PATH' ) && define ( 'CRYPT_PATH', LIB_PATH . 'crypt' . DIRECTORY_SEPARATOR );
+
+define ( 'SANDBOX_ROOT', SITE_ID );
+define ( 'SANDBOX_PATH', ROOT_PATH . 'test-data' . DIRECTORY_SEPARATOR );
+
+// If you want to setup a fixed set of options that no one can change via admin
+// panel then here is the place.
+// These settings override whatever the user might set on admin panel.
+
+// If you use sensitive info (like user/passwords) make sure you set the appropiate
+// permission to this file so as that no one but you (and the webserver daemon) can
+// read it.
+
+// NOTE: usually I use this file while testing various scenarioos but I thought
+// it may be a good feature too, especially when you want to have a rigid set of
+// settings.
+
+// See factory-config.php for the exhaustive list of all known options.
+$is_win = preg_match ( '/^win/i', PHP_OS );
+// ////////////////////////// TEST DEFAULT SETTINGS //////////////////////
+
+$fixed_options = array ();
+
+// general settings
+$fixed_options ['backup'] ['cpusleep'] = 0;
+$fixed_options ['backup'] ['toolchain'] = 'intern';
+$fixed_options ['backup'] ['bzipver'] = 'bzip2';
+$fixed_options ['backup'] ['encryption'] = 'AES-256-CBC';
+$fixed_options ['backup'] ['verbose'] = VERBOSE_FULL;
+$fixed_options ['backup'] ['compression_type'] = 2;
+$fixed_options ['backup'] ['wrkdir'] = sys_get_temp_dir ();
+$fixed_options ['backup'] ['max_exec_time'] = 600;
+$fixed_options ['backup'] ['mode'] = BACKUP_MODE_FULL;
+
+// source files
+$fixed_options ['fssource'] ['dir'] = SANDBOX_PATH . SANDBOX_ROOT;
+$fixed_options ['fssource'] ['excludeext'] = '7z,ace,arj,cab,iso,jar,lxz,lz,lzma,lzo,pak,rar,tgz,xz,zip,enc';
+$fixed_options ['fssource'] ['nocompress'] = 'jpg,jpeg,png,gif,avi,mov,qt,mkv,wmv,asf,m2v,m4v,rm';
+
+// mysql test server: http://www.ensembl.org/info/data/mysql.html
+$fixed_options ['mysql'] ['mysql_enabled'] = true;
+$fixed_options ['mysql'] ['mysql_host'] = 'your-sandbox-mysql-host';
+$fixed_options ['mysql'] ['mysql_port'] = 3306;
+$fixed_options ['mysql'] ['mysql_user'] = 'your-sandbox-mysql-user';
+$fixed_options ['mysql'] ['mysql_pwd'] = 'your-sandbox-mysql-pwd';
+$fixed_options ['mysql'] ['mysql_db'] = 'your-sandbox-mysql-db';
+$fixed_options ['mysql'] ['mysql_charset'] = DB_CHARSET;
+$fixed_options ['mysql'] ['mysql_collate'] = DB_COLLATE;
+$fixed_options ['mysql'] ['tables'] = 'sandbox_data';//the pattern of sanbox tables the user is allowed to alter (regexp allows)
+$fixed_options ['mysql'] ['mysql_maint'] = true;
+$fixed_options ['mysql'] ['mysql_maint_analyze'] = true;
+$fixed_options ['mysql'] ['mysql_maint_check'] = true;
+$fixed_options ['mysql'] ['mysql_maint_optimize'] = true;
+$fixed_options ['mysql'] ['mysql_maint_repair'] = true;
+$fixed_options ['mysql'] ['mysql_maint_notify'] = true;
+// $fixed_options ['mysql'] ['mysqldump'] = false;
+
+// disk target
+$fixed_options ['disk'] ['disk_enabled'] = true;
+$fixed_options ['disk'] ['disk_age'] = 0;
+$fixed_options ['disk'] ['disk'] = $fixed_options ['fssource'] ['dir'];
+
+// ftp target
+// http://www.wftpserver.com/onlinedemo.htm
+$fixed_options ['ftp'] ['ftp_enabled'] = true;
+$fixed_options ['ftp'] ['ftphost'] = 'your-sandbox-ftp-server';
+$fixed_options ['ftp'] ['ftpport'] = 21;
+$fixed_options ['ftp'] ['ftpuser'] = 'your-sandbox-ftp-user';
+$fixed_options ['ftp'] ['ftppwd'] = 'your-sandbox-ftp-pwd';
+$fixed_options ['ftp'] ['ftppasv'] = true;
+$fixed_options ['ftp'] ['ftp_age'] = 0;
+$fixed_options ['ftp'] ['ftp'] = '/';
+$fixed_options ['ftp'] ['ftp_path_id'] = $fixed_options ['ftp'] ['ftp'];
+$fixed_options ['ftp'] ['ftpproto'] = CURLPROTO_FTP | CURLPROTO_FTPS;
+$fixed_options ['ftp'] ['ftp_lib'] = 'curl';
+
+// ssh target
+$fixed_options ['ssh'] ['ssh_enabled'] = true;
+$fixed_options ['ssh'] ['sshhost'] = 'sandbox-ssh-test-server';
+$fixed_options ['ssh'] ['sshport'] = 22222;//whatever SSH port you have
+$fixed_options ['ssh'] ['sshuser'] = 'sandbox-ssh-user';
+$fixed_options ['ssh'] ['sshpwd'] = 'sandbox-ssh-pwd';
+$fixed_options ['ssh'] ['sshproto'] = 32;//see curl.php
+$fixed_options ['ssh'] ['ssh_age'] = 0;
+$fixed_options ['ssh'] ['ssh'] = $fixed_options ['fssource'] ['dir'];
+$fixed_options ['ssh'] ['ssh_path_id'] = $fixed_options ['ssh'] ['ssh'];
+$fixed_options ['ssh'] ['ssh_publickey_file'] = '/your/ssh/public/key/file';
+$fixed_options ['ssh'] ['ssh_privkey_file'] = '/your/ssh/private/key/file';
+$fixed_options ['ssh'] ['ssh_privkey_pwd'] = 'your-ssh-private-key-pwd';
+
+// dropbox target
+$fixed_options ['dropbox'] ['dropbox_enabled'] = true;
+$fixed_options ['dropbox'] ['dropbox_age'] = 0;
+
+// google target
+$fixed_options ['google'] ['google_enabled'] = true;
+$fixed_options ['google'] ['google_age'] = 0;
+
+// webdav target
+$fixed_options ['webdav'] ['webdav_enabled'] = true;
+$fixed_options ['webdav'] ['webdavhost'] = 'https://www.crushftp.com/demo/';
+$fixed_options ['webdav'] ['webdavuser'] = 'demo';
+$fixed_options ['webdav'] ['webdavpwd'] = 'demo';
+$fixed_options ['webdav'] ['webdav_age'] = 0;
+$fixed_options ['webdav'] ['webdav'] = '/';
+
+// email target
+$fixed_options ['backup2mail'] ['backup2mail'] = true;
+$fixed_options ['backup2mail'] ['backup2mail_maxsize'] = getUploadLimit ();
+$fixed_options ['backup2mail'] ['backup2mail_backend'] = 'sendmail';
+// $fixed_options ['backup2mail'] ['backup2mail_address'] = 'tester-email-address-here';
+
+// statistics
+$fixed_options ['stats'] ['stats_agree_google'] = true;
+
+// logs
+$fixed_options ['logs'] ['logdir'] = sys_get_temp_dir ();
+$fixed_options ['logs'] ['logsize'] = 1;
+$fixed_options ['logs'] ['logbranched'] = false;
+
+// job history
+$fixed_options ['history'] ['history_enabled'] = true;
+$fixed_options ['history'] ['historydb'] = 'sqlite';
+$fixed_options ['history'] ['historybackup'] = true;
+
+// support settings
+$fixed_options ['support'] ['debug_on'] = true;
+$fixed_options ['support'] ['curl_debug_on'] = true;
+$fixed_options ['support'] ['stats_debug_on'] = true;
+$fixed_options ['support'] ['debug_statusbar_on'] = true;
+$fixed_options ['support'] ['yayui_on'] = false;
+$fixed_options ['support'] ['wp_debug_on'] = true;
+$fixed_options ['support'] ['smtp_debug_on'] = true;
+$fixed_options ['support'] ['restore_debug_on'] = true;
+
+// restore settings
+$fixed_options ['restore'] ['restore_components_mysql'] = false;
+$fixed_options ['restore'] ['restore_path'] = 'custom';
+$fixed_options ['restore'] ['restore_target'] = DISK_TARGET;
+$fixed_options ['restore'] ['disk'] = SANDBOX_PATH . SANDBOX_ROOT . DIRECTORY_SEPARATOR . 'restore';
+$fixed_options ['restore'] ['restore_reconcile'] = 'overwrite';
+! _file_exists ( $fixed_options ['restore'] ['disk'] ) && mkdir ( $fixed_options ['restore'] ['disk'], 0770, true );
+
+// create sandbox test directory and test files
+! _file_exists ( $fixed_options ['fssource'] ['dir'] ) && mkdir ( $fixed_options ['fssource'] ['dir'], 0770, true );
+$auth_files = glob ( LOG_DIR .DIRECTORY_SEPARATOR. '*.auth' );
+if (empty ( $auth_files )) {
+	$auth_files = glob ( LOGS_PATH . '*.auth' );
+	foreach ( $auth_files as $file )
+		copy ( $file, LOG_DIR .DIRECTORY_SEPARATOR . basename ( $file ) );
+}
+
+$random_files = getFileListByPattern ( $fixed_options ['fssource'] ['dir'], '/tmp_.*/', false, false, false );
+(1 >= count ( $random_files )) && createRandomFile ( $fixed_options ['fssource'] ['dir'], 10 * MB );
+
+global $java_scripts;
+
+$click_hijack_elements_ids = array (
+		// 'unlinkacc',
+		'btn_remote_exec',
+		'folder_list' 
+);
+
+$mask_element_ids = array (
+		'dir',
+		'disk',
+		// mask mysql
+		'mysql_user',
+		'mysql_pwd',
+		// mask ftp
+		'ftpuser',
+		'ftppwd',
+		'ftp',
+		// mask ssh
+		'ssh',
+		'sshuser',
+		'sshpwd',
+		'sshport',
+		'ssh_publickey_file',
+		'ssh_privkey_file',
+		// mask webdav
+		'webdavpwd' 
+);
+$block_element_ids = array ();
+$block_element_names = array (
+		'backupsettingseditor',
+		'logs_expert_box' 
+);
+$java_scripts [] = 'var elsi=["' . implode ( '","', $block_element_ids ) . '"],elsm=["' . implode ( '","', $mask_element_ids ) . '"],elsn=["' . implode ( '","', $block_element_names ) . '"],elsh=["' . implode ( '","', $click_hijack_elements_ids ) . '"],i,j,el;';
+$java_scripts [] = 'for(i=0;i<elsi.length;i+=1){el=document.getElementById(elsi[i]);if(el)BlockUI.block(el);}';
+$java_scripts [] = 'for(i=0;i<elsm.length;i+=1){el=document.getElementById(elsm[i]);if(el)BlockUI.mask(el);}';
+$java_scripts [] = 'for(i=0;i<elsn.length;i+=1){el=document.getElementsByName(elsn[i]);if(el)for(j=0;j<el.length;j+=1){BlockUI.block(el[j]);}}';
+$java_scripts ['z0'] = 'parent.navFilesList=function(){parent.popupError("Access Denied","For security reasons this option is not enabled on Sandbox mode.");};';
+// $java_scripts ['z1'] = 'parent.send_oauthrequest=function(){parent.navFilesList();};';
+$java_scripts ['z2'] = 'for(i=0;i<elsh.length;i+=1){el=document.getElementById(elsh[i]);if(el)el.setAttribute("onclick","myApp.navFilesList();");}';
+$java_scripts ['z10'] = 'parent.navFolder=function(){parent.navFilesList();};';
+$java_scripts ['z12'] = 'parent.refreshFolderList=function(){parent.navFilesList();};';
+
+/**
+ * Finds the concurrent living sandboxes with activity in the last $lifespan seconds
+ *
+ * @param number $lifespan
+ *        	The number of seconds of inactivity a thread is regarded as dead (default 300)
+ * @return number Returns the number of alive threads within the given $lifespan interval
+ */
+function getActiveSandboxes($lifespan = 300) {
+	
+	// get only those files within a sandbox folder
+	$pattern = '/(.+)\/(.+\.(log|json))/';
+	
+	$session_files = getFileListByPattern ( LOG_DIR, $pattern, true, false, false );
+	
+	$last_changes = array ();
+	foreach ( $session_files as $filename ) {
+		! isset ( $last_changes [dirname ( $filename )] ) && $last_changes [dirname ( $filename )] = 0;
+		$last_changes [dirname ( $filename )] = max ( filemtime ( $filename ), $last_changes [dirname ( $filename )] );
+	}
+	
+	$last_changes = array_filter ( $last_changes, function ($a) use(&$lifespan) {
+		return time () - $a < $lifespan;
+	} );
+	
+	return count ( $last_changes );
+}
+
+/**
+ * Tells if the maximum allowed concurrent sandboxes reached
+ *
+ * @param number $limit
+ *        	The number of maximum allowed concurrent sandboxes
+ * @return boolean Return true if the active opened sandboxes exceed the maximum allowed $limit, false otherwise
+ */
+function sandboxLimitExceeds($limit = 10) {
+	return getActiveSandboxes () > $limit;
+}
+
+/**
+ * Get the JS initialization script for auto-login
+ *
+ * @return array Returns an array of Javascript code
+ */
+function sandbox_init_js() {
+	$sandbox_user = 'sandbox';
+	$sandbox_pwd = 'ji!z4ExBkF!C*s';
+	$result = array ();
+	$result [] = '(function(funcName, baseObj) {
+    funcName = funcName || "docReady";
+    baseObj = baseObj || window;
+    var readyList = [];
+    var readyFired = false;
+    var readyEventHandlersInstalled = false;
+
+    function ready() {
+        if (!readyFired) {
+            readyFired = true;
+            for (var i = 0; i < readyList.length; i++) {
+                readyList[i].fn.call(window, readyList[i].ctx);
+            }
+            readyList = [];
+        }
+    }
+
+    function readyStateChange() {
+        if ( document.readyState === "complete" ) {
+            ready();
+        }
+    }
+
+    baseObj[funcName] = function(callback, context) {
+        if (readyFired) {
+            setTimeout(function() {callback(context);}, 1);
+            return;
+        } else {
+            readyList.push({fn: callback, ctx: context});
+        }
+        if (document.readyState === "complete") {
+            setTimeout(ready, 1);
+        } else if (!readyEventHandlersInstalled) {
+            if (document.addEventListener) {
+                document.addEventListener("DOMContentLoaded", ready, false);
+                window.addEventListener("load", ready, false);
+            } else {
+                document.attachEvent("onreadystatechange", readyStateChange);
+                window.attachEvent("onload", ready);
+            }
+            readyEventHandlersInstalled = true;
+        }
+    }
+})("docReady", window);';
+	$result [] = 'docReady(function() {document.getElementById("username").value="' . $sandbox_user . '";var edtpwd=document.getElementById("password");edtpwd.value="' . $sandbox_pwd . '";edtpwd.onchange();document.getElementById("btn_login").onclick();});';
+	return $result;
+}
+
+$php_ini = ROOT_PATH . '.user.ini';
+$ini = file_get_contents ( $php_ini );
+(false === strpos ( $ini, 'post_max_size' )) && file_put_contents ( $php_ini, $ini . PHP_EOL . 'post_max_size=20M' . PHP_EOL . 'upload_max_filesize=20M' );
+
+?>

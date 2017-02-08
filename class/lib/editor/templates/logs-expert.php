@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,25 +24,29 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : logs-expert.php $
  * 
- * @id      : logs-expert.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : logs-expert.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 ?>
 <tr>
 <td><label for="logdir"><?php _pesc('Log directory');?></label></td>
+<?php if (defined(__NAMESPACE__.'\\BRANCHED_LOGS') && BRANCHED_LOGS){?>
+<td colspan="3"><?php echo LOG_DIR;?></td>
+<?php }else{?>
 <td colspan="3"><input type="text" name="logdir" id="logdir" size="42"
 value=<?php
 echo "'" . $log_dir . "'";
 ?>><a class='help' onclick=<?php
 echoHelp( $help_1 );
 ?>> [?]</a></td>
+<?php }?>		
 </tr>
 <tr>
 <td><label for="logrotate"><?php _pesc('Rotate logs');?></label></td>

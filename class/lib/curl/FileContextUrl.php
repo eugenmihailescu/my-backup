@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : FileContextUrl.php $
  * 
- * @id      : FileContextUrl.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : FileContextUrl.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -212,7 +212,7 @@ if (false !== $handle) {
 $meta = stream_get_meta_data($handle);
 $response_meta = $this->_parse_response_meta($meta);
 }
-} catch (MyException $e) {}
+} catch (\Exception $e) {}
 if (defined(__NAMESPACE__.'\\CURL_DEBUG') && CURL_DEBUG)
 if (defined(__NAMESPACE__.'\\CURL_DEBUG_LOG')) {
 $error = error_get_last();
@@ -279,6 +279,7 @@ $wrapper => $options
 $response = '';
 $dltotal = 0;
 $dlnow = 0;
+$exception = null;
 try {
 $handle = $this->exec($url, $options, $callback_info);
 if (is_resource($handle)) {
@@ -291,11 +292,14 @@ $response .= $buffer;
 $dlnow = strlen($buffer);
 }
 if (! in_array($response_meta['status']['code'], $this->_ok_status_codes)) {
-throw new \Exception($response_meta['status']['message'], $response_meta['status']['code']);
+$exception = new MyException($response_meta['status']['message'], $response_meta['status']['code']);
 }
 } else
 return false;
 } catch (\Exception $e) {}
+if ($exception) {
+throw $exception;
+}
 return isset($outfile) ? file_put_contents($outfile, $response) : $response;
 }
 public function curlGetDebugOutput()

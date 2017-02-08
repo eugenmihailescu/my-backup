@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,18 +24,19 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : WPBackupHandler.php $
  * 
- * @id      : WPBackupHandler.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : WPBackupHandler.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
 
 require_once CLASS_PATH . 'AbstractJob.php';
+require_once CLASS_PATH . 'TarArchive.php';
 include_once EDITOR_PATH . 'file-functions.php';
 if (defined(__NAMESPACE__.'\\GOOGLE_TARGET')) {
 }
@@ -76,7 +77,7 @@ $free_space = $api->getFreeSpace();
 $upload_limit = $api->getUploadLimit();
 if ($filesize > $free_space && $quota > 0) {
 $this->outputError(sprintf(_esc("<red>[!] file %s cannot be uploaded to %s due to insufficient disk space (free: %s, needs: %s)</red>"), $filename, $target_name, getHumanReadableSize($free_space), getHumanReadableSize($filesize)), false, $err_params);
-}             
+}  
 else 
 if ($filesize > $upload_limit) {
 $this->logOutputTimestamp(sprintf(_esc("<yellow>file %s (%s) exceeds %s limit of %s</yellow>"), basename($filename), getHumanReadableSize($filesize), $target_name, getHumanReadableSize($upload_limit)), BULLET);
@@ -86,7 +87,7 @@ $this->outputError(sprintf(_esc("file %s was splitted into %d parts"), basename(
 $parts = array(
 $filename
 );
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $err_params = $this->getOperErrParams($filename, $oper_send);
 $this->outputError(formatErrMsg($e, $target_name), false, $err_params);
 }
@@ -122,7 +123,7 @@ if (count($parts) > 1)
 unlink($part);
 }
 }
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $err_params = $this->getOperErrParams($filename, $oper_send);
 $this->outputError(formatErrMsg($e), false, $err_params);
 $metadata = false;
@@ -161,7 +162,7 @@ return $success;
 } else {
 $this->outputError(sprintf(_esc("<red>[!] file %s cannot be moved to disk due to insufficient disk space (free: %s, required: %s)</red>"), $arc, getHumanReadableSize($free), getHumanReadableSize($fsize)), false, $err_params);
 }
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $this->outputError(formatErrMsg($e), false, $err_params);
 return false;
 }
@@ -282,7 +283,7 @@ foreach (array(
 $backend_params[$key] = $this->getTarget($target)->getOption($value);
 $result = sendMail($from, $to, $subject, $body, $attachments, null, 3, $native_backend ? null : $backend, $backend_params, $smtp_debug);
 }
-} catch (MyException $err) {
+} catch (\Exception $err) {
 $err_msg = $err->getMessage();
 }
 if ($result) {
@@ -346,8 +347,7 @@ break;
 private function _cleanUpOldArchives($target)
 {
 $obj = &$this;
-$get_search_filter = function ($filter) use(&$target, &$obj)
-{
+$get_search_filter = function ($filter) use (&$target, &$obj) {
 switch ($target) {
 default:
 $result = $filter;
@@ -358,8 +358,7 @@ break;
 }
 return $result;
 };
-$get_metadata = function ($metadata) use(&$target, &$obj)
-{
+$get_metadata = function ($metadata) use (&$target, &$obj) {
 switch ($target) {
 case $obj->getTargetConstant('GOOGLE_TARGET'):
 $result = $metadata['items'];
@@ -370,8 +369,7 @@ break;
 }
 return $result;
 };
-$get_fileid = function ($file_item, $file_index, $file_path) use(&$target, &$obj)
-{
+$get_fileid = function ($file_item, $file_index, $file_path) use (&$target, &$obj) {
 switch ($target) {
 case $obj->getTargetConstant('DROPBOX_TARGET'):
 $result = $file_item['path'];
@@ -392,8 +390,7 @@ break;
 }
 return $result;
 };
-$get_isdir = function ($file_item) use(&$target, &$obj)
-{
+$get_isdir = function ($file_item) use (&$target, &$obj) {
 switch ($target) {
 case $obj->getTargetConstant('DROPBOX_TARGET'):
 case $obj->getTargetConstant('WEBDAV_TARGET'):
@@ -412,8 +409,7 @@ break;
 }
 return $result;
 };
-$get_filename = function ($file_item, $file_id) use(&$target, &$obj)
-{
+$get_filename = function ($file_item, $file_id) use (&$target, &$obj) {
 switch ($target) {
 case $obj->getTargetConstant('DROPBOX_TARGET'):
 $result = $file_item['path'];
@@ -434,8 +430,7 @@ break;
 }
 return $result;
 };
-$getfilesize = function ($file_item) use(&$target, &$obj)
-{
+$getfilesize = function ($file_item) use (&$target, &$obj) {
 switch ($target) {
 case $obj->getTargetConstant('DROPBOX_TARGET'):
 case $obj->getTargetConstant('WEBDAV_TARGET'):
@@ -554,7 +549,7 @@ break;
 }
 $this->onProgress($target, $filename, $i ++, $j, PT_DELETE);
 }
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $this->outputError(formatErrMsg($e), false, $err_params);
 }
 return $deleted_files;
@@ -642,8 +637,7 @@ throw new MyException($e['message'], $e['type']);
 private function _loadFileList($temp_file, $src_dir, $excl_dirs)
 {
 $_this_ = &$this;
-$before_section_callback = function ($temp_file, $file_count, $callbacks) use(&$_this_)
-{
+$before_section_callback = function ($temp_file, $file_count, $callbacks) use (&$_this_) {
 $_this_->getProgressManager()->cleanUp();
 $_this_->calcBackupReqDiskSpace($temp_file);
 $_this_->updateBackupFilesFilter($temp_file, $file_count, $callbacks);
@@ -989,6 +983,7 @@ return $arcs;
 }
 public function onNewArc($arc = null, $uncompressed_size = 0, $compressed_size = 0, $vol_no = 0)
 {
+global $BACKUP_TARGETS;
 $result = false;
 $this->compressed_files[$vol_no] = array(
 'name' => $arc,
@@ -1043,6 +1038,15 @@ $errmsg = error_get_last();
 if (null != $errmsg)
 $this->outputError(sprintf('<red>%s</red>', $errmsg['message']), false, $err_params);
 }
+if (! isset($this->processed_arcs[$arc])) {
+$this->processed_arcs[$arc] = array(
+'uncompressed' => $uncompressed_size,
+'compressed' => $compressed_size,
+'volume' => $vol_no,
+'targets' => array()
+);
+}
+$this->processed_arcs[$arc]['targets'][$BACKUP_TARGETS[$target]] = $this->getTarget($target)->getPath();
 }
 $this->uploaded += $saved;
 }
@@ -1056,7 +1060,7 @@ unlink($arc);
 }
 } else
 $this->outputError(sprintf(_esc("%s skipped due to null file size"), basename($arc)), false, $err_params);
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $this->outputError(formatErrMsg($e), false, $err_params);
 }
 } else
@@ -1136,7 +1140,7 @@ $status = $ok_status;
 $this->setError(null);
 } else
 $file_ok = false;
-} catch (MyException $e) {
+} catch (\Exception $e) {
 $status = _esc('with errors:<br>') . $e->getMessage();
 $this->setError($e);
 $arclist = false;

@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : LogsEditor.php $
  * 
- * @id      : LogsEditor.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : LogsEditor.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -38,11 +38,19 @@ class LogsEditor extends AbstractTargetEditor
 {
 private $_is_running;
 private $_index;
+private $_branched_log;
+private $_branched_logs;
+private function _get_branched_log_file($logfile)
+{
+if (false === $this->_branched_log)
+return $logfile;
+return $this->_branched_log . DIRECTORY_SEPARATOR . basename($logfile) . '.gz';
+}
 private function _getLogfileRow($log_type, $log_name)
 {
 ob_start();
 $spy_shown = $this->_is_running[0] ? 'block' : 'none';
-$logfile = getLogfileByType($log_type);
+$logfile = $this->_get_branched_log_file(getLogfileByType($log_type));
 $log_exists = _is_file($logfile);
 $view_id = 'view_' . $log_type . '_log';
 $clear_id = 'clear_' . $log_type . '_log';
@@ -77,6 +85,8 @@ private function _getJavaScripts()
 {
 global $PROGRESS_PROVIDER;
 $this->java_scripts[] = "parent.plugin_dir='" . addslashes(dirname(realpath($_SERVER['SCRIPT_NAME']))) . "';";
+$set_branched_log_action = 'set_branched_log';
+$del_branched_log_action = 'del_branched_log';
 $action = 'chk_status';
 ob_start();
 ?>
@@ -99,10 +109,20 @@ btn[i].style.display=job_status.status?'inherit':'none';
 parent.asyncGetContent(parent.ajaxurl, 'action=<?php echo $action;?>&tab=logs&nonce='+parent.chk_status_nonce, parent.dummy, on_status_ready);
 parent.chk_status_nonce=false;
 };
+parent.set_branched_log=function(sender){
+parent.post(parent.this_url,{action:"<?php echo $set_branched_log_action;?>",log:sender.value,nonce:"<?php echo wp_create_nonce_wrapper($set_branched_log_action);?>"});
+};
+parent.del_branched_log=function(){
+parent.post(parent.this_url,{action:"<?php echo $del_branched_log_action;?>",log:document.getElementById("branch_log_selector").value,nonce:"<?php echo wp_create_nonce_wrapper($del_branched_log_action);?>"});
+};
 setInterval(parent.check_job_status,<?php echo LOG_CHECK_TIMEOUT ;?>);
 parent.helpROOT=function(){<?php echo getHelpCall( "'This is the site log folder, that is:<br><i>" . normalize_path( LOG_DIR ) . "</i>'", false );?>};
 parent.clearLog=function(log_type, log_name){<?php
-$clear_log_click = sprintf('jsMyBackup.post(jsMyBackup.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'});', wp_create_nonce_wrapper('clear_log'));
+$branched_log='';
+if ($this->_branched_log) {
+$branched_log = sprintf(',log:\\\'%s\\\'', $this->_branched_log);
+}
+$clear_log_click = sprintf('jsMyBackup.post(jsMyBackup.this_url,{action:\\\'clear_log\\\',log_type:\\\'\'+log_type+\'\\\',nonce:\\\'%s\\\'%s});', wp_create_nonce_wrapper('clear_log'), $branched_log);
 printf("parent.popupConfirm('%s', '%s', null, {'%s':'%s','%s':null});", _esc('Log clear confirmation'), sprintf(_esc('Are you sure you want to clear the %s log file?'), "<b>'+log_name+'</b>"), _esc('Yes, I`m damn sure'), $clear_log_click, _esc('No'));
 ?>
 };
@@ -116,12 +136,37 @@ parent::initTarget();
 $this->_index = 0;
 $this->_is_running = isJobRunning();
 $this->root = ROOT_PATH;
+$this->_branched_log = false;
+$this->_branched_logs = array();
+if (defined(__NAMESPACE__.'\\BRANCHED_LOGS') && BRANCHED_LOGS) {
+$this->_branched_logs = glob(LOG_DIR . 'job_*.*', GLOB_ONLYDIR);
+empty($this->_branched_logs) || $this->_branched_log = $this->_branched_logs[0];
+if (isset($_POST) && isset($_POST['action']) && 'set_branched_log' == $_POST['action']) {
+$this->_branched_log = LOG_DIR . $_POST['log'];
+}
+}
 $this->inBetweenContent = $this->_getDebugTemplate();
 $this->_getJavaScripts();
 }
 protected function getEditorTemplate()
 {
 $help_1 = "'" . sprintf(_esc('The status is checked automatically (anyhow)<br>at each %s ms and displayed as such.'), LOG_CHECK_TIMEOUT) . "'";
+if (defined(__NAMESPACE__.'\\BRANCHED_LOGS') && BRANCHED_LOGS) {
+$options = '';
+foreach ($this->_branched_logs as $branch_log_dir) {
+$name = basename($branch_log_dir);
+$selected = $name == basename($this->_branched_log) ? ' selected="selected"' : '';
+$options .= sprintf('<option value="%s"%s>%s</option>', $name, $selected, $name);
+}
+?>
+<tr>
+<td><label for="branch_log_selector"><?php _pesc('Select log');?></label> :</td>
+<td><select id="branch_log_selector" name="branch_log_selector" onchange="jsMyBackup.set_branched_log(this);"><?php echo $options;?></select></td>
+<td colspan="4"><input type="button" class="button" value="<?php _pesc("Remove");?>" onclick="jsMyBackup.del_branched_log();"> <a
+class='help' onclick=<?php echo echoHelp($help_1);?>>[?]</a></td>
+</tr>
+<?php
+}
 echo $this->_getLogfileRow('jobs', _esc('jobs'));
 echo $this->_getLogfileRow('full', _esc('full'));
 require_once $this->getTemplatePath('logs.php');

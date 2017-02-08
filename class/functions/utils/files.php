@@ -3,7 +3,7 @@
  * ################################################################################
  * MyBackup
  * 
- * Copyright 2016 Eugen Mihailescu <eugenmihailescux@gmail.com>
+ * Copyright 2017 Eugen Mihailescu <eugenmihailescux@gmail.com>
  * 
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,13 @@
  * 
  * Git revision information:
  * 
- * @version : 1.0-2 $
- * @commit  : f8add2d67e5ecacdcf020e1de6236dda3573a7a6 $
+ * @version : 1.0-3 $
+ * @commit  : 1b3291b4703ba7104acb73f0a2dc19e3a99f1ac1 $
  * @author  : eugenmihailescu <eugenmihailescux@gmail.com> $
- * @date    : Tue Dec 13 06:40:49 2016 +0100 $
+ * @date    : Tue Feb 7 08:55:11 2017 +0100 $
  * @file    : files.php $
  * 
- * @id      : files.php | Tue Dec 13 06:40:49 2016 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
+ * @id      : files.php | Tue Feb 7 08:55:11 2017 +0100 | eugenmihailescu <eugenmihailescux@gmail.com> $
 */
 
 namespace MyBackup;
@@ -56,8 +56,9 @@ return $files;
 function getFileListByPattern($dir, $pattern, $recursively = false, $add_empty_dir = true, $tree = true, $output_style = false, $skip_files = null, $skip_links = true)
 {
 $dir .= DIRECTORY_SEPARATOR != substr($dir, - 1) ? DIRECTORY_SEPARATOR : '';
-if (! _file_exists($dir))
-throw new \Exception(sprintf(_esc("File or directory %s does not exists"), $dir));
+if (! _file_exists($dir)){
+throw new MyException(sprintf(_esc("File or directory %s does not exists"), $dir));
+}
 $dh = @opendir($dir);
 ($tree && $dirname = basename($dir)) || $dirname = $dir;
 ($tree && $files = array(
@@ -348,7 +349,7 @@ $match = $match || false !== strpos($currentFile, $excl_dir);
 } elseif (! (@is_link($currentFile) && '.' == @readlink($currentFile))) {
 $dir_size += @filesize($currentFile);
 }
-} catch (MyException $e) {}
+} catch (\Exception $e) {}
 }
 return $dir_size;
 }
@@ -379,7 +380,7 @@ $size = $specs->Size;
 $fs = null;
 return $size;
 }
-} catch (MyException $e) {}
+} catch (\Exception $e) {}
 }
 return false;
 }
